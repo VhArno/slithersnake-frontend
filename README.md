@@ -1,6 +1,7 @@
 # slithersnake-frontend
 
 This template should help get you started developing with Vue 3 in Vite.
+Figma design: https://www.figma.com/file/f5xu2Hb2gveYvLQaKKUl9k/Website-design?type=design&node-id=1%3A3&mode=design&t=A45BIp9tnRu5VB92-1
 
 ## Recommended IDE Setup
 
