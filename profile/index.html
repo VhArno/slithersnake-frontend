@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/885c51143e.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="/src/assets/styles/style.scss" >
-    <link rel="stylesheet" type="text/css" href="/src/assets/styles/main.scss" >
+    <link rel="stylesheet" type="text/css" href="/src/assets/styles/profile.scss" >
     <title>Slithersnake</title>
   </head>
   <body>
@@ -28,13 +28,48 @@
       </nav>
     </header>
     <main>
-      <section class="main-window">
-        <ul class="main-menu">
-          <li><a href="#">Play</a></li>
-          <li><a href="#">Create room</a></li>
-          <li><a href="#">Skins</a></li>
-          <li><a href="#">Settings</a></li>
-        </ul>
+      <section class="profile">
+        <div class="user-profile">
+            <div class="user-info">
+              <div class="user-name">
+                <h2>User154523</h2>
+                <p>Lvl. 11</p>
+              </div>
+  
+              <img src="/img/profile-picture.jpg" alt="user_profile">
+            </div>
+            
+            <button>Change name</button>
+        </div>
+  
+        <div class="user-stats">
+            <ul>          
+              <li>
+                <h3>Highscore</h3>
+                <p>15235</p>
+              </li>
+              <li>
+                <h3>Games played</h3>
+                <p>125</p>
+              </li>
+              <li>
+                <h3>Games won</h3>
+                <p>100</p>
+              </li>
+              <li>
+                <h3>Win percentage</h3>
+                <p>80%</p>
+              </li>
+              <li>
+                <h3>Kills</h3>
+                <p>50</p>
+              </li>
+              <li>
+                <h3>Skins unlocked</h3>
+                <p>10</p>
+              </li>
+            </ul>
+        </div>
       </section>
 
       <dialog class="modal settings-modal hidden">
@@ -76,50 +111,6 @@
             <li>
               <p>Move down</p>
               <button>Arrow-down</button>
-            </li>
-          </ul>
-        </div>
-      </dialog>
-
-      <dialog class="modal profile-modal hidden">
-        <div class="user-profile">
-          <div class="user-info">
-            <div class="user-name">
-              <h2>User154523</h2>
-              <p>Lvl. 11</p>
-            </div>
-
-            <img src="" alt="user_profile">
-          </div>
-          
-          <button>Change name</button>
-        </div>
-
-        <div class="user-stats">
-          <ul>          
-            <li>
-              <h3>Highscore</h3>
-              <p>15235</p>
-            </li>
-            <li>
-              <h3>Games played</h3>
-              <p>125</p>
-            </li>
-            <li>
-              <h3>Games won</h3>
-              <p>100</p>
-            </li>
-            <li>
-              <h3>Win percentage</h3>
-              <p>80%</p>
-            </li>
-            <li>
-              <h3>Kills</h3>
-              <p>50</p>
-            </li>
-            <li>
-              <h3>Skins unlocked</h3>
-              <p>10</p>
             </li>
           </ul>
         </div>

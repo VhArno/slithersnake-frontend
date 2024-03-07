@@ -125,38 +125,6 @@ main {
     }
 }
 
-.profile-modal {
-    .user-profile {
-        display: flex;
-        flex-flow: row;
-        justify-content: space-between;
-
-        .user-info {
-            display: flex;
-            flex-flow: row-reverse;
-            gap: 0.5rem;
-        }
-
-        button {
-            background-color: var(--accent);
-            color: var(--default-text-dark);
-            border: none;
-            border-radius: 10px;
-            padding: 0rem 2rem;
-        }
-    }
-
-    .user-stats {
-        > ul {
-            display: flex;
-            flex-flow: column;
-            gap: 0.5rem;
-            list-style-type: none;
-            padding: 0;
-        }
-    }
-}
-
 .overlay {
     position: fixed;
     top: 0;

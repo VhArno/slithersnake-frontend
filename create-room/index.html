@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/885c51143e.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="/src/assets/styles/style.scss" >
+    <link rel="stylesheet" type="text/css" href="/src/assets/styles/create.scss" >
+    <script defer src="/src/assets/ts/modeSelect.ts"></script>
+    <title>Slithersnake</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <header>
+      <nav>
+        <button aria-expanded="false" class="toggle hamburger hidden" id="menu">
+          <span aria-hidden="true" class="icon">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
+        <a id="logo" href="/" aria-label="logo" tabindex="0">
+          <h1>Slithersnake</h1>
+        </a>
+        <ul class="menu-list">
+          <li><a href="#"><i class="fa-solid fa-user"></i></a></li>
+          <li><a href="#"><i class="fa-solid fa-gear"></i></a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+        <section class="create">
+            <div class="settings">
+                <div class="bg-gray players">
+                    <div>
+                        <h2>Players</h2> 
+                        <ul class="player-list">
+                            <li>You (lvl. <span>11</span>)</li>
+                            <li>Player 1 (lvl. <span>9</span>)</li>
+                        </ul>
+                    </div>
+
+                    <button>Invite</button>
+                </div>
+
+                <div class="bg-gray options">
+                    <h2>Game options</h2>
+                    <div class="game-options">
+                        <div>
+                            <h3>Map</h3>
+                            <div class="map-select">
+                                <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                                <div class="maps">
+                                    <div class="map">Normal</div>
+                                    <div class="map">Power-ups</div>
+                                    <div class="map">Walls</div>
+                                </div>
+                                <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3>Gamemode</h3>
+                            <div class="gamemode-select">
+                                <button id="prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                                <div class="gamemodes">
+                                    <div class="gamemode">Normal</div>
+                                    <div class="gamemode">Power-ups</div>
+                                    <div class="gamemode">Walls</div>
+                                </div>
+                                <button id="next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div> 
+                    <button>Play</button>
+                </div>
+            </div>
+
+
+            <p>Sound <span><i class="fa-solid fa-volume-high"></i></span></p>
+
+            <button>Start game</button>
+            <button>Leave game</button>
+        </section>
+
+        <dialog class="modal settings-modal hidden">
+            <div class="title-div">
+            <h2>Settings</h2>
+            <button>Close <i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="sound-div horz-div">
+            <h3>Sound</h3>
+            <div>
+                <span class="sound-value">30%</span>
+                <input class="sound-range" type="range">
+            </div>
+            </div>
+
+            <div class="mode-div horz-div">
+            <h3>Dark mode</h3>
+            <button class="mode-toggle">
+                <span></span>
+            </button>
+            </div>
+
+            <div class="controls-div">
+            <h3>Controls</h3>
+            <ul class="controls">
+                <li>
+                <p>Move left</p>
+                <button>Arrow-left</button>
+                </li>
+                <li>
+                <p>Move right</p>
+                <button>Arrow-right</button>
+                </li>
+                <li>
+                <p>Move up</p>
+                <button>Arrow-up</button>
+                </li>
+                <li>
+                <p>Move down</p>
+                <button>Arrow-down</button>
+                </li>
+            </ul>
+            </div>
+        </dialog>
+    </main>
+    <footer>
+
+    </footer>
+  </body>
+</html>

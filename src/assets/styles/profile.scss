@@ -1,0 +1,70 @@
+.profile {
+    color: var(--default-text-dark);
+    background-color: var(--bg2-dark);
+    margin: 2rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+
+    .user-profile {
+        display: flex;
+        flex-flow: column;
+        align-items: first baseline;
+        justify-content: space-between;
+        gap: 1rem;
+
+        .user-info {
+            display: flex;
+            gap: 0.5rem;
+
+            .user-name {
+                order: 1;
+            }
+
+            > img {
+                width: 5rem;
+            }
+        }
+
+        button {
+            background-color: var(--accent);
+            color: var(--default-text-dark);
+            border: none;
+            border-radius: 10px;
+            padding: 0.4rem 2rem;
+        }
+    }
+
+    .user-stats {
+        margin: 2rem 0rem 0rem 0rem;
+        > ul {
+            display: flex;
+            flex-flow: column;
+            gap: 0.5rem;
+            list-style-type: none;
+            padding: 0;
+        }
+    }
+}
+
+/* BREAKPOINTS */
+@media (width >= 65em) {
+    .profile {
+        width: 60%;
+
+        .user-profile {
+            flex-flow: row;
+            align-items: flex-start;
+
+            .user-info {
+                flex: 3;
+            }
+
+            button {
+                flex: 1;
+            }
+        }
+    }
+}

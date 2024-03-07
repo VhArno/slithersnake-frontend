@@ -4,6 +4,7 @@
     --default-text-dark: #F8F8F8;
     --default-text-light: #141414;
     --accent: #1F56A8;
+    --accent-light: #5286d4;
     --main-bg-dark: #1A1A1B;
     --bg2-dark: #242424;
     --light-gray: #D9D9D9;
@@ -30,7 +31,18 @@ h1, h2, h3, p {
 }
 
 button {
+    font-size: 1.3em;
     cursor: pointer;
+    color: var(--default-text-dark);
+    background-color: var(--accent);
+    border: none;
+    padding: 0.6rem 2rem;
+    border-radius: 10px;
+    width: 100%;
+
+    &:hover {
+        background-color: var(--accent-light);
+    }
 }
 
 #logo {
