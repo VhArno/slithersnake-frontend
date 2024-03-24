@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import SgHeader from "./components/molecules/SgHeader.vue"
-import SgGrid from "./components/organisms/SgGrid.vue"
 </script>
 
 <template>
   <header>
     <SgHeader></SgHeader>
   </header>
-  <main>
-    <SgGrid></SgGrid>
-  </main>
-  <footer>
 
+  <main>
+    <h1>SlitherGrid</h1>
+    <RouterView />
+  </main>
+
+  <footer>
   </footer>
 </template>
 

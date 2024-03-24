@@ -8,12 +8,12 @@
         <span></span><span></span><span></span>
         </span>
     </button>
-    <a id="logo" href="/" aria-label="logo" tabindex="0">
+    <RouterLink to="/" id="logo" href="/" aria-label="logo" tabindex="0">
         <h1>Slithersnake</h1>
-    </a>
+    </RouterLink>
     <ul class="menu-list">
-        <li><a href="#"><i class="fa-solid fa-user"></i></a></li>
-        <li><a href="#"><i class="fa-solid fa-gear"></i></a></li>
+        <li><RouterLink to="/profile">profile <i class="fa-solid fa-user"></i></RouterLink></li>
+        <li><RouterLink to="/settings">Settings <i class="fa-solid fa-gear"></i></RouterLink></li>
     </ul>
     </nav>
 </template>

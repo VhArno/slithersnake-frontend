@@ -1,0 +1,73 @@
+<script setup lang="ts">
+import SgGrid from "../organisms/SgGrid.vue"
+</script>
+
+<template>
+    <section class="main-sec">
+        <SgGrid></SgGrid>
+
+        <div class="scoreboard">
+            <div class="players">
+                <h3>Scoreboard</h3>
+                
+                <div class="player-1">
+                    <p>You (lvl. 11)</p>
+                    <span>0</span>
+                </div>
+                <div class="player-2">
+                    <p>Player 1(lvl. 9)</p>
+                    <span>0</span>
+                </div>
+            </div>
+
+            <div class="score-settings">
+                <div class="sound-div">
+                    <p>Sound <span><i class="fa-solid fa-volume-high"></i></span></p>
+                </div>
+                <button class="leave-btn">Leave</button>
+            </div>
+        </div>
+    </section>
+</template>
+
+<style lang="scss">
+.main-sec {
+    display: flex;
+    flex-flow: row;
+
+    .grid {
+        flex: 4;
+        height: 100%;
+    }
+
+    .scoreboard {
+        flex: 1;
+        display: flex;
+        flex-flow: column;
+        justify-content: space-between;
+        margin: 2rem;
+        padding: 1rem;
+        border-radius: 10px;
+        color: var(--default-text-dark);
+        background-color: var(--bg2-dark);
+
+        .players {
+            display: flex;
+            flex-flow: column;
+            gap: 1rem;
+            
+            > div {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-between;
+            }
+        }
+
+        .score-settings {
+            display: flex;
+            flex-flow: column;
+            gap: 1rem;
+        }
+    }
+}
+</style>

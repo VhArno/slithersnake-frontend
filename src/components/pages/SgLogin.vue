@@ -1,3 +1,30 @@
+<script setup lang="ts">
+
+</script>
+
+<template>
+    <section class="login">
+        <form id="login-form" method="post">
+            <div class="form-intro">
+                <img src="/img/profile-picture.jpg">
+                <h2>Login</h2>
+            </div>
+            <div class="form-div">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="">
+            </div>
+            <div class="form-div">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" value="">
+            </div>
+
+            <button>Login</button>
+            <a href="/register/">Already have an account?</a>
+        </form>
+    </section>
+</template>
+
+<style lang="scss">
 .login {
     color: var(--default-text-dark);
     background-color: var(--bg2-dark);
@@ -61,3 +88,4 @@
         }
     }
 }
+</style>
