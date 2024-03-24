@@ -26,8 +26,8 @@
                             <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
                             <div class="maps">
                                 <div class="map">Normal</div>
-                                <div class="map">Power-ups</div>
-                                <div class="map">Walls</div>
+                                <div class="map">Hexagon</div>
+                                <div class="map">Larger</div>
                             </div>
                             <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
@@ -60,6 +60,7 @@
     display: flex;
     flex-flow: column;
     gap: 1rem;
+    width: 80%;
     margin: 1rem;
     padding: 1rem;
     border-radius: 10px;
@@ -112,7 +113,7 @@
 /* BREAKPOINTS */
 @media (width >= 65em) {
     .create {
-        width: 70%;
+        width: 60%;
         margin: 2rem auto;
 
         .settings {

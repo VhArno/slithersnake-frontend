@@ -31,6 +31,20 @@ nav {
         flex-flow: row;
         gap: 1rem;
         padding: 0;
+
+        li a {
+            display: flex;
+            flex-flow: row;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5em;
+            text-decoration: none;
+            color: var(--default-text-dark);
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
         
         i {
             color: var(--default-text-dark);

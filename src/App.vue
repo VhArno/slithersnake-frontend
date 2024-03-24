@@ -8,7 +8,6 @@ import SgHeader from "./components/molecules/SgHeader.vue"
   </header>
 
   <main>
-    <h1>SlitherGrid</h1>
     <RouterView />
   </main>
 
