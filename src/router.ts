@@ -7,6 +7,7 @@ import SkinsView from './components/pages/SgSkins.vue'
 import SettingsView from './components/pages/SgSettings.vue'
 import ProfileView from './components/pages/SgProfile.vue'
 import LoginView from './components/pages/SgLogin.vue'
+import RegisterView from './components/pages/SgRegister.vue'
 
 const routes = [
   { path: '/', component: HomeView },
@@ -16,6 +17,7 @@ const routes = [
   { path: '/settings', component: SettingsView },
   { path: '/profile', component: ProfileView },
   { path: '/login', component: LoginView },
+  { path: '/register', component: RegisterView },
 ]
 
 const router = createRouter({

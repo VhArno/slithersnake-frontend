@@ -45,6 +45,9 @@
           </li>
         </ul>
     </div>
+    <div>
+      <RouterLink to="/login">Logout</RouterLink>
+    </div>
   </section>
 </template>
 

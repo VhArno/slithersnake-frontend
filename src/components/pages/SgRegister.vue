@@ -10,6 +10,10 @@
                 <h2>Login</h2>
             </div>
             <div class="form-div">
+                <label for="username">Username</label>
+                <input type="username" id="username" name="username" value="">
+            </div>
+            <div class="form-div">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" value="">
             </div>
@@ -19,7 +23,7 @@
             </div>
 
             <button>Login</button>
-            <RouterLink to="/register">New to SlitherGrid?</RouterLink>
+            <RouterLink to="/login">Already have an account?</RouterLink>
         </form>
     </section>
 </template>
