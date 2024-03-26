@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SgHeader from './components/molecules/SgHeader.vue'
-//only testing webhook
 </script>
 
 <template>
