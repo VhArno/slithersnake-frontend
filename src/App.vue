@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import SgHeader from "./components/molecules/SgHeader.vue"
+import SgHeader from './components/molecules/SgHeader.vue'
+//only testing webhook
 </script>
 
 <template>
@@ -12,8 +13,7 @@ import SgHeader from "./components/molecules/SgHeader.vue"
     <RouterView />
   </main>
 
-  <footer>
-  </footer>
+  <footer></footer>
 </template>
 
 <style scoped lang="scss">
