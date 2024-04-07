@@ -8,7 +8,6 @@ import SgHeader from './components/molecules/SgHeader.vue'
   </header>
 
   <main>
-    {{ $route.fullPath }}
     <RouterView />
   </main>
 

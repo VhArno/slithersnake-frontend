@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useUrlSearchParams } from '@vueuse/core'
 
+const params = useUrlSearchParams('history')
+params.id = "4762ga47gf932a8-4548a"
 </script>
 
 <template>
