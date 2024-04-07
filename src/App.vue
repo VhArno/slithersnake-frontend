@@ -15,13 +15,4 @@ import SgHeader from './components/molecules/SgHeader.vue'
 </template>
 
 <style scoped lang="scss">
-#logo {
-  color: var(--default-text-dark);
-  text-decoration: none;
-}
-
-header {
-  border-bottom: 3px solid var(--bg2-dark);
-  padding: 0 2rem;
-}
 </style>

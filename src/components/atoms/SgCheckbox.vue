@@ -26,7 +26,7 @@
   --switch-width: 46px;
   --switch-height: 24px;
   --switch-bg: rgb(131, 131, 131);
-  --switch-checked-bg: rgb(0, 218, 80);
+  --switch-checked-bg: var(--accent);
   --switch-offset: calc((var(--switch-height) - var(--circle-diameter)) / 2);
   --switch-transition: all .2s cubic-bezier(0.27, 0.2, 0.25, 1.51);
   /* circle */

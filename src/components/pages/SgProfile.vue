@@ -51,7 +51,7 @@
   </section>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .profile {
     color: var(--default-text-dark);
     background-color: var(--bg2-dark);
@@ -105,21 +105,21 @@
 
 /* BREAKPOINTS */
 @media (width >= 65em) {
-    .profile {
-        width: 60%;
+.profile {
+    width: 60%;
 
-        .user-profile {
-            flex-flow: row;
-            align-items: flex-start;
+    .user-profile {
+      flex-flow: row;
+      align-items: flex-start;
 
-            .user-info {
-                flex: 3;
-            }
+      .user-info {
+          flex: 3;
+      }
 
-            button {
-                flex: 1;
-            }
-        }
+      button {
+          flex: 1;
+      }
     }
+  }
 }
 </style>

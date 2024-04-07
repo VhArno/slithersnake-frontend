@@ -30,7 +30,7 @@ import SgGrid from "../organisms/SgGrid.vue"
     </section>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .main-sec {
     display: flex;
     flex-flow: row;

@@ -58,7 +58,7 @@ params.id = "4762ga47gf932a8-4548a"
     </section>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .create {
     display: flex;
     flex-flow: column;

@@ -28,7 +28,7 @@
     </section>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .login {
     color: var(--default-text-dark);
     background-color: var(--bg2-dark);

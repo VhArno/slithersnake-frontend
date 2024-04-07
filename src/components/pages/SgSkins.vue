@@ -15,7 +15,7 @@ import SgSkin from "../molecules/SgSkin.vue"
     </section>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .skin-section {
     width: 80%;
     color: var(--default-text-dark);
