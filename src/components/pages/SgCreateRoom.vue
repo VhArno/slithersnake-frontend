@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useUrlSearchParams } from '@vueuse/core'
+import SgButton from '../atoms/SgButton.vue';
 
 const params = useUrlSearchParams('history')
 params.id = "4762ga47gf932a8-4548a"
@@ -17,7 +18,7 @@ params.id = "4762ga47gf932a8-4548a"
                     </ul>
                 </div>
 
-                <button>Invite</button>
+                <SgButton>Invite</SgButton>
             </div>
 
             <div class="bg-gray options">
@@ -26,35 +27,35 @@ params.id = "4762ga47gf932a8-4548a"
                     <div>
                         <h3>Map</h3>
                         <div class="map-select">
-                            <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                            <SgButton id="prevBtn"><i class="fa-solid fa-chevron-left"></i></SgButton>
                             <div class="maps">
                                 <div class="map">Normal</div>
                                 <div class="map">Hexagon</div>
                                 <div class="map">Larger</div>
                             </div>
-                            <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                            <SgButton id="nextBtn"><i class="fa-solid fa-chevron-right"></i></SgButton>
                         </div>
                     </div>
                     
                     <div>
                         <h3>Gamemode</h3>
                         <div class="gamemode-select">
-                            <button id="prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                            <SgButton id="prev-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
                             <div class="gamemodes">
                                 <div class="gamemode">Normal</div>
                                 <div class="gamemode">Power-ups</div>
                                 <div class="gamemode">Walls</div>
                             </div>
-                            <button id="next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                            <SgButton id="next-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
                         </div>
                     </div>
                 </div> 
-                <button>Play</button>
+                <SgButton>Play</SgButton>
             </div>
         </div>
         <p>Sound <span><i class="fa-solid fa-volume-high"></i></span></p>
-        <button>Start game</button>
-        <button>Leave game</button>
+        <SgButton>Start game</SgButton>
+        <SgButton>Leave game</SgButton>
     </section>
 </template>
 
@@ -103,7 +104,7 @@ params.id = "4762ga47gf932a8-4548a"
                     text-align: center;
                 }
 
-                button {
+                SgButton {
                     flex-shrink: 3;
                     padding: 0;
                     background-color: transparent;
