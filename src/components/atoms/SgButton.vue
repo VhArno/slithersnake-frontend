@@ -4,8 +4,25 @@
 
 <style scoped lang="scss">
     button {
-        text-align: center;
-        padding: 0.5rem 1rem;
-        color: var(--accent);
+        font-size: 1.3em;
+        cursor: pointer;
+        color: var(--default-text-dark);
+        background-color: var(--accent);
+        border: none;
+        padding: 0.6rem 2rem;
+        border-radius: 10px;
+        width: 100%;
+
+        &:hover {
+            background-color: var(--accent-light);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+
+            &:hover {
+                background-color: var(--accent-dark);
+            }
+        }
     }
 </style>

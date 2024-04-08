@@ -11,7 +11,7 @@ const goToPlay = () => {
 <template>
     <section class="main-window">
         <ul class="main-menu">
-          <li><RouterLink to="/play">Play</RouterLink></li>
+          <li><RouterLink to="/find-game">Play</RouterLink></li>
           <li><RouterLink to="/create-room">Create room</RouterLink></li>
           <li><RouterLink to="/skins">Skins</RouterLink></li>
           <li><RouterLink to="/settings">Settings</RouterLink></li>
