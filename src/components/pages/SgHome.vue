@@ -20,4 +20,11 @@ const goToPlay = () => {
 </template>
 
 <style scoped lang="scss">
+.main-menu {
+  li {
+    &:hover {
+      background-color: #6e6e6e;
+    }
+  }
+}
 </style>

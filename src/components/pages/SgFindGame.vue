@@ -2,6 +2,9 @@
 import { ref } from 'vue';
 import SgButton from '../atoms/SgButton.vue'
 import type { Room } from '@/types/'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const selectedRoom = ref<Room | null>(null);
 const rooms = ref<Room[]>([
@@ -42,6 +45,10 @@ const toggleSelectRoom = (room: Room) => {
         selectedRoom.value = room;
     }
 }
+
+const joinRoom = () => {
+    router.push('/play')
+}
 </script>
 
 <template>
@@ -65,7 +72,7 @@ const toggleSelectRoom = (room: Room) => {
             </tr>
         </table>
         <div class="button-div">
-            <SgButton :disabled="!selectedRoom" class="join-button">Join room</SgButton>
+            <SgButton class="join-button" @click="joinRoom" :disabled="!selectedRoom">Join room</SgButton>
         </div>
     </section>
 </template>

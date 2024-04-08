@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SgButton from "../atoms/SgButton.vue";
 import SgGrid from "../organisms/SgGrid.vue"
 </script>
 
@@ -24,7 +25,7 @@ import SgGrid from "../organisms/SgGrid.vue"
                 <div class="sound-div">
                     <p>Sound <span><i class="fa-solid fa-volume-high"></i></span></p>
                 </div>
-                <button class="leave-btn">Leave</button>
+                <SgButton class="leave-btn">Leave</SgButton>
             </div>
         </div>
     </section>
