@@ -190,7 +190,7 @@ const leaveGame = () => {
     flex-flow: column;
     gap: 1rem;
     width: 80%;
-    margin: 1rem;
+    margin: 1rem auto;
     padding: 1rem;
     border-radius: 10px;
     color: var(--default-text-dark);

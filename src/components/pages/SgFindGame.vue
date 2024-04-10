@@ -80,7 +80,7 @@ const joinRoom = () => {
                     <input placeholder="Add game url..." type="text" id="join" name="join" class="input">
                 </div>
                 <div class="form-button">
-                    <SgButton @click="joinRoom" :disabled="!selectedRoom">Join room</SgButton>
+                    <SgButton @click="joinRoom" :disabled="!selectedRoom">Join</SgButton>
                 </div>
             </form>
         </div>
@@ -155,15 +155,15 @@ const joinRoom = () => {
     /*.input:hover {
         border: 2px solid lightgrey;
         box-shadow: 0px 0px 20px -17px;
-    }*/
-
-    /*.input:active {
-        transform: scale(0.95);
-    }*/
-
-    .input:focus {
-        border: 2px solid grey;
     }
+
+    .input:active {
+        transform: scale(0.95);
+    }
+
+    /*.input:focus {
+        border: 2px solid grey;
+    }*/
 
     .join-custom {
         display: flex;

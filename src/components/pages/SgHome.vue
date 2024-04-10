@@ -22,23 +22,37 @@ const goSettings = () => {
 </script>
 
 <template>
-    <section class="main-window">
-        <ul class="main-menu">
-          <SgButton @click="goFindGame"><RouterLink to="/find-game">Play</RouterLink></SgButton>
-          <SgButton @click="goCreateRoom"><RouterLink to="/create-room">Create room</RouterLink></SgButton>
-          <SgButton @click="goSkins"><RouterLink to="/skins">Skins</RouterLink></SgButton>
-          <SgButton @click="goSettings"><RouterLink to="/settings">Settings</RouterLink></SgButton>
-        </ul>
-    </section>
+  <section class="main-window">
+      <div class="main-menu">
+        <SgButton @click="goFindGame"><RouterLink to="/find-game">Play</RouterLink></SgButton>
+        <SgButton @click="goCreateRoom"><RouterLink to="/create-room">Create room</RouterLink></SgButton>
+        <SgButton @click="goSkins"><RouterLink to="/skins">Skins</RouterLink></SgButton>
+        <SgButton @click="goSettings"><RouterLink to="/settings">Settings</RouterLink></SgButton>
+      </div>
+  </section>
 </template>
 
 <style scoped lang="scss">
 .main-window {
-  margin: 2rem auto;
-  padding: 0.5rem;
+  width: 100%;
+  padding: 3rem 0rem;
+  background-image: url('/src/assets/img/SgBackground.jpg');
+  background-size: cover;
 
   .main-menu {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: 80%;
+    margin: auto;
+    padding: 2rem 0rem;
+    border-radius: 10px;
+    background-color: var(--bg2-dark);
+
     button {
+      width: 80%;
       background-color: var(--dark-gray);
 
       a {
@@ -48,6 +62,36 @@ const goSettings = () => {
 
       &:hover {
         background-color: #6e6e6e;
+      }
+    }
+  }
+}
+
+/* Breakpoints */
+@media (width >= 65em) {
+  .main-window {
+    padding: 5rem 0rem;
+    background-size: contain;
+
+    .main-menu {
+      width: 30%;
+      margin: 0 auto;
+      padding: 2rem 0rem;
+      border-radius: 10px;
+      background-color: var(--bg2-dark);
+
+      button {
+        width: 80%;
+        background-color: var(--dark-gray);
+
+        a {
+          text-decoration: none;      
+          color: var(--default-text-dark);
+        }
+
+        &:hover {
+          background-color: #6e6e6e;
+        }
       }
     }
   }
