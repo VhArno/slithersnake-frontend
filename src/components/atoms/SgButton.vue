@@ -4,7 +4,7 @@
 
 <style scoped lang="scss">
     button {
-        font-size: 1.3em;
+        font-size: 1.1em;
         cursor: pointer;
         color: var(--default-text-dark);
         background-color: var(--accent);

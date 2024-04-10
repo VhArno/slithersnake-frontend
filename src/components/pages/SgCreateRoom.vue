@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useUrlSearchParams, useClipboard  } from '@vueuse/core'
 import SgButton from '../atoms/SgButton.vue'
-import SgToas from '../atoms/SgToast.vue'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import type { Room, Map, GameMode, Player } from '@/types/'
 import SgToast from '../atoms/SgToast.vue'
 import { v4 as uuidv4 } from 'uuid';

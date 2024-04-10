@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import SgButton from '../atoms/SgButton.vue';
+
 
 </script>
 
@@ -14,7 +16,7 @@
           <img src="/img/profile-picture.jpg" alt="user_profile">
         </div>
         
-        <button>Change name</button>
+        <SgButton>Change name</SgButton>
     </div>
 
     <div class="user-stats">
