@@ -109,3 +109,10 @@ nav {
     transform: translateY(-8px) rotate(-45deg);
     background-color: var(--accent);
 }
+
+/* BREAKPOINTS */
+@media (width >= 65em) {
+    header {
+        padding: 0 3rem;
+    }
+}
