@@ -1,24 +1,148 @@
 <script setup lang="ts">
-import { useUrlSearchParams } from '@vueuse/core'
-import SgButton from '../atoms/SgButton.vue';
+import { useUrlSearchParams, useClipboard  } from '@vueuse/core'
+import SgButton from '../atoms/SgButton.vue'
+import SgToas from '../atoms/SgToast.vue'
+import { ref, watch } from 'vue'
+import type { Room, Map, GameMode, Player } from '@/types/'
+import SgToast from '../atoms/SgToast.vue'
+import { v4 as uuidv4 } from 'uuid';
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
+
+// Generate a random GUID
+const randomGuid: string = uuidv4();
 const params = useUrlSearchParams('history')
-params.id = "4762ga47gf932a8-4548a"
+params.id = randomGuid
+
+/* toast settigns */
+const showToast = ref<boolean>(false);
+
+const toggleToast = () => {
+    showToast.value = !showToast.value;
+}
+
+/* getters */
+const maps = ref<Map[]>([
+    {
+        id: 1,
+        name: 'map1'
+    },
+    {
+        id: 2,
+        name: 'map2'
+    },
+    {
+        id: 3,
+        name: 'map3'
+    },
+])
+const modes = ref<GameMode[]>([
+    {
+        id: 1,
+        name: 'mode1'
+    },
+    {
+        id: 2,
+        name: 'mode2'
+    },
+    {
+        id: 3,
+        name: 'mode3'
+    },
+])
+const players = ref<Player[]>([
+    {
+        id: 1,
+        username: 'test user',
+        email: '',
+        level: 1,
+        highscore: 0,
+        played: 0,
+        won: 0,
+        killed: 0
+    },
+    {
+        id: 2,
+        username: 'test user 2',
+        email: '',
+        level: 5,
+        highscore: 0,
+        played: 0,
+        won: 0,
+        killed: 0
+    }
+])
+
+const selectedMap = ref<Map>(maps.value[0])
+const selectedMode = ref<GameMode>(modes.value[0])
+
+/* invite button */
+const source = ref('Hello')
+const { text, copy, copied, isSupported } = useClipboard({ source })
+
+const invite = () => {
+    copy(window.location.href)
+    if (copied) {
+        toggleToast()
+    }
+}
+
+/* Previous and next buttons */
+// Method to switch to the previous map
+const prevMap = () => {
+    const currentIndex = maps.value.findIndex(map => map === selectedMap.value);
+    const newIndex = (currentIndex - 1 + maps.value.length) % maps.value.length;
+    selectedMap.value = maps.value[newIndex];
+}
+
+// Method to switch to the next map
+const nextMap = () => {
+    const currentIndex = maps.value.findIndex(map => map === selectedMap.value);
+    const newIndex = (currentIndex + 1) % maps.value.length;
+    selectedMap.value = maps.value[newIndex];
+}
+
+// Method to switch to the previous game mode
+const prevMode = () => {
+    const currentIndex = modes.value.findIndex(mode => mode === selectedMode.value);
+    const newIndex = (currentIndex - 1 + modes.value.length) % modes.value.length;
+    selectedMode.value = modes.value[newIndex];
+}
+
+// Method to switch to the next game mode
+const nextMode = () => {
+    const currentIndex = modes.value.findIndex(mode => mode === selectedMode.value);
+    const newIndex = (currentIndex + 1) % modes.value.length;
+    selectedMode.value = modes.value[newIndex];
+}
+
+/* actions buttons */
+const startGame = () => {
+    router.push('/play')
+}
+
+const leaveGame = () => {
+    router.push('/')
+}
 </script>
 
 <template>
     <section class="create">
+        <div>
+            <SgToast v-if="showToast" :content="'Game link copied!'" :duration="5000"></SgToast>
+        </div>
+
         <div class="settings">
             <div class="bg-gray players">
                 <div>
                     <h2>Players</h2> 
                     <ul class="player-list">
-                        <li>You (lvl. <span>11</span>)</li>
-                        <li>Player 1 (lvl. <span>9</span>)</li>
+                        <li v-for="player in players" :key="player.id">{{ player.username }} (lvl. <span>{{ player.level }}</span>)</li>
                     </ul>
                 </div>
 
-                <SgButton>Invite</SgButton>
+                <SgButton @click="invite">Invite</SgButton>
             </div>
 
             <div class="bg-gray options">
@@ -27,26 +151,28 @@ params.id = "4762ga47gf932a8-4548a"
                     <div>
                         <h3>Map</h3>
                         <div class="map-select">
-                            <SgButton id="prevBtn"><i class="fa-solid fa-chevron-left"></i></SgButton>
+                            <SgButton @click="prevMap"><i class="fa-solid fa-chevron-left"></i></SgButton>
                             <div class="maps">
-                                <div class="map">Normal</div>
-                                <div class="map">Hexagon</div>
-                                <div class="map">Larger</div>
+                                <div>
+                                    <p>{{ selectedMap?.name }}</p>
+                                    <img :src="selectedMap?.img" alt="map image">
+                                </div>
                             </div>
-                            <SgButton id="nextBtn"><i class="fa-solid fa-chevron-right"></i></SgButton>
+                            <SgButton @click="nextMap"><i class="fa-solid fa-chevron-right"></i></SgButton>
                         </div>
                     </div>
                     
                     <div>
                         <h3>Gamemode</h3>
                         <div class="gamemode-select">
-                            <SgButton id="prev-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
+                            <SgButton @click="prevMode" id="prev-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
                             <div class="gamemodes">
-                                <div class="gamemode">Normal</div>
-                                <div class="gamemode">Power-ups</div>
-                                <div class="gamemode">Walls</div>
+                                <div>
+                                    <p>{{ selectedMode?.name }}</p>
+                                    <img :src="selectedMode?.img" alt="mode image">
+                                </div>
                             </div>
-                            <SgButton id="next-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
+                            <SgButton @click="nextMode" id="next-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
                         </div>
                     </div>
                 </div> 
@@ -54,8 +180,8 @@ params.id = "4762ga47gf932a8-4548a"
             </div>
         </div>
         <p>Sound <span><i class="fa-solid fa-volume-high"></i></span></p>
-        <SgButton>Start game</SgButton>
-        <SgButton>Leave game</SgButton>
+        <SgButton @click="startGame">Start game</SgButton>
+        <SgButton @click="leaveGame">Leave game</SgButton>
     </section>
 </template>
 
@@ -89,6 +215,9 @@ params.id = "4762ga47gf932a8-4548a"
 
         .options {
             .game-options {
+                display: flex;
+                flex-flow: column;
+                gap: 1rem;
                 margin: 1em 0em;
             }
 

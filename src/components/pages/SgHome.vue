@@ -20,10 +20,15 @@ const goToPlay = () => {
 </template>
 
 <style scoped lang="scss">
-.main-menu {
-  li {
-    &:hover {
-      background-color: #6e6e6e;
+.main-window {
+  margin: 2rem auto;
+  padding: 0.5rem;
+
+  .main-menu {
+    li {
+      &:hover {
+        background-color: #6e6e6e;
+      }
     }
   }
 }

@@ -10,11 +10,13 @@ export interface Room {
 export interface Map {
     id: number
     name: string
+    img?: string
 }
 
 export interface GameMode {
     id: number
     name: string
+    img?: string
 }
 
 export interface Player {
