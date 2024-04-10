@@ -63,7 +63,7 @@ const joinRoom = () => {
                     <th>Players</th>
                     <th>Ping</th>
                 </tr>
-                <tr v-for="room in rooms" :key="room.id" :class="['row', { 'selected': room === selectedRoom }]" @click="toggleSelectRoom(room)">
+                <tr v-for="room in rooms" :key="room.id" :class="[{ 'selected': room === selectedRoom }, 'row']" @click="toggleSelectRoom(room)">
                     <td>{{ room.id }}</td>
                     <td>{{ room.name }}</td>
                     <td>{{ room.map.name }}</td>
@@ -115,7 +115,7 @@ const joinRoom = () => {
         }
 
         .selected {
-            background-color: var(--dark-gray);
+            background-color: var(--accent);
         }
 
         .row {
@@ -126,7 +126,7 @@ const joinRoom = () => {
                 padding: 0 1rem;
             }
 
-            &:hover {
+            &:not(.selected):hover {
                 background-color: var(--dark-gray);
             }
         }
@@ -148,18 +148,18 @@ const joinRoom = () => {
         border-radius: 8px;
         border: 1.5px solid lightgrey;
         outline: none;
-        transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+        //transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
         box-shadow: 0px 0px 20px -18px;
     }
 
-    .input:hover {
+    /*.input:hover {
         border: 2px solid lightgrey;
         box-shadow: 0px 0px 20px -17px;
-    }
+    }*/
 
-    .input:active {
+    /*.input:active {
         transform: scale(0.95);
-    }
+    }*/
 
     .input:focus {
         border: 2px solid grey;
