@@ -1,16 +1,16 @@
 <script setup lang="ts">
+import type { Skin } from "@/types";
 import SgSkin from "../molecules/SgSkin.vue"
+import { ref } from "vue";
+
+const skins = ref<Skin[]>([])
 </script>
 
 <template>
     <section class="skin-section">
         <h2>Skins</h2>
         <div class="skin-list">
-            <SgSkin></SgSkin>
-            <SgSkin></SgSkin>
-            <SgSkin></SgSkin>
-            <SgSkin></SgSkin>
-            <SgSkin></SgSkin>
+            <SgSkin :skin="skin" v-for="skin in skins" :key="skin.id"></SgSkin>
         </div>
     </section>
 </template>
@@ -20,7 +20,7 @@ import SgSkin from "../molecules/SgSkin.vue"
     width: 80%;
     color: var(--default-text-dark);
     background-color: var(--bg2-dark);
-    margin-top: 1rem;
+    margin: 1rem auto;
     padding: 1rem;
     border-radius: 10px;
 

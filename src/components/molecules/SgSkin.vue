@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import type { Skin } from '@/types';
 
+defineProps<{
+    skin: Skin
+}>()
 </script>
 
 <template>
     <div class="skin">
-        <p>Skin 1</p>
-        <img src="" alt="skin 1">
+        <p>{{ skin.name }}</p>
+        <img :src="skin.img" :alt="skin.name">
     </div>
 </template>
 
