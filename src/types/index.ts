@@ -34,6 +34,7 @@ export interface Player {
     played: number
     won: number
     killed: number
+    skins: Skin[]
 }
 
 export interface Keybinds {

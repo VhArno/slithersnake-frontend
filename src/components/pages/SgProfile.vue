@@ -1,7 +1,15 @@
 <script setup lang="ts">
+import type { Player } from '@/types';
 import SgButton from '../atoms/SgButton.vue';
+import { computed, ref } from 'vue';
 
+const user = ref<Player>()
 
+const winPerc = computed(() => {
+  const won = user.value?.won ?? 0
+  const played = user.value?.played ?? 1
+  return (won / played) * 100
+})
 </script>
 
 <template>
@@ -9,8 +17,8 @@ import SgButton from '../atoms/SgButton.vue';
     <div class="user-profile">
         <div class="user-info">
           <div class="user-name">
-            <h2>User154523</h2>
-            <p>Lvl. 11</p>
+            <h2>{{ user?.username }}</h2>
+            <p>Lvl. {{ user?.level }}</p>
           </div>
 
           <img src="/img/profile-picture.jpg" alt="user_profile">
@@ -23,27 +31,27 @@ import SgButton from '../atoms/SgButton.vue';
         <ul>          
           <li>
             <h3>Highscore</h3>
-            <p>15235</p>
+            <p>{{ user?.highscore }}</p>
           </li>
           <li>
             <h3>Games played</h3>
-            <p>125</p>
+            <p>{{ user?.played }}</p>
           </li>
           <li>
             <h3>Games won</h3>
-            <p>100</p>
+            <p>{{ user?.won }}</p>
           </li>
           <li>
             <h3>Win percentage</h3>
-            <p>80%</p>
+            <p>{{ winPerc }}%</p>
           </li>
           <li>
             <h3>Kills</h3>
-            <p>50</p>
+            <p>{{ user?.killed }}</p>
           </li>
           <li>
             <h3>Skins unlocked</h3>
-            <p>10</p>
+            <p>{{ user?.skins.length }}</p>
           </li>
         </ul>
     </div>

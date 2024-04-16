@@ -1,4 +1,4 @@
-import type { Keybinds, Settings } from '@/types'
+import type { Keybinds } from '@/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

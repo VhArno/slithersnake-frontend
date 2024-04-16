@@ -10,17 +10,26 @@ const settingsStore = useSettingsStore()
 const { keybinds } = storeToRefs(settingsStore)
 
 // keybinds
+// => gebruik om snake te laten bewegen naar bepaalde richting
+// beneden
 onKeyStroke(keybinds.value.down, (s) => {
-  s.preventDefault()
+    console.log("Snake move down")
+    s.preventDefault()
 })
+// boven
 onKeyStroke(keybinds.value.up, (w) => {
-  w.preventDefault()
+    console.log("Snake move up")
+    w.preventDefault()
 })
+// links
 onKeyStroke(keybinds.value.left, (a) => {
-  a.preventDefault()
+    console.log("Snake move left")
+    a.preventDefault()
 })
+// rechts
 onKeyStroke(keybinds.value.right, (d) => {
-  d.preventDefault()
+    console.log("Snake move right")
+    d.preventDefault()
 })
 </script>
 
