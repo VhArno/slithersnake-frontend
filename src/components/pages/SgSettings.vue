@@ -1,47 +1,39 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
 import SgCheckbox from '../atoms/SgCheckbox.vue';
 import SgSoundRange from '../atoms/SgSoundRange.vue';
-import type { Keybinds } from '@/types/'
+import { useSettingsStore } from '@/stores/settings';
+import { storeToRefs } from 'pinia'
+import SgKeybindOverlay from '../molecules/SgKeybindOverlay.vue';
+import { ref } from 'vue';
 
-const keybinds = ref<Keybinds>({
-  left: 'Arrow-left',
-  right: 'Arrow-right',
-  up: 'Arrow-up',
-  down: 'Arrow-down'
-})
+// settings store
+const settingsStore = useSettingsStore()
+const { keybinds, volume, darkMode } = storeToRefs(settingsStore)
 
-const pressedKey = ref('')
-
-const handleKeyPress = (event: KeyboardEvent) => {
-  pressedKey.value = event.key
-}
-
-onMounted(() => {
-  window.addEventListener('keydown', handleKeyPress);
-})
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyPress);
-}) 
+const selectedKey = ref<string>('')
 </script>
 
 <template>
+  <SgKeybindOverlay v-if="selectedKey == 'left'" v-model:keybind="keybinds.left" v-model:selectedkey="selectedKey"></SgKeybindOverlay>
+  <SgKeybindOverlay v-if="selectedKey == 'right'" v-model:keybind="keybinds.right" v-model:selectedkey="selectedKey"></SgKeybindOverlay>
+  <SgKeybindOverlay v-if="selectedKey == 'up'" v-model:keybind="keybinds.up" v-model:selectedkey="selectedKey"></SgKeybindOverlay>
+  <SgKeybindOverlay v-if="selectedKey == 'down'" v-model:keybind="keybinds.down" v-model:selectedkey="selectedKey"></SgKeybindOverlay>
+
   <div class="settings">
     <div class="title-div">
       <h2>Settings</h2>
-      <p>Pressed key: {{ pressedKey }}</p>
     </div>
 
         <div class="sound-div horz-div">
           <h3>Sound</h3>
           <div>
-            <SgSoundRange></SgSoundRange>
+            <SgSoundRange v-model:modelValue="volume"></SgSoundRange>
           </div>
         </div>
 
         <div class="mode-div horz-div">
           <h3>Dark mode</h3>
-          <SgCheckbox></SgCheckbox>
+          <SgCheckbox v-model:modelValue="darkMode"></SgCheckbox>
         </div>
 
         <div class="controls-div">
@@ -49,30 +41,30 @@ onUnmounted(() => {
           <ul class="controls">
             <li>
               <p>Move left</p>
-              <button class="keybind">
+              <button class="keybind" @click="() => selectedKey = 'left'">
                 <span>{{ keybinds.left }}</span>
-                <span><i class="fa-solid fa-xmark"></i></span>
+                <i class="fa-solid fa-xmark"></i>
               </button>
             </li>
             <li>
               <p>Move right</p>
-              <button class="keybind">
+              <button class="keybind" @click="() => selectedKey = 'right'">
                 <span>{{ keybinds.right }}</span>
-                <span><i class="fa-solid fa-xmark"></i></span>
+                <i class="fa-solid fa-xmark"></i>
               </button>
             </li>
             <li>
               <p>Move up</p>
-              <button class="keybind">
+              <button class="keybind" @click="() => selectedKey = 'up'">
                 <span>{{ keybinds.up }}</span>
-                <span><i class="fa-solid fa-xmark"></i></span>
+                <i class="fa-solid fa-xmark"></i>
               </button>
             </li>
             <li>
               <p>Move down</p>
-              <button class="keybind">
+              <button class="keybind" @click="() => selectedKey = 'down'">
                 <span>{{ keybinds.down }}</span>
-                <span><i class="fa-solid fa-xmark"></i></span>
+                <i class="fa-solid fa-xmark"></i>
               </button>
             </li>
           </ul>
@@ -124,6 +116,7 @@ onUnmounted(() => {
 
       p {
         font-size: 1.15em;
+        flex: 2;
       }
 
       .keybind {
@@ -132,18 +125,26 @@ onUnmounted(() => {
         align-items: center;
         gap: 0.5rem;
         flex: 1;
+        background-color: var(--dark-gray);
+        color: var(--default-text-dark);
+        border: none;
+        border-radius: 5px;
+        padding: 0.5rem 1rem;
+        flex: 1;
 
         &:hover {
           cursor: pointer;
+          background-color: var(--accent);
         }
 
         span {
           width: 100%;
-          font-size: 1.2em;
+          font-size: 1.3em;
+          align-self: flex-start;
+        }
 
-          i {
-            font-size: 1.7em;
-          }
+        i {
+          font-size: 1.4em;
         }
       }
     }

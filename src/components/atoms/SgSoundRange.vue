@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
-const sliderValue = ref<number>(50)
+const modelValue = defineModel('modelValue')
 </script>
 
 <template>
 <label class="slider">
-    <span class="sound-value">{{ sliderValue }}%</span>
-    <input type="range" class="level" v-model="sliderValue">
+    <span class="sound-value">{{ modelValue }}%</span>
+    <input type="range" class="level" v-model="modelValue">
     <svg class="volume" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve">
         <g>
             <path d="M18.36 19.36a1 1 0 0 1-.705-1.71C19.167 16.148 20 14.142 20 12s-.833-4.148-2.345-5.65a1 1 0 1 1 1.41-1.419C20.958 6.812 22 9.322 22 12s-1.042 5.188-2.935 7.069a.997.997 0 0 1-.705.291z" fill="currentColor" data-original="#000000"></path>

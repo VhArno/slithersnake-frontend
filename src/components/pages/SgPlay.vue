@@ -2,18 +2,24 @@
 import SgButton from "../atoms/SgButton.vue";
 import SgGrid from "../organisms/SgGrid.vue"
 import { onKeyStroke } from '@vueuse/core'
+import { useSettingsStore } from '@/stores/settings';
+import { storeToRefs } from 'pinia'
+
+// settings store
+const settingsStore = useSettingsStore()
+const { keybinds } = storeToRefs(settingsStore)
 
 // keybinds
-onKeyStroke('ArrowDown', (s) => {
+onKeyStroke(keybinds.value.down, (s) => {
   s.preventDefault()
 })
-onKeyStroke('ArrowUp', (w) => {
+onKeyStroke(keybinds.value.up, (w) => {
   w.preventDefault()
 })
-onKeyStroke('ArrowLeft', (a) => {
+onKeyStroke(keybinds.value.left, (a) => {
   a.preventDefault()
 })
-onKeyStroke('ArrowRight', (d) => {
+onKeyStroke(keybinds.value.right, (d) => {
   d.preventDefault()
 })
 </script>

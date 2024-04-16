@@ -2,11 +2,26 @@
 import { useUrlSearchParams, useClipboard  } from '@vueuse/core'
 import SgButton from '../atoms/SgButton.vue'
 import { ref } from 'vue'
-import type { Room, Map, GameMode, Player } from '@/types/'
+import type { Map, GameMode, Player } from '@/types/'
 import SgToast from '../atoms/SgToast.vue'
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'vue-router'
+import { useMapsStore } from '@/stores/maps'
+import { useGamemodesStore } from '@/stores/gamemodes'
+import { storeToRefs } from 'pinia'
 
+// pinia
+/* maps store */
+const mapsStore = useMapsStore()
+mapsStore.loadMaps()
+const { maps } = storeToRefs(mapsStore)
+
+/* modes store */
+const modesStore = useGamemodesStore()
+modesStore.loadModes()
+const { modes } = storeToRefs(modesStore)
+
+// router
 const router = useRouter()
 
 // Generate a random GUID
@@ -21,35 +36,6 @@ const toggleToast = () => {
     showToast.value = !showToast.value;
 }
 
-/* getters */
-const maps = ref<Map[]>([
-    {
-        id: 1,
-        name: 'map1'
-    },
-    {
-        id: 2,
-        name: 'map2'
-    },
-    {
-        id: 3,
-        name: 'map3'
-    },
-])
-const modes = ref<GameMode[]>([
-    {
-        id: 1,
-        name: 'mode1'
-    },
-    {
-        id: 2,
-        name: 'mode2'
-    },
-    {
-        id: 3,
-        name: 'mode3'
-    },
-])
 const players = ref<Player[]>([
     {
         id: 1,
@@ -78,7 +64,7 @@ const selectedMode = ref<GameMode>(modes.value[0])
 
 /* invite button */
 const source = ref('Hello')
-const { text, copy, copied, isSupported } = useClipboard({ source })
+const { copy, copied } = useClipboard({ source })
 
 const invite = () => {
     copy(window.location.href)

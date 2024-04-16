@@ -1,7 +1,11 @@
+<script setup lang="ts">
+const modelValue = defineModel('modelValue')
+</script>
+
 <template>
     <div>
         <label class="switch">
-            <input checked="true" type="checkbox">
+            <input checked="true" type="checkbox" v-model="modelValue">
             <div class="slider">
                 <div class="circle">
                     <svg class="cross" xml:space="preserve" style="enable-background:new 0 0 512 512" viewBox="0 0 365.696 365.696" y="0" x="0" height="6" width="6" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
