@@ -1,13 +1,36 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue';
 import SgCheckbox from '../atoms/SgCheckbox.vue';
 import SgSoundRange from '../atoms/SgSoundRange.vue';
+import type { Keybinds } from '@/types/'
+
+const keybinds = ref<Keybinds>({
+  left: 'Arrow-left',
+  right: 'Arrow-right',
+  up: 'Arrow-up',
+  down: 'Arrow-down'
+})
+
+const pressedKey = ref('')
+
+const handleKeyPress = (event: KeyboardEvent) => {
+  pressedKey.value = event.key
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyPress);
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyPress);
+}) 
 </script>
 
 <template>
   <div class="settings">
     <div class="title-div">
-          <h2>Settings</h2>
-        </div>
+      <h2>Settings</h2>
+      <p>Pressed key: {{ pressedKey }}</p>
+    </div>
 
         <div class="sound-div horz-div">
           <h3>Sound</h3>
@@ -26,19 +49,31 @@ import SgSoundRange from '../atoms/SgSoundRange.vue';
           <ul class="controls">
             <li>
               <p>Move left</p>
-              <button>Arrow-left</button>
+              <button class="keybind">
+                <span>{{ keybinds.left }}</span>
+                <span><i class="fa-solid fa-xmark"></i></span>
+              </button>
             </li>
             <li>
               <p>Move right</p>
-              <button>Arrow-right</button>
+              <button class="keybind">
+                <span>{{ keybinds.right }}</span>
+                <span><i class="fa-solid fa-xmark"></i></span>
+              </button>
             </li>
             <li>
               <p>Move up</p>
-              <button>Arrow-up</button>
+              <button class="keybind">
+                <span>{{ keybinds.up }}</span>
+                <span><i class="fa-solid fa-xmark"></i></span>
+              </button>
             </li>
             <li>
               <p>Move down</p>
-              <button>Arrow-down</button>
+              <button class="keybind">
+                <span>{{ keybinds.down }}</span>
+                <span><i class="fa-solid fa-xmark"></i></span>
+              </button>
             </li>
           </ul>
         </div>
@@ -89,6 +124,27 @@ import SgSoundRange from '../atoms/SgSoundRange.vue';
 
       p {
         font-size: 1.15em;
+      }
+
+      .keybind {
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+
+        &:hover {
+          cursor: pointer;
+        }
+
+        span {
+          width: 100%;
+          font-size: 1.2em;
+
+          i {
+            font-size: 1.7em;
+          }
+        }
       }
     }
   }

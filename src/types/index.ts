@@ -25,7 +25,6 @@ export interface Skin {
     img?: string
 }
 
-
 export interface Player {
     id: number
     username: string
@@ -35,4 +34,11 @@ export interface Player {
     played: number
     won: number
     killed: number
+}
+
+export interface Keybinds {
+    left: string
+    right: string
+    up: string
+    down: string
 }

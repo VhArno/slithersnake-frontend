@@ -1,6 +1,21 @@
 <script setup lang="ts">
 import SgButton from "../atoms/SgButton.vue";
 import SgGrid from "../organisms/SgGrid.vue"
+import { onKeyStroke } from '@vueuse/core'
+
+// keybinds
+onKeyStroke('ArrowDown', (s) => {
+  s.preventDefault()
+})
+onKeyStroke('ArrowUp', (w) => {
+  w.preventDefault()
+})
+onKeyStroke('ArrowLeft', (a) => {
+  a.preventDefault()
+})
+onKeyStroke('ArrowRight', (d) => {
+  d.preventDefault()
+})
 </script>
 
 <template>
