@@ -42,3 +42,7 @@ export interface Keybinds {
     up: string
     down: string
 }
+
+export interface Localstorage {
+    _value?: Keybinds
+}

@@ -9,6 +9,8 @@ import { useRouter } from 'vue-router'
 import { useMapsStore } from '@/stores/maps'
 import { useGamemodesStore } from '@/stores/gamemodes'
 import { storeToRefs } from 'pinia'
+import SgSoundRange from '../atoms/SgSoundRange.vue'
+import { useSettingsStore } from '@/stores/settings'
 
 // pinia
 /* maps store */
@@ -20,6 +22,10 @@ const { maps } = storeToRefs(mapsStore)
 const modesStore = useGamemodesStore()
 modesStore.loadModes()
 const { modes } = storeToRefs(modesStore)
+
+/* settings store */
+const settingsStore = useSettingsStore()
+const { volume } = storeToRefs(settingsStore)
 
 // router
 const router = useRouter()
@@ -164,7 +170,7 @@ const leaveGame = () => {
                 <SgButton>Play</SgButton>
             </div>
         </div>
-        <p>Sound <span><i class="fa-solid fa-volume-high"></i></span></p>
+        <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
         <SgButton @click="startGame">Start game</SgButton>
         <SgButton @click="leaveGame">Leave game</SgButton>
     </section>
@@ -217,12 +223,6 @@ const leaveGame = () => {
                     width: 100%;
                     text-align: center;
                 }
-
-                SgButton {
-                    flex-shrink: 3;
-                    padding: 0;
-                    background-color: transparent;
-                }
             }
         }
     }
@@ -247,6 +247,10 @@ const leaveGame = () => {
                 flex-flow: column;
                 justify-content: space-between;
             }
+        }
+
+        .sound-range {
+            width: 30%
         }
     }
 }

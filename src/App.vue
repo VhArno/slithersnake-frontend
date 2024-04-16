@@ -1,5 +1,17 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import SgHeader from './components/molecules/SgHeader.vue'
+import { useSettingsStore } from './stores/settings';
+
+const settingsStore = useSettingsStore()
+
+onMounted(() => {
+  settingsStore.loadKeybinds()
+})
+
+settingsStore.$subscribe(() => {
+  settingsStore.saveKeybinds()
+})
 </script>
 
 <template>

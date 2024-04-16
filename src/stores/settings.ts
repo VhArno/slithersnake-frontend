@@ -1,4 +1,4 @@
-import type { Keybinds } from '@/types'
+import type { Keybinds, Localstorage } from '@/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -12,5 +12,18 @@ export const useSettingsStore = defineStore('settings', () => {
     const volume = ref<number>(50)
     const darkMode = ref<boolean>(true)
 
-    return { keybinds, volume, darkMode }
+    const saveKeybinds = () => {
+        localStorage.setItem('keybinds', JSON.stringify(keybinds))
+        console.log("saving keybinds in localstorage")
+    }
+
+    const loadKeybinds = () => {
+        const savedKeybinds = localStorage.getItem('keybinds');
+        if (savedKeybinds) {
+            const parsedKeybinds = JSON.parse(savedKeybinds);
+            keybinds.value = parsedKeybinds._value || {};
+        }
+    }
+
+    return { keybinds, volume, darkMode, saveKeybinds, loadKeybinds }
 })
