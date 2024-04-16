@@ -1,18 +1,33 @@
 <script setup lang="ts">
-import type { Player } from '@/types';
-import SgButton from '../atoms/SgButton.vue';
-import { computed, ref } from 'vue';
+import type { Player } from '@/types'
+import SgButton from '@/components/atoms/SgButton.vue'
+import SgPrompt from '@/components/molecules/SgPrompt.vue'
+import { computed, ref } from 'vue'
 
-const user = ref<Player>()
+const user = ref<Player>({
+  id: 0,
+  username: '',
+  email: '',
+  level: 0,
+  highscore: 0,
+  played: 0,
+  won: 0,
+  killed: 0,
+  skins: []
+})
 
 const winPerc = computed(() => {
   const won = user.value?.won ?? 0
   const played = user.value?.played ?? 1
   return (won / played) * 100
 })
+
+// username prompt
+const showPrompt = ref<boolean>(false)
 </script>
 
 <template>
+  <SgPrompt v-show="showPrompt" v-model:showPrompt="showPrompt" @update:username="(v) => user.username = v"></SgPrompt>
   <section class="profile">
     <div class="user-profile">
         <div class="user-info">
@@ -24,7 +39,7 @@ const winPerc = computed(() => {
           <img src="/img/profile-picture.jpg" alt="user_profile">
         </div>
         
-        <SgButton>Change name</SgButton>
+        <SgButton @click="() => showPrompt = true">Change name</SgButton>
     </div>
 
     <div class="user-stats">
