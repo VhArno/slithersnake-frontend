@@ -43,6 +43,8 @@ export interface Keybinds {
     down: string
 }
 
-export interface Localstorage {
-    _value?: Keybinds
+export interface Settings {
+    keybinds: {}
+    volume: string
+    darkMode: boolean
 }

@@ -6,11 +6,11 @@ import { useSettingsStore } from './stores/settings';
 const settingsStore = useSettingsStore()
 
 onMounted(() => {
-  settingsStore.loadKeybinds()
+  settingsStore.loadData()
 })
 
 settingsStore.$subscribe(() => {
-  settingsStore.saveKeybinds()
+  settingsStore.saveData()
 })
 </script>
 

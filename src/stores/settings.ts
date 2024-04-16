@@ -1,4 +1,4 @@
-import type { Keybinds, Localstorage } from '@/types'
+import type { Keybinds, Settings } from '@/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -12,18 +12,32 @@ export const useSettingsStore = defineStore('settings', () => {
     const volume = ref<number>(50)
     const darkMode = ref<boolean>(true)
 
-    const saveKeybinds = () => {
+    // keybinds actions
+    const saveData = () => {
         localStorage.setItem('keybinds', JSON.stringify(keybinds))
-        console.log("saving keybinds in localstorage")
+        localStorage.setItem('volume', JSON.stringify(volume))
+        localStorage.setItem('darkMode', JSON.stringify(darkMode))
     }
 
-    const loadKeybinds = () => {
-        const savedKeybinds = localStorage.getItem('keybinds');
+    const loadData = () => {
+        const savedKeybinds = localStorage.getItem('keybinds')
         if (savedKeybinds) {
-            const parsedKeybinds = JSON.parse(savedKeybinds);
-            keybinds.value = parsedKeybinds._value || {};
+            const parsedKeybinds = JSON.parse(savedKeybinds)
+            keybinds.value = parsedKeybinds._value || {}
+        }
+
+        const savedVolume = localStorage.getItem('volume')
+        if (savedVolume) {
+            const parsedvolume = JSON.parse(savedVolume)
+            volume.value = parsedvolume._value || {}
+        }
+
+        const savedColorMode = localStorage.getItem('darkMode')
+        if (savedColorMode) {
+            const parsedColorMode = JSON.parse(savedColorMode)
+            darkMode.value = parsedColorMode._value || {}
         }
     }
 
-    return { keybinds, volume, darkMode, saveKeybinds, loadKeybinds }
+    return { keybinds, volume, darkMode, saveData, loadData }
 })
