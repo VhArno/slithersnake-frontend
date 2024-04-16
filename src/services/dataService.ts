@@ -19,4 +19,9 @@ const getGamemodes = async <T>(): Promise<AxiosResponse<T>> => {
     return myAxios.get<T>(`/gamemodes`)
 }
 
-export { getMap, getMaps, getGamemode, getGamemodes }
+// skins
+const getSkins = async <T>(): Promise<AxiosResponse<T>> => {
+    return myAxios.get<T>(`/skins`)
+}
+
+export { getMap, getMaps, getGamemode, getGamemodes, getSkins }

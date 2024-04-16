@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import SgButton from '../atoms/SgButton.vue';
+import { onKeyStroke } from '@vueuse/core';
 
 const model = defineModel('showPrompt')
 
@@ -16,6 +17,12 @@ const handleClick = () => {
         emit('update:username', username.value)
     }
 }
+
+// watch for escape
+onKeyStroke('Escape', (s) => {
+    s.preventDefault()
+    model.value = false
+})
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Room, Map, GameMode, Player } from '@/types/'
+import type { Map, GameMode } from '@/types/'
 import { getGamemodes } from '@/services/dataService'
 
 export const useGamemodesStore = defineStore('gamemodes', () => {

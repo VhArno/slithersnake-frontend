@@ -24,5 +24,15 @@ defineProps<{
     background-color: var(--dark-gray);
     border-radius: 10px;
     margin: 0 auto;
+
+    &:not(.selected):hover {
+        cursor: pointer;
+        border: 3px solid var(--accent);
+    }
+}
+
+.selected {
+    cursor: pointer;
+    border: 3px solid var(--selected);
 }
 </style>
