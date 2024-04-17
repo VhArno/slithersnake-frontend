@@ -37,7 +37,7 @@ export const usePlayStore = defineStore('play', () => {
     // Plaats food
     generateFood()
   }
-
+  //eindigt de game
   const endGame = () => {
     clearInterval(gameLoopInterval)
     // Toon een game over bericht of handel het einde van het spel af
@@ -45,6 +45,7 @@ export const usePlayStore = defineStore('play', () => {
     restartGame()
   }
 
+  //herstart de game
   const restartGame = () => {
     initializeGame()
     startGameLoop()
@@ -76,11 +77,37 @@ export const usePlayStore = defineStore('play', () => {
     }, 1000 / 5) // Pas de snelheid aan door de intervaltijd te veranderen
   }
 
+  
   // Lees toetsenbordinvoer
-  onKeyStroke(keybinds.value.down, () => (direction.value = 'down'))
-  onKeyStroke(keybinds.value.up, () => (direction.value = 'up'))
-  onKeyStroke(keybinds.value.left, () => (direction.value = 'left'))
-  onKeyStroke(keybinds.value.right, () => (direction.value = 'right'))
+  onKeyStroke(keybinds.value.down, () => {
+    //zorgt ervoor dat je niet kan verwisselen naar de tegenovergestelde richting
+    if(direction.value === 'up'){
+      return
+    }else{
+    direction.value = 'down'
+    }
+  })
+  onKeyStroke(keybinds.value.up, () => {
+    if(direction.value === 'down'){
+      return
+    }else{
+    direction.value = 'up'
+    }
+  })
+  onKeyStroke(keybinds.value.left, () => {
+    if(direction.value === 'right'){
+      return
+    }else{
+    direction.value = 'left'
+    }
+  })
+  onKeyStroke(keybinds.value.right, () => {
+    if(direction.value === 'left'){
+      return
+    }else{
+    direction.value = 'right'
+    }
+  })
 
   // Beweeg de slang
   function moveSnake() {
