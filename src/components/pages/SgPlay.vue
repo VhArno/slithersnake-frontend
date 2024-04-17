@@ -6,10 +6,17 @@ import { storeToRefs } from 'pinia'
 import SgGrid from '@/components/organisms/SgGrid.vue'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // instellingen opslaan
 const settingsStore = useSettingsStore()
 const { keybinds, volume } = storeToRefs(settingsStore)
+
+const leaveGame = () => {
+  router.push('/')
+}
 
 const numRows = 20 // Aantal rijen
 const numCols = 20 // Aantal kolommen
@@ -166,7 +173,7 @@ onMounted(() => {
 
       <div class="score-settings">
         <SgSoundRange v-model:modelValue="volume"></SgSoundRange>
-        <SgButton class="leave-btn">Verlaten</SgButton>
+        <SgButton class="leave-btn"  @click="leaveGame">Verlaten</SgButton>
       </div>
     </div>
   </section>
