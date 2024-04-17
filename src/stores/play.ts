@@ -53,7 +53,9 @@ function startGameLoop() {
     if (!gameOver.value) {
       moveSnake()
       checkCollisions()
+      if(!gameOver.value){
       updateGameGrid()
+      }
     } else {
       clearInterval(gameLoopInterval)
       // Toon een game over bericht of handel het einde van het spel af
