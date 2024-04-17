@@ -1,16 +1,32 @@
 <script setup lang="ts">
-import type { Skin } from "@/types";
 import SgSkin from "../molecules/SgSkin.vue"
-import { ref } from "vue";
+import { useSkinsStore } from "@/stores/skins";
+import type { Skin } from "@/types";
+import { storeToRefs } from 'pinia'
 
-const skins = ref<Skin[]>([])
+// skins store
+const skinStore = useSkinsStore()
+skinStore.loadSkins()
+
+const { skins } = storeToRefs(skinStore)
+
+const handleClick = (skin: Skin) => {
+    skinStore.selectedSkin = skin
+}
+
+const isSelected = (skin: Skin) => {
+    if (skinStore.selectedSkin === skin) {
+        return true
+    }
+    return false
+}
 </script>
 
 <template>
     <section class="skin-section">
         <h2>Skins</h2>
         <div class="skin-list">
-            <SgSkin :skin="skin" v-for="skin in skins" :key="skin.id"></SgSkin>
+            <SgSkin @click="handleClick(skin)" :class="{ selected: isSelected(skin)}" :skin="skin" v-for="skin in skins" :key="skin.id"></SgSkin>
         </div>
     </section>
 </template>
