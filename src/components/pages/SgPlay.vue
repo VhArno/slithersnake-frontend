@@ -4,10 +4,12 @@ import { onKeyStroke } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
 import SgGrid from '@/components/organisms/SgGrid.vue'
+import SgSoundRange from '../atoms/SgSoundRange.vue'
+import SgButton from '../atoms/SgButton.vue'
 
 // instellingen opslaan
 const settingsStore = useSettingsStore()
-const { keybinds } = storeToRefs(settingsStore)
+const { keybinds, volume } = storeToRefs(settingsStore)
 
 const numRows = 20 // Aantal rijen
 const numCols = 20 // Aantal kolommen
@@ -163,11 +165,7 @@ onMounted(() => {
       </div>
 
       <div class="score-settings">
-        <div class="sound-div">
-          <p>
-            Geluid <span><i class="fa-solid fa-volume-high"></i></span>
-          </p>
-        </div>
+        <SgSoundRange v-model:modelValue="volume"></SgSoundRange>
         <SgButton class="leave-btn">Verlaten</SgButton>
       </div>
     </div>

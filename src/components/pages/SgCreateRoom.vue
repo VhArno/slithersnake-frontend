@@ -44,25 +44,27 @@ const toggleToast = () => {
 
 const players = ref<Player[]>([
     {
-        id: 1,
-        username: 'test user',
-        email: '',
-        level: 1,
-        highscore: 0,
-        played: 0,
-        won: 0,
-        killed: 0
-    },
+    id: 1,
+    username: 'test user',
+    email: '',
+    level: 1,
+    highscore: 0,
+    played: 0,
+    won: 0,
+    killed: 0,
+    skins: []
+},
     {
-        id: 2,
-        username: 'test user 2',
-        email: '',
-        level: 5,
-        highscore: 0,
-        played: 0,
-        won: 0,
-        killed: 0
-    }
+    id: 2,
+    username: 'test user 2',
+    email: '',
+    level: 5,
+    highscore: 0,
+    played: 0,
+    won: 0,
+    killed: 0,
+    skins: []
+}
 ])
 
 const selectedMap = ref<Map>(maps.value[0])
