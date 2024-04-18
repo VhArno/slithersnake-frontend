@@ -54,6 +54,7 @@ export interface Character {
     id: number
     name: string
     attributes: Attributes
+    imgUrl: string
     // skin: Skin
 }
 
