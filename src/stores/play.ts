@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { onKeyStroke } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
+import type { Character } from '@/types'
+import { useCharStore } from './char'
 
 export const usePlayStore = defineStore('play', () => {
   // instellingen opslaan
   const settingsStore = useSettingsStore()
+  const charStore = useCharStore()
   const { keybinds } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
@@ -19,9 +22,13 @@ export const usePlayStore = defineStore('play', () => {
   const score = ref(0)
   const gameOver = ref(false)
   let gameLoopInterval = 0
+  const character = ref<Character>()
 
   // initialiseren
   function initializeGame() {
+    //Sla de geselecteerde character op
+    character.value = charStore.selectedCharacter
+   
     //in geval dat spel herbegint
     gameOver.value = false
     // Maak een leeg speelveld
@@ -77,35 +84,34 @@ export const usePlayStore = defineStore('play', () => {
     }, 1000 / 5) // Pas de snelheid aan door de intervaltijd te veranderen
   }
 
-  
   // Lees toetsenbordinvoer
   onKeyStroke(keybinds.value.down, () => {
     //zorgt ervoor dat je niet kan verwisselen naar de tegenovergestelde richting
-    if(direction.value === 'up'){
+    if (direction.value === 'up') {
       return
-    }else{
-    direction.value = 'down'
+    } else {
+      direction.value = 'down'
     }
   })
   onKeyStroke(keybinds.value.up, () => {
-    if(direction.value === 'down'){
+    if (direction.value === 'down') {
       return
-    }else{
-    direction.value = 'up'
+    } else {
+      direction.value = 'up'
     }
   })
   onKeyStroke(keybinds.value.left, () => {
-    if(direction.value === 'right'){
+    if (direction.value === 'right') {
       return
-    }else{
-    direction.value = 'left'
+    } else {
+      direction.value = 'left'
     }
   })
   onKeyStroke(keybinds.value.right, () => {
-    if(direction.value === 'left'){
+    if (direction.value === 'left') {
       return
-    }else{
-    direction.value = 'right'
+    } else {
+      direction.value = 'right'
     }
   })
 
@@ -157,6 +163,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     // Controleer botsingen met zichzelf
+
     for (let i = 1; i < snake.value.length; i++) {
       if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
         gameOver.value = true

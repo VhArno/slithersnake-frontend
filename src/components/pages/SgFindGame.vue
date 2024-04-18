@@ -47,7 +47,7 @@ const toggleSelectRoom = (room: Room) => {
 }
 
 const joinRoom = () => {
-    router.push('/play')
+    router.push('/character-select')
 }
 </script>
 
