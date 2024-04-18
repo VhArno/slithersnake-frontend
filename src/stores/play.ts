@@ -25,6 +25,9 @@ export const usePlayStore = defineStore('play', () => {
   const interval = ref<number>(5)
   const character = ref<Character>()
 
+  //kijkt of richting al veranderd is in interval
+  const directionChanged = ref<boolean>(false)
+
   // initialiseren
   function initializeGame() {
     //Sla de geselecteerde character op
@@ -79,6 +82,7 @@ export const usePlayStore = defineStore('play', () => {
   function startGameLoop() {
     gameLoopInterval = setInterval(() => {
       if (!gameOver.value) {
+        directionChanged.value = false
         moveSnake()
         checkCollisions()
         if (!gameOver.value) {
@@ -93,32 +97,46 @@ export const usePlayStore = defineStore('play', () => {
   // Lees toetsenbordinvoer
   onKeyStroke(keybinds.value.down, () => {
     //zorgt ervoor dat je niet kan verwisselen naar de tegenovergestelde richting
+    if(!directionChanged.value){
     if (direction.value === 'up') {
       return
     } else {
       direction.value = 'down'
+      directionChanged.value = true
     }
+  }
   })
   onKeyStroke(keybinds.value.up, () => {
+    if(!directionChanged.value){
     if (direction.value === 'down') {
       return
     } else {
       direction.value = 'up'
+      directionChanged.value = true
     }
+  }
   })
   onKeyStroke(keybinds.value.left, () => {
+    if(!directionChanged.value){
     if (direction.value === 'right') {
       return
     } else {
       direction.value = 'left'
+      directionChanged.value = true
+
     }
+  }
   })
   onKeyStroke(keybinds.value.right, () => {
+    if(!directionChanged.value){
     if (direction.value === 'left') {
       return
     } else {
       direction.value = 'right'
+      directionChanged.value = true
+
     }
+  }
   })
 
   // Beweeg de slang

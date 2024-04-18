@@ -48,6 +48,7 @@ onMounted(() => {
   flex-flow: row;
 
   .grid {
+    margin: 2rem;
     flex: 4;
     height: 100%;
   }
