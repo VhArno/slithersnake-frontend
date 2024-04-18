@@ -19,7 +19,7 @@ export const useCharStore = defineStore('char', () => {
   }, {
     id: 3,
     name: 'LongNeck',
-    attributes: { speed: 4, startLength: 6, lives: 1 }
+    attributes: { speed: 3, startLength: 6, lives: 1 }
   }])
 
   const selectedCharacter = ref<Character>({

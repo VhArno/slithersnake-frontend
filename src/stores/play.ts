@@ -22,13 +22,14 @@ export const usePlayStore = defineStore('play', () => {
   const score = ref(0)
   const gameOver = ref(false)
   let gameLoopInterval = 0
+  const interval = ref<number>(5)
   const character = ref<Character>()
 
   // initialiseren
   function initializeGame() {
     //Sla de geselecteerde character op
     character.value = charStore.selectedCharacter
-   
+    interval.value =character.value.attributes.speed
     //in geval dat spel herbegint
     gameOver.value = false
     // Maak een leeg speelveld
@@ -39,7 +40,12 @@ export const usePlayStore = defineStore('play', () => {
     // spawn slang
     const startX = Math.floor(numCols / 2)
     const startY = Math.floor(numRows / 2)
+
     snake.value = [{ x: startX, y: startY }]
+
+    for(let i = 1; i < character.value.attributes.startLength; i++){
+      snake.value.push({ x: startX, y: startY + i })
+    }
 
     // Plaats food
     generateFood()
@@ -81,7 +87,7 @@ export const usePlayStore = defineStore('play', () => {
       } else {
         endGame()
       }
-    }, 1000 / 5) // Pas de snelheid aan door de intervaltijd te veranderen
+    }, 1000 / (interval.value * 2)) // Pas de snelheid aan door de intervaltijd te veranderen
   }
 
   // Lees toetsenbordinvoer
