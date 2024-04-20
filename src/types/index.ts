@@ -64,3 +64,14 @@ export interface Attributes {
     lives: number
 }
 
+export interface PowerUp {
+    id: number
+    name: string
+    x: number
+    y: number
+    // image: string
+    //color verplaatst tijdelijk een image
+    // color: string
+}
+
+
