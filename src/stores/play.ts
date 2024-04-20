@@ -5,12 +5,13 @@ import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
 import type { Character } from '@/types'
 import { useCharStore } from './char'
+import { useRouter } from 'vue-router'
 
 export const usePlayStore = defineStore('play', () => {
   // instellingen opslaan
   const settingsStore = useSettingsStore()
   const charStore = useCharStore()
-  const { keybinds } = storeToRefs(settingsStore)
+  const { keybinds, volume } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
   const numCols = 20 // Aantal kolommen
@@ -214,6 +215,12 @@ export const usePlayStore = defineStore('play', () => {
     gameGrid.value[y][x] = 'food'
   }
 
+  const router = useRouter()
+
+  const leaveGame = () => {
+    router.push('/')
+  }
+
   return {
     keybinds,
     numRows,
@@ -224,10 +231,12 @@ export const usePlayStore = defineStore('play', () => {
     direction,
     score,
     gameOver,
+    volume,
     initializeGame,
     startGameLoop,
     moveSnake,
     checkCollisions,
-    updateGameGrid
+    updateGameGrid,
+    leaveGame
   }
 })

@@ -5,8 +5,13 @@ import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
 import SgGrid from '@/components/organisms/SgGrid.vue'
 import { usePlayStore } from '@/stores/play'
+import SgSoundRange from '../atoms/SgSoundRange.vue'
+import SgButton from '../atoms/SgButton.vue'
 
 const playStore = usePlayStore()
+
+
+
 
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
@@ -31,8 +36,8 @@ onMounted(() => {
       </div>
 
       <div class="score-settings">
-        <SgSoundRange v-model:modelValue="volume"></SgSoundRange>
-        <SgButton class="leave-btn"  @click="leaveGame">Verlaten</SgButton>
+        <SgSoundRange v-model:modelValue="playStore.volume"></SgSoundRange>
+        <SgButton class="leave-btn"  @click="playStore.leaveGame">Verlaten</SgButton>
       </div>
     </div>
   </section>
