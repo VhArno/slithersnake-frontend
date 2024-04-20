@@ -49,3 +49,18 @@ export interface Settings {
     volume: string
     darkMode: boolean
 }
+
+export interface Character {
+    id: number
+    name: string
+    attributes: Attributes
+    imgUrl: string
+    // skin: Skin
+}
+
+export interface Attributes {
+    speed: number
+    startLength: number
+    lives: number
+}
+

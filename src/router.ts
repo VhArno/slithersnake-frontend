@@ -1,6 +1,7 @@
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from './components/pages/SgHome.vue'
+import CharSelectView from './components/pages/SgCharSelect.vue'
 import PlayView from './components/pages/SgPlay.vue'
 import FindGame from './components/pages/SgFindGame.vue'
 import CreateRoomView from './components/pages/SgCreateRoom.vue'
@@ -12,6 +13,7 @@ import RegisterView from './components/pages/SgRegister.vue'
 
 const routes = [
   { path: '/', component: HomeView },
+  { path: '/character-select', component: CharSelectView },
   { path: '/play', component: PlayView },
   { path: '/find-game', component: FindGame },
   { path: '/create-room', component: CreateRoomView },
