@@ -31,8 +31,8 @@ onMounted(() => {
       </div>
 
       <div class="score-settings">
-        <SgSoundRange v-model:modelValue="volume"></SgSoundRange>
-        <SgButton class="leave-btn"  @click="leaveGame">Verlaten</SgButton>
+        <SgSoundRange v-model:modelValue="playStore.volume"></SgSoundRange>
+        <SgButton class="leave-btn"  @click="playStore.leaveGame">Verlaten</SgButton>
       </div>
     </div>
   </section>
