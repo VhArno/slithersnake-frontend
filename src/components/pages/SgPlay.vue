@@ -31,12 +31,8 @@ onMounted(() => {
       </div>
 
       <div class="score-settings">
-        <div class="sound-div">
-          <p>
-            Geluid <span><i class="fa-solid fa-volume-high"></i></span>
-          </p>
-        </div>
-        <SgButton class="leave-btn">Verlaten</SgButton>
+        <SgSoundRange v-model:modelValue="volume"></SgSoundRange>
+        <SgButton class="leave-btn"  @click="leaveGame">Verlaten</SgButton>
       </div>
     </div>
   </section>
