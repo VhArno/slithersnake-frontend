@@ -8,6 +8,18 @@ import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
 
 export const usePlayStore = defineStore('play', () => {
+  // Audios
+  const gameMusic = ref()
+  const endGameSound = ref()
+
+  function setGameMusic(music: HTMLAudioElement) {
+    gameMusic.value = music
+  }
+
+  function setEndGameSound(sound: HTMLAudioElement) {
+    endGameSound.value = sound
+  }
+
   // instellingen opslaan
   const settingsStore = useSettingsStore()
   const charStore = useCharStore()
@@ -53,11 +65,25 @@ export const usePlayStore = defineStore('play', () => {
 
     // Plaats food
     generateFood()
+
+    // Play audio
+    gameMusic.value.currentTime = 0
+    gameMusic.value.play().catch(() => {
+      console.error('Something went wrong')
+    })
   }
   //eindigt de game
   const endGame = () => {
     clearInterval(gameLoopInterval)
     // Toon een game over bericht of handel het einde van het spel af
+
+    gameMusic.value.pause()
+
+    endGameSound.value.currentTime = 0
+    endGameSound.value.play().catch(() => {
+      console.error('Something went wrong')
+    })
+
     alert('game over!')
     restartGame()
   }
@@ -223,6 +249,8 @@ export const usePlayStore = defineStore('play', () => {
   
 
   return {
+    setGameMusic,
+    setEndGameSound,
     keybinds,
     numRows,
     numCols,
