@@ -8,6 +8,7 @@ import { usePlayStore } from '@/stores/play'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
 import { Socket } from 'socket.io-client'
+import { watch } from 'fs'
 
 //audios
 
@@ -24,11 +25,13 @@ const { volume } = storeToRefs(settingsStore)
 
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
+  const socket: Socket = inject('socket') as Socket
   playStore.setGameMusic(gameMusic.value)
   playStore.setPickupSound(pickupSound.value)
   playStore.setEndGameSound(endGameSound.value)
 
   playStore.initializeGame()
+  playStore.initializeSocket(socket)
   const grid = document.getElementById('grid')
   grid?.addEventListener('click', () => {
     if (gameStatus.value === 'started') {
