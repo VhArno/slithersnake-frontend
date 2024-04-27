@@ -10,9 +10,6 @@ import SgButton from '../atoms/SgButton.vue'
 
 const playStore = usePlayStore()
 
-
-
-
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
   playStore.initializeGame()

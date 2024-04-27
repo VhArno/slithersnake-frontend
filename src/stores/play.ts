@@ -88,8 +88,50 @@ export const usePlayStore = defineStore('play', () => {
     food.value = { x: foodX, y: foodY }
   }
 
+  //logica van speedboost powerUpn 
+  const speedBoost = function () {
+    console.log('speed boost')
+    clearInterval(gameLoopInterval)
+    gameLoopInterval = setInterval(
+      () => {
+        if (!gameOver.value) {
+          directionChanged.value = false
+          moveSnake()
+          checkCollisions()
+          if (!gameOver.value) {
+            updateGameGrid()
+          }
+        } else {
+          endGame()
+        }
+      },
+      1000 / (interval.value * 2)
+    )
+
+    setTimeout(() => {
+      console.log("speed boost over")
+      clearInterval(gameLoopInterval)
+      gameLoopInterval = setInterval(
+        () => {
+          if (!gameOver.value) {
+            directionChanged.value = false
+            moveSnake()
+            checkCollisions()
+            if (!gameOver.value) {
+              updateGameGrid()
+            }
+          } else {
+            endGame()
+          }
+        },
+        2000 / (interval.value * 2)
+      )
+    }, 4000)
+  }
+
   function generatePowerUp() {
     powerUpAvailable.value = true
+
     let powerX, powerY
     do {
       powerX = Math.floor(Math.random() * numCols)
@@ -98,6 +140,16 @@ export const usePlayStore = defineStore('play', () => {
 
     powerUp.value.x = powerX
     powerUp.value.y = powerY
+  }
+
+  function pickupPowerUp() {
+    powerUpAvailable.value = false
+
+    switch (powerUp.value.name) {
+      case 'speedboost':
+        speedBoost()
+        break
+    }
   }
 
   // Start de game loop om de spelstatus bij te werken
@@ -199,10 +251,10 @@ export const usePlayStore = defineStore('play', () => {
       powerUpAvailable.value = false
       //genereer een nieuwe powerUp na aantal seconden
       console.log('pwoer up picked up')
-
+      pickupPowerUp()
       powerUpTimeOut = setTimeout(() => {
         generatePowerUp()
-      }, 3000)
+      }, 20000)
     }
   }
 
