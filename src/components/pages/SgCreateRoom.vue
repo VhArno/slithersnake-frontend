@@ -19,6 +19,8 @@ const mapsStore = useMapsStore()
 mapsStore.loadMaps()
 const { maps } = storeToRefs(mapsStore)
 
+const creator = sessionStorage.getItem('creator')
+
 /* modes store */
 const modesStore = useGamemodesStore()
 modesStore.loadModes()
@@ -130,9 +132,23 @@ const nextMode = () => {
 
 /* actions buttons */
 const startGame = () => {
-  router.push('/play')
-  socket.emit('startGame', selectedMap.value.name, selectedMode.value.name)
+  // router.push('/character-select')
+  // router.push('/play')
+  const params = useUrlSearchParams('history')
+  if (params.id) {
+    socket.emit('startGame', params.id)
+  }
 }
+
+socket.on('gameStarted', (roomId) => {
+  console.log('game started')
+  const params = useUrlSearchParams('history')
+  if (params.id && roomId) {
+    if (roomId === params.id) {
+      router.push('/play?id=' + roomId)
+    }
+  }
+})
 
 const leaveGame = () => {
   router.push('/')
@@ -146,16 +162,15 @@ const leaveGame = () => {
     </div>
 
     <div class="settings">
-        <div class="bg-gray players">
-            <div>
-            <h2>Players</h2>
-            <ul class="player-list">
-                <li v-for="player in players" :key="player.id">
-                {{ player.username }} (lvl. <span>{{ player.level }}</span
-                >)
-                </li>
-            </ul>
-            </div>
+      <div class="bg-gray players">
+        <div>
+          <h2>Players</h2>
+          <ul class="player-list">
+            <li v-for="player in players" :key="player.id">
+              {{ player.username }} (lvl. <span>{{ player.level }}</span>)
+            </li>
+          </ul>
+        </div>
 
             <SgButton @click="invite">Invite</SgButton>
         </div>
@@ -177,44 +192,29 @@ const leaveGame = () => {
             </div>
           </div>
 
-            <div class="bg-gray options">
-                <h2>Game options</h2>
-                <div class="game-options">
-                    <div v-show="maps[0] !== undefined">
-                        <h3>Map</h3>
-                        <div class="map-select">
-                            <SgButton @click="prevMap" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
-                            <div class="maps">
-                                <div>
-                                    <p>{{ selectedMap?.name }}</p>
-                                    <img :src="selectedMap?.image" alt="map image">
-                                </div>
-                            </div>
-                            <SgButton @click="nextMap" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h3>Gamemode</h3>
-                        <div class="gamemode-select">
-                            <SgButton @click="prevMode" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
-                            <div class="gamemodes">
-                                <div>
-                                    <p>{{ selectedMode?.name }}</p>
-                                    <img :src="selectedMode?.image" alt="mode image">
-                                </div>
-                            </div>
-                            <SgButton @click="nextMode" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
-                        </div>
-                    </div>
-                </div> 
+          <div>
+            <h3>Gamemode</h3>
+            <div class="gamemode-select">
+              <SgButton @click="prevMode" class="select-btn"
+                ><i class="fa-solid fa-chevron-left"></i
+              ></SgButton>
+              <div class="gamemodes">
+                <div>
+                  <p>{{ selectedMode?.name }}</p>
+                  <img :src="selectedMode?.image" alt="mode image" />
+                </div>
+              </div>
+              <SgButton @click="nextMode" class="select-btn"
+                ><i class="fa-solid fa-chevron-right"></i
+              ></SgButton>
             </div>
           </div>
         </div>
         <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
-        <SgButton @click="startGame">Start game</SgButton>
+        <SgButton v-if="creator" @click="startGame">Start game</SgButton>
         <SgButton @click="leaveGame">Leave game</SgButton>
       </div>
+    </div>
     </section>
 </template>
 
@@ -269,40 +269,28 @@ const leaveGame = () => {
         }
 
         .players {
-            display: flex;
-            flex-flow: column;
+          display: flex;
+          flex-flow: column;
         }
 
         .options {
-            .game-options {
-                display: flex;
-                flex-flow: column;
-                gap: 1rem;
-                margin: 1em 0em;
-            }
+          .game-options {
+            display: flex;
+            flex-flow: column;
+            gap: 1rem;
+            margin: 1em 0em;
+          }
 
             .gamemode-select, .map-select {
                 display: flex;
                 flex-flow: row;
                 align-items: center;
                 margin-top: 1rem;
-                justify-content: space-between;
-
-                .select-btn {
-                    flex: 1
-                }
 
                 .gamemodes, .maps {
-                    flex: 5;
+                    flex-grow: 1;
+                    width: 100%;
                     text-align: center;
-
-                    p {
-                        margin-bottom: 0.5rem;
-                    }
-
-                    img {
-                        height: 8em;
-                    }
                 }
             }
         SgButton {
@@ -315,30 +303,30 @@ const leaveGame = () => {
   }
 }
 
-/* BREAKPOINTS */
-@media (width >= 65em) {
-  .create {
-    width: 60%;
-    margin: 2rem auto;
+  /* BREAKPOINTS */
+  @media (width >=65em) {
+    .create {
+      width: 60%;
+      margin: 2rem auto;
 
-    .settings {
-      flex-flow: row;
+      .settings {
+        flex-flow: row;
 
-      .bg-gray {
-        flex: 1;
-        width: 100%;
+        .bg-gray {
+          flex: 1;
+          width: 100%;
+        }
+
+        .players {
+          display: flex;
+          flex-flow: column;
+          justify-content: space-between;
+        }
       }
 
-            .players {
-                display: flex;
-                flex-flow: column;
-                justify-content: space-between;
-            }
-        }
-
-        .sound-range {
-            width: 30%
-        }
+      .sound-range {
+        width: 30%
+      }
     }
   }
 }

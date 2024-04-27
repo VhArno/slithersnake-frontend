@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 import { onKeyStroke } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
@@ -7,6 +7,9 @@ import type { Character, PowerUp } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
+import { io, Socket } from 'socket.io-client'
+
+const socket: Socket = inject('socket') as Socket
 
 export const usePlayStore = defineStore('play', () => {
   // Audios
@@ -115,7 +118,7 @@ export const usePlayStore = defineStore('play', () => {
     food.value = { x: foodX, y: foodY }
   }
 
-  //logica van speedboost powerUpn 
+  //logica van speedboost powerUpn
   const speedBoost = function () {
     console.log('speed boost')
     clearInterval(gameLoopInterval)
@@ -136,7 +139,7 @@ export const usePlayStore = defineStore('play', () => {
     )
 
     setTimeout(() => {
-      console.log("speed boost over")
+      console.log('speed boost over')
       clearInterval(gameLoopInterval)
       gameLoopInterval = setInterval(
         () => {
@@ -284,7 +287,7 @@ export const usePlayStore = defineStore('play', () => {
     if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
       powerUpAvailable.value = false
       //genereer een nieuwe powerUp na aantal seconden
-      console.log('pwoer up picked up')
+      console.log('power up picked up')
       pickupPowerUp()
       powerUpTimeOut = setTimeout(() => {
         generatePowerUp()
