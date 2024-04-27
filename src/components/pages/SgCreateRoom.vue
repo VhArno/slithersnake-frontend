@@ -6,7 +6,7 @@ import type { Room, Map, GameMode, Player } from '@/types/'
 import SgToast from '../atoms/SgToast.vue'
 import { v4 as uuidv4 } from 'uuid'
 import { useRouter } from 'vue-router'
-import { io, Socket } from 'socket.io-client'
+import { Socket } from 'socket.io-client'
 
 const socket: Socket = inject('socket') as Socket
 const router = useRouter()
@@ -16,29 +16,28 @@ const player = ref<Player>({
   id: Math.floor(Math.random() * (100 - 0 + 1)) + 0,
   username: 'test user',
   email: '',
-  level: 1,
+  level: Math.floor(Math.random() * (100 - 0 + 1)) + 0,
   highscore: 0,
   played: 0,
   won: 0,
   killed: 0
 })
 
-watchEffect(() => {
-  if (sessionStorage.getItem('creator')) {
-    const randomGuid: string = uuidv4()
-    const params = useUrlSearchParams('history')
-    params.id = randomGuid
-    console.log(params.id)
-    socket.emit('createRoom', params.id, player)
-  }
+if (sessionStorage.getItem('creator')) {
+  const randomGuid: string = uuidv4()
+  const params = useUrlSearchParams('history')
+  params.id = randomGuid
+  socket.emit('createRoom', params.id, player)
+}
 
-  socket.on('joinedRoom', (room: Room) => {
-    const params = useUrlSearchParams('history')
-    if (params.id === room.id) {
-      players.value = room.players
-      console.log(players.value)
-    }
-  })
+socket.on('joinedRoom', (room: Room) => {
+  const params = useUrlSearchParams('history')
+  console.log('player joined room')
+  if (params.id === room.id) {
+    players.value = room.players
+    console.log(players.value)
+    socket.emit('getPlayers', params.id)
+  }
 })
 
 const params = useUrlSearchParams('history')
