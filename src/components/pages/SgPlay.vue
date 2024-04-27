@@ -9,12 +9,19 @@ import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
 
 const playStore = usePlayStore()
+const settingsStore = useSettingsStore()
+const { volume } = storeToRefs(settingsStore)
 
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
+  playStore.setGameMusic(gameMusic.value)
+  playStore.setPickupSound(pickupSound.value)
+  playStore.setEndGameSound(endGameSound.value)
+
   playStore.initializeGame()
   playStore.startGameLoop()
 })
+
 </script>
 
 <template>
@@ -37,6 +44,9 @@ onMounted(() => {
         <SgButton class="leave-btn"  @click="playStore.leaveGame">Verlaten</SgButton>
       </div>
     </div>
+    <audio ref="endGameSound" hidden preload="auto" src="/src/assets/sounds/game_end-defeat.wav" :volume="volume / 100"></audio>
+    <audio ref="gameMusic" hidden loop preload="auto" src="/src/assets/sounds/game_music.wav" :volume="volume / 100"></audio>
+    <audio ref="pickupSound" hidden preload="auto" src="/src/assets/sounds/power-up_pickup.wav" :volume="volume / 100"></audio>
   </section>
 </template>
 

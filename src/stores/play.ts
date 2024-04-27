@@ -9,6 +9,23 @@ import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
 
 export const usePlayStore = defineStore('play', () => {
+  // Audios
+  const gameMusic = ref()
+  const pickupSound = ref()
+  const endGameSound = ref()
+
+  function setGameMusic(music: HTMLAudioElement) {
+    gameMusic.value = music
+  }
+
+  function setPickupSound(sound: HTMLAudioElement) {
+    pickupSound.value = sound
+  }
+
+  function setEndGameSound(sound: HTMLAudioElement) {
+    endGameSound.value = sound
+  }
+
   // instellingen opslaan
   const settingsStore = useSettingsStore()
   const charStore = useCharStore()
@@ -66,7 +83,17 @@ export const usePlayStore = defineStore('play', () => {
   //eindigt de game
   const endGame = () => {
     clearInterval(gameLoopInterval)
+
     // Toon een game over bericht of handel het einde van het spel af
+    // Pause game music
+    gameMusic.value.pause()
+
+    // Play end game sound
+    endGameSound.value.currentTime = 0
+    endGameSound.value.play().catch(() => {
+      console.error('Something went wrong')
+    })
+
     alert('game over!')
     restartGame()
   }
@@ -242,6 +269,13 @@ export const usePlayStore = defineStore('play', () => {
 
     if (newHead.x === food.value.x && newHead.y === food.value.y) {
       score.value++
+
+      // Play pick up sound
+      pickupSound.value.currentTime = 0
+      pickupSound.value.play().catch(() => {
+        console.error('Something went wrong')
+      })
+
       generateFood() // Genereer nieuw voedsel
     } else {
       snake.value.pop() // Verwijder het einde van de slang
@@ -312,6 +346,9 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   return {
+    setGameMusic,
+    setPickupSound,
+    setEndGameSound,
     keybinds,
     numRows,
     numCols,
