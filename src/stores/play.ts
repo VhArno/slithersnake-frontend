@@ -9,7 +9,7 @@ import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
 
-const socket: Socket = inject('socket') as Socket
+let socket: Socket | null = null
 
 export const usePlayStore = defineStore('play', () => {
   // Audios
@@ -53,6 +53,10 @@ export const usePlayStore = defineStore('play', () => {
 
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
+
+  function initializeSocket(s: Socket) {
+    socket = s
+  }
 
   // initialiseren
   function initializeGame() {
@@ -182,8 +186,21 @@ export const usePlayStore = defineStore('play', () => {
     }
   }
 
+  const startInterval = () => {
+    // console.log(socket)
+    setInterval(() => {
+      socket?.emit('sendPlayerData')
+      socket?.emit('getPlayerData')
+    }, 100)
+
+    socket?.on('playerData', () => {
+      console.log('player data received')
+    })
+  }
+
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
+    startInterval()
     gameLoopInterval = setInterval(
       () => {
         if (!gameOver.value) {
@@ -367,6 +384,7 @@ export const usePlayStore = defineStore('play', () => {
     moveSnake,
     checkCollisions,
     updateGameGrid,
-    leaveGame
+    leaveGame,
+    initializeSocket
   }
 })
