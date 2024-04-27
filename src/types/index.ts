@@ -1,3 +1,7 @@
+export interface ApiResponse {
+    data: []
+}
+
 export interface Room {
   id: string
   name: string
@@ -8,15 +12,15 @@ export interface Room {
 }
 
 export interface Map {
-  id: number
-  name: string
-  img?: string
+    id: number
+    name: string
+    image: string
 }
 
 export interface GameMode {
-  id: number
-  name: string
-  img?: string
+    id: number
+    name: string
+    image: string
 }
 
 export interface Skin {

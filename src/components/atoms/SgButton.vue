@@ -9,9 +9,11 @@
         color: var(--default-text-dark);
         background-color: var(--accent);
         border: none;
-        padding: 0.6rem 2rem;
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
         border-radius: 10px;
         width: 100%;
+        min-width: 1%;
 
         &:hover {
             background-color: var(--accent-light);

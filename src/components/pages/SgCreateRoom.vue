@@ -172,37 +172,41 @@ const leaveGame = () => {
           </ul>
         </div>
 
-        <SgButton @click="invite">Invite</SgButton>
-      </div>
+            <SgButton @click="invite">Invite</SgButton>
+        </div>
 
-      <div class="bg-gray options">
+        <div class="bg-gray options">
         <h2>Game options</h2>
         <div class="game-options">
           <div>
             <h3>Map</h3>
             <div class="map-select">
-              <SgButton @click="prevMap"><i class="fa-solid fa-chevron-left"></i></SgButton>
+              <SgButton @click="prevMap" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
               <div class="maps">
                 <div>
                   <p>{{ selectedMap?.name }}</p>
-                  <img :src="selectedMap?.img" alt="map image" />
+                  <img :src="selectedMap?.image" alt="map image" />
                 </div>
               </div>
-              <SgButton @click="nextMap"><i class="fa-solid fa-chevron-right"></i></SgButton>
+              <SgButton @click="nextMap" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
             </div>
           </div>
 
           <div>
             <h3>Gamemode</h3>
             <div class="gamemode-select">
-              <SgButton @click="prevMode" id="prev-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
+              <SgButton @click="prevMode" class="select-btn"
+                ><i class="fa-solid fa-chevron-left"></i
+              ></SgButton>
               <div class="gamemodes">
                 <div>
                   <p>{{ selectedMode?.name }}</p>
-                  <img :src="selectedMode?.img" alt="mode image" />
+                  <img :src="selectedMode?.image" alt="mode image" />
                 </div>
               </div>
-              <SgButton @click="nextMode" id="next-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
+              <SgButton @click="nextMode" class="select-btn"
+                ><i class="fa-solid fa-chevron-right"></i
+              ></SgButton>
             </div>
           </div>
         </div>
@@ -211,7 +215,7 @@ const leaveGame = () => {
         <SgButton @click="leaveGame">Leave game</SgButton>
       </div>
     </div>
-  </section>
+    </section>
 </template>
 
 <style scoped lang="scss">
@@ -277,30 +281,27 @@ const leaveGame = () => {
             margin: 1em 0em;
           }
 
-          .gamemode-select,
-          .map-select {
-            display: flex;
-            flex-flow: row;
-            align-items: center;
-            margin-top: 1rem;
+            .gamemode-select, .map-select {
+                display: flex;
+                flex-flow: row;
+                align-items: center;
+                margin-top: 1rem;
 
-            .gamemodes,
-            .maps {
-              flex-grow: 1;
-              width: 100%;
-              text-align: center;
+                .gamemodes, .maps {
+                    flex-grow: 1;
+                    width: 100%;
+                    text-align: center;
+                }
             }
-          }
-
-          SgButton {
-            flex-shrink: 3;
-            padding: 0;
-            background-color: transparent;
-          }
+        SgButton {
+          flex-shrink: 3;
+          padding: 0;
+          background-color: transparent;
         }
       }
     }
   }
+}
 
   /* BREAKPOINTS */
   @media (width >=65em) {
