@@ -8,6 +8,13 @@ import { usePlayStore } from '@/stores/play'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
 
+//audios
+
+const gameMusic = ref()
+const pickupSound = ref()
+const endGameSound = ref()
+
+
 const playStore = usePlayStore()
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
