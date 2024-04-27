@@ -5,13 +5,8 @@ import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
 import SgGrid from '@/components/organisms/SgGrid.vue'
 import { usePlayStore } from '@/stores/play'
-import SgButton from '../atoms/SgButton.vue'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
-
-// Audios
-const gameMusic = ref()
-const pickupSound = ref()
-const endGameSound = ref()
+import SgButton from '../atoms/SgButton.vue'
 
 const playStore = usePlayStore()
 const settingsStore = useSettingsStore()

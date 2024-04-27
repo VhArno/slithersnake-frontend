@@ -30,6 +30,10 @@ const props = defineProps<{
   border: 1px solid #ccc;
 }
 
+.powerUp{
+  background-color: yellow;
+}
+
 .snake {
   background-color: green;
 }

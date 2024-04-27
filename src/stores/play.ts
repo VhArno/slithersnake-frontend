@@ -3,9 +3,10 @@ import { ref } from 'vue'
 import { onKeyStroke } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
-import type { Character } from '@/types'
+import type { Character, PowerUp } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
+import { usePowerUpStore } from './powerups'
 
 export const usePlayStore = defineStore('play', () => {
   // Audios
@@ -28,6 +29,7 @@ export const usePlayStore = defineStore('play', () => {
   // instellingen opslaan
   const settingsStore = useSettingsStore()
   const charStore = useCharStore()
+  const powerStore = usePowerUpStore()
   const { keybinds, volume } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
@@ -35,11 +37,14 @@ export const usePlayStore = defineStore('play', () => {
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
-  const food = ref<{ x: number; y: number }>({ x: 0, y: 0 }) // Positie van food
+  const food = ref<{ x: number; y: number }>({ x: 0, y: 0 })
+  const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
   let gameLoopInterval = 0
+  let powerUpTimeOut = 0
+  const powerUpAvailable = ref<boolean>(false)
   const interval = ref<number>(5)
   const character = ref<Character>()
 
@@ -50,7 +55,7 @@ export const usePlayStore = defineStore('play', () => {
   function initializeGame() {
     //Sla de geselecteerde character op
     character.value = charStore.selectedCharacter
-    interval.value =character.value.attributes.speed
+    interval.value = character.value.attributes.speed
     //in geval dat spel herbegint
     gameOver.value = false
     // Maak een leeg speelveld
@@ -64,18 +69,16 @@ export const usePlayStore = defineStore('play', () => {
 
     snake.value = [{ x: startX, y: startY }]
 
-    for(let i = 1; i < character.value.attributes.startLength; i++){
+    for (let i = 1; i < character.value.attributes.startLength; i++) {
       snake.value.push({ x: startX, y: startY + i })
     }
 
     // Plaats food
     generateFood()
 
-    // Play audio
-    gameMusic.value.currentTime = 0
-    gameMusic.value.play().catch(() => {
-      console.error('Something went wrong')
-    })
+    powerUpTimeOut = setTimeout(() => {
+      generatePowerUp()
+    }, 5000)
   }
   //eindigt de game
   const endGame = () => {
@@ -112,65 +115,130 @@ export const usePlayStore = defineStore('play', () => {
     food.value = { x: foodX, y: foodY }
   }
 
+  //logica van speedboost powerUpn 
+  const speedBoost = function () {
+    console.log('speed boost')
+    clearInterval(gameLoopInterval)
+    gameLoopInterval = setInterval(
+      () => {
+        if (!gameOver.value) {
+          directionChanged.value = false
+          moveSnake()
+          checkCollisions()
+          if (!gameOver.value) {
+            updateGameGrid()
+          }
+        } else {
+          endGame()
+        }
+      },
+      1000 / (interval.value * 2)
+    )
+
+    setTimeout(() => {
+      console.log("speed boost over")
+      clearInterval(gameLoopInterval)
+      gameLoopInterval = setInterval(
+        () => {
+          if (!gameOver.value) {
+            directionChanged.value = false
+            moveSnake()
+            checkCollisions()
+            if (!gameOver.value) {
+              updateGameGrid()
+            }
+          } else {
+            endGame()
+          }
+        },
+        2000 / (interval.value * 2)
+      )
+    }, 4000)
+  }
+
+  function generatePowerUp() {
+    powerUpAvailable.value = true
+
+    let powerX, powerY
+    do {
+      powerX = Math.floor(Math.random() * numCols)
+      powerY = Math.floor(Math.random() * numRows)
+    } while (gameGrid.value[powerY][powerX] !== 'empty')
+
+    powerUp.value.x = powerX
+    powerUp.value.y = powerY
+  }
+
+  function pickupPowerUp() {
+    powerUpAvailable.value = false
+
+    switch (powerUp.value.name) {
+      case 'speedboost':
+        speedBoost()
+        break
+    }
+  }
+
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
-    gameLoopInterval = setInterval(() => {
-      if (!gameOver.value) {
-        directionChanged.value = false
-        moveSnake()
-        checkCollisions()
+    gameLoopInterval = setInterval(
+      () => {
         if (!gameOver.value) {
-          updateGameGrid()
+          directionChanged.value = false
+          moveSnake()
+          checkCollisions()
+          if (!gameOver.value) {
+            updateGameGrid()
+          }
+        } else {
+          endGame()
         }
-      } else {
-        endGame()
-      }
-    }, 1000 / (interval.value * 2)) // Pas de snelheid aan door de intervaltijd te veranderen
+      },
+      2000 / (interval.value * 2)
+    ) // Pas de snelheid aan door de intervaltijd te veranderen
   }
 
   // Lees toetsenbordinvoer
   onKeyStroke(keybinds.value.down, () => {
     //zorgt ervoor dat je niet kan verwisselen naar de tegenovergestelde richting
-    if(!directionChanged.value){
-    if (direction.value === 'up') {
-      return
-    } else {
-      direction.value = 'down'
-      directionChanged.value = true
+    if (!directionChanged.value) {
+      if (direction.value === 'up') {
+        return
+      } else {
+        direction.value = 'down'
+        directionChanged.value = true
+      }
     }
-  }
   })
   onKeyStroke(keybinds.value.up, () => {
-    if(!directionChanged.value){
-    if (direction.value === 'down') {
-      return
-    } else {
-      direction.value = 'up'
-      directionChanged.value = true
+    if (!directionChanged.value) {
+      if (direction.value === 'down') {
+        return
+      } else {
+        direction.value = 'up'
+        directionChanged.value = true
+      }
     }
-  }
   })
   onKeyStroke(keybinds.value.left, () => {
-    if(!directionChanged.value){
-    if (direction.value === 'right') {
-      return
-    } else {
-      direction.value = 'left'
-      directionChanged.value = true
-
+    if (!directionChanged.value) {
+      if (direction.value === 'right') {
+        return
+      } else {
+        direction.value = 'left'
+        directionChanged.value = true
+      }
     }
-  }
   })
   onKeyStroke(keybinds.value.right, () => {
-    if(!directionChanged.value){
-    if (direction.value === 'left') {
-      return
-    } else {
-      direction.value = 'right'
-      directionChanged.value = true
-
+    if (!directionChanged.value) {
+      if (direction.value === 'left') {
+        return
+      } else {
+        direction.value = 'right'
+        directionChanged.value = true
+      }
     }
-  }
   })
 
   // Beweeg de slang
@@ -182,19 +250,15 @@ export const usePlayStore = defineStore('play', () => {
     switch (direction.value) {
       case 'up':
         newHead = { x: head.x, y: head.y - 1 }
-        console.log('omhoog')
         break
       case 'down':
         newHead = { x: head.x, y: head.y + 1 }
-        console.log('omlaag')
         break
       case 'left':
         newHead = { x: head.x - 1, y: head.y }
-        console.log('links')
         break
       case 'right':
         newHead = { x: head.x + 1, y: head.y }
-        console.log('rechts')
         break
       default:
         return
@@ -215,6 +279,16 @@ export const usePlayStore = defineStore('play', () => {
       generateFood() // Genereer nieuw voedsel
     } else {
       snake.value.pop() // Verwijder het einde van de slang
+    }
+
+    if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
+      powerUpAvailable.value = false
+      //genereer een nieuwe powerUp na aantal seconden
+      console.log('pwoer up picked up')
+      pickupPowerUp()
+      powerUpTimeOut = setTimeout(() => {
+        generatePowerUp()
+      }, 20000)
     }
   }
 
@@ -244,6 +318,16 @@ export const usePlayStore = defineStore('play', () => {
       row.fill('empty')
     })
 
+    //coordinaten van powerUp
+    const xP = powerUp.value.x
+    const yP = powerUp.value.y
+
+    if (powerUpAvailable.value) {
+      gameGrid.value[yP][xP] = 'powerUp'
+    } else {
+      gameGrid.value[yP][xP] = 'empty'
+    }
+
     // Plaats de slang op het speelveld
     snake.value.forEach((segment) => {
       const { x, y } = segment
@@ -260,7 +344,6 @@ export const usePlayStore = defineStore('play', () => {
   const leaveGame = () => {
     router.push('/')
   }
-  
 
   return {
     setGameMusic,
