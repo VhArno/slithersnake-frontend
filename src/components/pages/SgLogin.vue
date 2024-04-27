@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import SgButton from '../atoms/SgButton.vue';
+
 
 </script>
 
@@ -18,8 +20,8 @@
                 <input type="password" id="password" name="password" value="">
             </div>
 
-            <button>Login</button>
-            <RouterLink to="/register">New to SlitherGrid?</RouterLink>
+            <SgButton>Login</SgButton>
+            <RouterLink to="/register" class="link">New to SlitherGrid?</RouterLink>
         </form>
     </section>
 </template>
@@ -73,7 +75,7 @@
         }
 
         a {
-            color: var(--default-text-dark);
+            color: var(--accent-light);
         }
     }
 }

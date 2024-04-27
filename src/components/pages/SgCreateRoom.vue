@@ -206,7 +206,7 @@ const leaveGame = () => {
                 </div>
             </div>
         </div>
-        <div>
+        <div class="controls">
             <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
             <SgButton v-if="creator" @click="startGame">Start game</SgButton>
             <SgButton @click="leaveGame">Leave game</SgButton>
@@ -275,6 +275,12 @@ const leaveGame = () => {
             }
         }
     }
+    .controls {
+      display: flex;
+      flex-flow: column;
+      gap: 1rem
+    }
+
 }
 
   /* BREAKPOINTS */
