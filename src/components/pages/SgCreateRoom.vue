@@ -11,8 +11,7 @@ import { useGamemodesStore } from '@/stores/gamemodes'
 import { storeToRefs } from 'pinia'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import { useSettingsStore } from '@/stores/settings'
-import type { Socket } from 'dgram'
-//import { Socket } from 'socket.io-client'
+import { Socket } from 'socket.io-client'
 
 // pinia
 /* maps store */
@@ -217,65 +216,65 @@ const leaveGame = () => {
 
 <style scoped lang="scss">
 .create {
-  display: flex;
-  flex-flow: column;
-  gap: 1rem;
-  width: 80%;
-  margin: 1rem auto;
-  padding: 1rem;
-  border-radius: 10px;
-  color: var(--default-text-dark);
-  background-color: var(--bg2-dark);
-
-  .settings {
     display: flex;
     flex-flow: column;
     gap: 1rem;
+    width: 80%;
+    margin: 1rem auto;
+    padding: 1rem;
+    border-radius: 10px;
+    color: var(--default-text-dark);
+    background-color: var(--bg2-dark);
 
-    .bg-gray {
-      padding: 1rem;
-      border-radius: 10px;
-      background-color: var(--dark-gray);
-    }
-
-    .players {
-      display: flex;
-      flex-flow: column;
-    }
-
-    .options {
-      .game-options {
+    .settings { 
         display: flex;
         flex-flow: column;
         gap: 1rem;
-        margin: 1em 0em;
-      }
 
-      .gamemode-select, .map-select {
-        display: flex;
-        flex-flow: row;
-        align-items: center;
-        margin-top: 1rem;
-        justify-content: space-between;
-
-        .gamemodes, .maps {
-          flex: 5;
-          width: 100%;
-          text-align: center;
-
-          img {
-            height: 10em;
-            width: 100%;
-            object-fit: contain;
-          }
+        .bg-gray {
+            padding: 1rem;
+            border-radius: 10px;
+            background-color: var(--dark-gray);
         }
 
-        .select-btn {
-            flex: 1;
+        .players {
+            display: flex;
+            flex-flow: column;
+        }
+
+        .options {
+            .game-options {
+                display: flex;
+                flex-flow: column;
+                gap: 1rem;
+                margin: 1em 0em;
+            }
+
+            .gamemode-select, .map-select {
+                display: flex;
+                flex-flow: row;
+                align-items: center;
+                margin-top: 1rem;
+                justify-content: space-between;
+
+                .gamemodes, .maps {
+                flex: 5;
+                width: 100%;
+                text-align: center;
+
+                img {
+                    height: 10em;
+                    width: 100%;
+                    object-fit: contain;
+                }
+                }
+
+                .select-btn {
+                    flex: 1;
+                }
+            }
         }
     }
-  }
-}
 }
 
   /* BREAKPOINTS */
