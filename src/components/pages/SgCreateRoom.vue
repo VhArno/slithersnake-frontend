@@ -70,6 +70,10 @@ const players = ref<Player[]>([
 const selectedMap = ref<Map>(maps.value[0])
 const selectedMode = ref<GameMode>(modes.value[0])
 
+function setSelectedMap() {
+    selectedMap.value = maps.value[0]
+}
+
 /* invite button */
 const source = ref('Hello')
 const { copy, copied } = useClipboard({ source })
@@ -141,31 +145,31 @@ const leaveGame = () => {
             <div class="bg-gray options">
                 <h2>Game options</h2>
                 <div class="game-options">
-                    <div>
+                    <div v-show="maps[0] !== undefined">
                         <h3>Map</h3>
                         <div class="map-select">
-                            <SgButton @click="prevMap"><i class="fa-solid fa-chevron-left"></i></SgButton>
+                            <SgButton @click="prevMap" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
                             <div class="maps">
                                 <div>
                                     <p>{{ selectedMap?.name }}</p>
-                                    <img :src="selectedMap?.img" alt="map image">
+                                    <img :src="selectedMap?.image" alt="map image">
                                 </div>
                             </div>
-                            <SgButton @click="nextMap"><i class="fa-solid fa-chevron-right"></i></SgButton>
+                            <SgButton @click="nextMap" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
                         </div>
                     </div>
                     
                     <div>
                         <h3>Gamemode</h3>
                         <div class="gamemode-select">
-                            <SgButton @click="prevMode" id="prev-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
+                            <SgButton @click="prevMode" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
                             <div class="gamemodes">
                                 <div>
                                     <p>{{ selectedMode?.name }}</p>
-                                    <img :src="selectedMode?.img" alt="mode image">
+                                    <img :src="selectedMode?.image" alt="mode image">
                                 </div>
                             </div>
-                            <SgButton @click="nextMode" id="next-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
+                            <SgButton @click="nextMode" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
                         </div>
                     </div>
                 </div> 
@@ -219,11 +223,23 @@ const leaveGame = () => {
                 flex-flow: row;
                 align-items: center;
                 margin-top: 1rem;
+                justify-content: space-between;
+
+                .select-btn {
+                    flex: 1
+                }
 
                 .gamemodes, .maps {
-                    flex-grow: 1;
-                    width: 100%;
+                    flex: 5;
                     text-align: center;
+
+                    p {
+                        margin-bottom: 0.5rem;
+                    }
+
+                    img {
+                        height: 8em;
+                    }
                 }
             }
         }

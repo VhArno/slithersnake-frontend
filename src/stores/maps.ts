@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Room, Map, GameMode, Player } from '@/types/'
+import type { Room, Map, GameMode, Player, ApiResponse } from '@/types/'
 import { getMaps } from '@/services/dataService'
 
 export const useMapsStore = defineStore('maps', () => {
   const maps = ref<Map[]>([])
 
   const loadMaps = () => {
-    getMaps<Map[]>().then((response) => {
-      const loadedMaps: Map[] = response.data.map((record: any) => {
+    getMaps<ApiResponse>().then((response) => {
+      const loadedMaps: Map[] = response.data.data.map((record: any) => {
         return {
           id: record.id,
           name: record.name,
