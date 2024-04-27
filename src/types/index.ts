@@ -3,12 +3,12 @@ export interface ApiResponse {
 }
 
 export interface Room {
-    id: string
-    name: string
-    map: Map
-    mode: GameMode
-    players: []
-    ping: number
+  id: string
+  name: string
+  map: Map
+  mode: GameMode
+  players: []
+  ping: number
 }
 
 export interface Map {
@@ -24,9 +24,9 @@ export interface GameMode {
 }
 
 export interface Skin {
-    id: number
-    name: string
-    img?: string
+  id: number
+  name: string
+  img?: string
 }
 
 export interface Player {
@@ -67,4 +67,15 @@ export interface Attributes {
     startLength: number
     lives: number
 }
+
+export interface PowerUp {
+    id: number
+    name: string
+    x: number
+    y: number
+    // image: string
+    //color verplaatst tijdelijk een image
+    // color: string
+}
+
 

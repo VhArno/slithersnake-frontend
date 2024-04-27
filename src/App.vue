@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted } from 'vue'
 import SgHeader from './components/molecules/SgHeader.vue'
-import { useSettingsStore } from './stores/settings';
+import { useSettingsStore } from './stores/settings'
+import { provide } from 'vue'
+
+import { io, Socket } from 'socket.io-client'
 
 const settingsStore = useSettingsStore()
 
@@ -12,6 +15,16 @@ onMounted(() => {
 settingsStore.$subscribe(() => {
   settingsStore.saveData()
 })
+
+const socket: Socket = io('http://localhost:3000')
+
+socket.on('connect', () => {
+  console.log('Connected to server')
+})
+
+if (socket) {
+  provide('socket', socket)
+}
 </script>
 
 <template>
@@ -26,5 +39,4 @@ settingsStore.$subscribe(() => {
   <footer></footer>
 </template>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>
