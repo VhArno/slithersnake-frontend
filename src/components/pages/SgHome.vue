@@ -11,6 +11,7 @@ const goFindGame = () => {
   router.push('/find-game')
 }
 const goCreateRoom = () => {
+  sessionStorage.setItem('creator', "true")
   router.push('/create-room')
 }
 const goSkins = () => {

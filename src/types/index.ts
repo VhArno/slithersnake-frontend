@@ -1,28 +1,28 @@
 export interface Room {
-    id: string
-    name: string
-    map: Map
-    mode: GameMode
-    players: []
-    ping: number
+  id: string
+  name: string
+  map: Map
+  mode: GameMode
+  players: []
+  ping: number
 }
 
 export interface Map {
-    id: number
-    name: string
-    img?: string
+  id: number
+  name: string
+  img?: string
 }
 
 export interface GameMode {
-    id: number
-    name: string
-    img?: string
+  id: number
+  name: string
+  img?: string
 }
 
 export interface Skin {
-    id: number
-    name: string
-    img?: string
+  id: number
+  name: string
+  img?: string
 }
 
 export interface Player {
