@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { onKeyStroke } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
@@ -7,12 +7,15 @@ import SgGrid from '@/components/organisms/SgGrid.vue'
 import { usePlayStore } from '@/stores/play'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
+import { Socket } from 'socket.io-client'
 
 //audios
 
 const gameMusic = ref()
 const pickupSound = ref()
 const endGameSound = ref()
+const gameStatus = ref()
+
 
 
 const playStore = usePlayStore()
@@ -26,14 +29,21 @@ onMounted(() => {
   playStore.setEndGameSound(endGameSound.value)
 
   playStore.initializeGame()
-  playStore.startGameLoop()
+  const grid = document.getElementById('grid')
+  grid?.addEventListener('click', () => {
+    if (gameStatus.value === 'started') {
+      return
+    }
+    playStore.startGameLoop()
+    gameStatus.value = 'started'
+  })
 })
 
 </script>
 
 <template>
   <section class="main-sec">
-    <SgGrid :gameGrid="playStore.gameGrid"></SgGrid>
+    <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
 
     <div class="scoreboard">
       <div class="players">
@@ -48,12 +58,15 @@ onMounted(() => {
 
       <div class="score-settings">
         <SgSoundRange v-model:modelValue="playStore.volume"></SgSoundRange>
-        <SgButton class="leave-btn"  @click="playStore.leaveGame">Verlaten</SgButton>
+        <SgButton class="leave-btn" @click="playStore.leaveGame">Verlaten</SgButton>
       </div>
     </div>
-    <audio ref="endGameSound" hidden preload="auto" src="/src/assets/sounds/game_end-defeat.wav" :volume="volume / 100"></audio>
-    <audio ref="gameMusic" hidden loop preload="auto" src="/src/assets/sounds/game_music.wav" :volume="volume / 100"></audio>
-    <audio ref="pickupSound" hidden preload="auto" src="/src/assets/sounds/power-up_pickup.wav" :volume="volume / 100"></audio>
+    <audio ref="endGameSound" hidden preload="auto" src="/src/assets/sounds/game_end-defeat.wav"
+      :volume="volume / 100"></audio>
+    <audio ref="gameMusic" hidden loop preload="auto" src="/src/assets/sounds/game_music.wav"
+      :volume="volume / 100"></audio>
+    <audio ref="pickupSound" hidden preload="auto" src="/src/assets/sounds/power-up_pickup.wav"
+      :volume="volume / 100"></audio>
   </section>
 </template>
 
@@ -84,7 +97,7 @@ onMounted(() => {
       flex-flow: column;
       gap: 1rem;
 
-      > div {
+      >div {
         display: flex;
         flex-flow: row;
         justify-content: space-between;

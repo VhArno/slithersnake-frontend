@@ -19,6 +19,8 @@ const mapsStore = useMapsStore()
 mapsStore.loadMaps()
 const { maps } = storeToRefs(mapsStore)
 
+const creator = sessionStorage.getItem('creator')
+
 /* modes store */
 const modesStore = useGamemodesStore()
 modesStore.loadModes()
@@ -130,9 +132,23 @@ const nextMode = () => {
 
 /* actions buttons */
 const startGame = () => {
-  router.push('/play')
-  socket.emit('startGame', selectedMap.value.name, selectedMode.value.name)
+  // router.push('/character-select')
+  // router.push('/play')
+  const params = useUrlSearchParams('history')
+  if (params.id) {
+    socket.emit('startGame', params.id)
+  }
 }
+
+socket.on('gameStarted', (roomId) => {
+  console.log('game started')
+  const params = useUrlSearchParams('history')
+  if (params.id && roomId) {
+    if (roomId === params.id) {
+      router.push('/play?id=' + roomId)
+    }
+  }
+})
 
 const leaveGame = () => {
   router.push('/')
@@ -151,8 +167,7 @@ const leaveGame = () => {
           <h2>Players</h2>
           <ul class="player-list">
             <li v-for="player in players" :key="player.id">
-              {{ player.username }} (lvl. <span>{{ player.level }}</span
-              >)
+              {{ player.username }} (lvl. <span>{{ player.level }}</span>)
             </li>
           </ul>
         </div>
@@ -180,27 +195,23 @@ const leaveGame = () => {
           <div>
             <h3>Gamemode</h3>
             <div class="gamemode-select">
-              <SgButton @click="prevMode" id="prev-btn"
-                ><i class="fa-solid fa-chevron-left"></i
-              ></SgButton>
+              <SgButton @click="prevMode" id="prev-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
               <div class="gamemodes">
                 <div>
                   <p>{{ selectedMode?.name }}</p>
                   <img :src="selectedMode?.img" alt="mode image" />
                 </div>
               </div>
-              <SgButton @click="nextMode" id="next-btn"
-                ><i class="fa-solid fa-chevron-right"></i
-              ></SgButton>
+              <SgButton @click="nextMode" id="next-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
             </div>
           </div>
         </div>
         <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
-        <SgButton @click="startGame">Start game</SgButton>
+        <SgButton v-if="creator" @click="startGame">Start game</SgButton>
         <SgButton @click="leaveGame">Leave game</SgButton>
       </div>
     </div>
-    </section>
+  </section>
 </template>
 
 <style scoped lang="scss">
@@ -254,64 +265,67 @@ const leaveGame = () => {
         }
 
         .players {
-            display: flex;
-            flex-flow: column;
+          display: flex;
+          flex-flow: column;
         }
 
         .options {
-            .game-options {
-                display: flex;
-                flex-flow: column;
-                gap: 1rem;
-                margin: 1em 0em;
-            }
+          .game-options {
+            display: flex;
+            flex-flow: column;
+            gap: 1rem;
+            margin: 1em 0em;
+          }
 
-            .gamemode-select, .map-select {
-                display: flex;
-                flex-flow: row;
-                align-items: center;
-                margin-top: 1rem;
+          .gamemode-select,
+          .map-select {
+            display: flex;
+            flex-flow: row;
+            align-items: center;
+            margin-top: 1rem;
 
-                .gamemodes, .maps {
-                    flex-grow: 1;
-                    width: 100%;
-                    text-align: center;
-                }
+            .gamemodes,
+            .maps {
+              flex-grow: 1;
+              width: 100%;
+              text-align: center;
             }
-        SgButton {
-          flex-shrink: 3;
-          padding: 0;
-          background-color: transparent;
+          }
+
+          SgButton {
+            flex-shrink: 3;
+            padding: 0;
+            background-color: transparent;
+          }
         }
       }
     }
   }
-}
 
-/* BREAKPOINTS */
-@media (width >= 65em) {
-  .create {
-    width: 60%;
-    margin: 2rem auto;
+  /* BREAKPOINTS */
+  @media (width >=65em) {
+    .create {
+      width: 60%;
+      margin: 2rem auto;
 
-    .settings {
-      flex-flow: row;
+      .settings {
+        flex-flow: row;
 
-      .bg-gray {
-        flex: 1;
-        width: 100%;
+        .bg-gray {
+          flex: 1;
+          width: 100%;
+        }
+
+        .players {
+          display: flex;
+          flex-flow: column;
+          justify-content: space-between;
+        }
       }
 
-            .players {
-                display: flex;
-                flex-flow: column;
-                justify-content: space-between;
-            }
-        }
-
-        .sound-range {
-            width: 30%
-        }
+      .sound-range {
+        width: 30%
+      }
     }
   }
 }
