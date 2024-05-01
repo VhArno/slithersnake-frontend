@@ -98,13 +98,6 @@ export const usePlayStore = defineStore('play', () => {
     for (let i = 1; i < character.value.attributes.startLength; i++) {
       snake.value.push({ x: startX, y: startY + i })
     }
-
-    // Plaats food
-    // generateFood()
-
-    powerUpTimeOut = setTimeout(() => {
-      generatePowerUp()
-    }, 5000)
   }
   //eindigt de game
   const endGame = () => {
@@ -137,10 +130,8 @@ export const usePlayStore = defineStore('play', () => {
       foodX = Math.floor(Math.random() * numCols)
       foodY = Math.floor(Math.random() * numRows)
     } while (gameGrid.value[foodY][foodX] !== 'empty')
-    
-    console.log("food generated")
+
     socket?.emit('generateFood', foodX, foodY)
-    // food.value = { x: foodX, y: foodY }
   }
 
   //logica van speedboost powerUpn
@@ -187,7 +178,7 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   function generatePowerUp() {
-    powerUpAvailable.value = true
+    socket?.emit('setPowerUpAvailability', true)
 
     let powerX, powerY
     do {
@@ -197,10 +188,12 @@ export const usePlayStore = defineStore('play', () => {
 
     powerUp.value.x = powerX
     powerUp.value.y = powerY
+
+    socket?.emit('generatePowerUp', powerX, powerY)
   }
 
   function pickupPowerUp() {
-    powerUpAvailable.value = false
+    socket?.emit('setPowerUpAvailability', false)
 
     switch (powerUp.value.name) {
       case 'speedboost':
@@ -221,7 +214,7 @@ export const usePlayStore = defineStore('play', () => {
     socketInterval = setInterval(() => {
       socket?.emit('sendPlayerData', snake.value, params.playerId)
       socket?.emit('getPlayerData')
-      
+
       if (!gameOver.value) {
         updateGameGrid()
       } else {
@@ -237,7 +230,6 @@ export const usePlayStore = defineStore('play', () => {
       }
     })
 
-
     // socket?.on('sendData', () => {
     //   console.log('player data sent')
     // })
@@ -246,9 +238,23 @@ export const usePlayStore = defineStore('play', () => {
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
-    generateFood() // Genereer nieuw voedsel
+    // Genereer eerste voedsel
+    generateFood()
+    //genereer eerste powerUp
+    powerUpTimeOut = setTimeout(() => {
+      generatePowerUp()
+    }, 5000)
+
     socket?.on('showFood', (foodX, foodY) => {
       food.value = { x: foodX, y: foodY }
+    })
+
+    socket?.on('showPowerUp', (powerX, powerY) => {
+      powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
+    })
+
+    socket?.on('setPowerUpAvailability', (bool) => {
+      powerUpAvailable.value = bool
     })
 
     gameLoopInterval = setInterval(
@@ -346,14 +352,14 @@ export const usePlayStore = defineStore('play', () => {
       pickupSound.value.play().catch(() => {
         console.error('Something went wrong')
       })
-      
+
       generateFood() // Genereer nieuw voedsel
     } else {
       snake.value.pop() // Verwijder het einde van de slang
     }
 
     if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
-      powerUpAvailable.value = false
+      socket?.emit('setPowerUpAvailability', false)
       //genereer een nieuwe powerUp na aantal seconden
       console.log('power up picked up')
       pickupPowerUp()
