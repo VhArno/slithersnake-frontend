@@ -12,6 +12,7 @@ import { io, Socket } from 'socket.io-client'
 const socket: Socket = inject('socket') as Socket
 
 export const usePlayStore = defineStore('play', () => {
+
   // Audios
   const gameMusic = ref()
   const pickupSound = ref()
@@ -39,6 +40,7 @@ export const usePlayStore = defineStore('play', () => {
   const numCols = 20 // Aantal kolommen
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
+
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
   const food = ref<{ x: number; y: number }>({ x: 0, y: 0 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
@@ -53,6 +55,14 @@ export const usePlayStore = defineStore('play', () => {
 
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
+
+  //obstakels toevoegen
+  // Obstacles
+  const obstacles = ref<Array<{ x: number; y: number }>>([])
+
+  function addObstacle(x: number, y: number) {
+    obstacles.value.push({ x, y })
+  }
 
   // initialiseren
   function initializeGame() {
