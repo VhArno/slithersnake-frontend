@@ -43,13 +43,13 @@ export const usePlayStore = defineStore('play', () => {
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
   const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
-  const food = ref<{ x: number; y: number }>({ x: 0, y: 0 })
+  const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
   const powerUpAvailable = ref<boolean>(false)
-  const interval = ref<number>(5)
+  const interval = ref<number>(10)
   const character = ref<Character>()
 
   //init game intervals
@@ -68,7 +68,7 @@ export const usePlayStore = defineStore('play', () => {
 
   // initialiseren
   function initializeGame() {
-    players.value = JSON.parse(sessionStorage.getItem("players")!)
+    players.value = JSON.parse(sessionStorage.getItem('players')!)
     console.log(players.value)
     //Sla de geselecteerde character op
     character.value = charStore.selectedCharacter
@@ -80,15 +80,14 @@ export const usePlayStore = defineStore('play', () => {
       Array.from({ length: numCols }, () => 'empty')
     )
 
-
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
 
-    if(players.value.length >= 2){
-      for(let i = 0; i < players.value.length; i++){
-        if(players.value[i].id === params.playerId){
-          startX = Math.floor(numCols / (2 + (2 * i)))
+    if (players.value.length >= 2) {
+      for (let i = 0; i < players.value.length; i++) {
+        if (players.value[i].id === params.playerId) {
+          startX = Math.floor(numCols / (2 + 2 * i))
           startY = Math.floor(numRows / 2)
         }
       }
@@ -101,7 +100,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     // Plaats food
-    generateFood()
+    // generateFood()
 
     powerUpTimeOut = setTimeout(() => {
       generatePowerUp()
@@ -138,8 +137,10 @@ export const usePlayStore = defineStore('play', () => {
       foodX = Math.floor(Math.random() * numCols)
       foodY = Math.floor(Math.random() * numRows)
     } while (gameGrid.value[foodY][foodX] !== 'empty')
-
-    food.value = { x: foodX, y: foodY }
+    
+    console.log("food generated")
+    socket?.emit('generateFood', foodX, foodY)
+    // food.value = { x: foodX, y: foodY }
   }
 
   //logica van speedboost powerUpn
@@ -150,6 +151,7 @@ export const usePlayStore = defineStore('play', () => {
       () => {
         if (!gameOver.value) {
           directionChanged.value = false
+          checkCollisions()
           moveSnake()
           checkCollisions()
           if (!gameOver.value) {
@@ -169,6 +171,7 @@ export const usePlayStore = defineStore('play', () => {
         () => {
           if (!gameOver.value) {
             directionChanged.value = false
+            checkCollisions()
             moveSnake()
             checkCollisions()
             if (!gameOver.value) {
@@ -218,6 +221,12 @@ export const usePlayStore = defineStore('play', () => {
     socketInterval = setInterval(() => {
       socket?.emit('sendPlayerData', snake.value, params.playerId)
       socket?.emit('getPlayerData')
+      
+      if (!gameOver.value) {
+        updateGameGrid()
+      } else {
+        endGame()
+      }
     }, 100)
 
     socket?.on('getData', (snake) => {
@@ -225,9 +234,9 @@ export const usePlayStore = defineStore('play', () => {
         console.log('enemy snake moved!')
         console.log(snake)
         enemySnake.value = snake.data
-        updateGameGrid()
       }
     })
+
 
     // socket?.on('sendData', () => {
     //   console.log('player data sent')
@@ -237,10 +246,16 @@ export const usePlayStore = defineStore('play', () => {
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
+    generateFood() // Genereer nieuw voedsel
+    socket?.on('showFood', (foodX, foodY) => {
+      food.value = { x: foodX, y: foodY }
+    })
+
     gameLoopInterval = setInterval(
       () => {
         if (!gameOver.value) {
           directionChanged.value = false
+          checkCollisions()
           moveSnake()
           checkCollisions()
           if (!gameOver.value) {
@@ -331,7 +346,7 @@ export const usePlayStore = defineStore('play', () => {
       pickupSound.value.play().catch(() => {
         console.error('Something went wrong')
       })
-
+      
       generateFood() // Genereer nieuw voedsel
     } else {
       snake.value.pop() // Verwijder het einde van de slang

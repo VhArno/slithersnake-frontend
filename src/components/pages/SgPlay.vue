@@ -32,6 +32,7 @@ onMounted(() => {
 
   playStore.initializeGame()
   playStore.initializeSocket(socket)
+  
   const grid = document.getElementById('grid')
   grid?.addEventListener('click', () => {
     if (gameStatus.value === 'started') {
