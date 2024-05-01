@@ -153,6 +153,11 @@ socket.on('gameStarted', (roomId) => {
 })
 
 watchEffect(() => {
+  selectedMap.value = maps.value[0]
+  selectedMode.value = modes.value[0]
+})
+
+watchEffect(() => {
   const params = useUrlSearchParams('history')
   currentRoom.value = {
     id: params.id + '',

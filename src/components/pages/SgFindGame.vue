@@ -22,11 +22,13 @@ const rooms = ref<Room[]>([
     name: 'zghr',
     map: {
       id: 0,
-      name: 'rectangle'
+      name: 'rectangle',
+      image: 'rectangle.png'
     },
     mode: {
       id: 0,
-      name: 'default'
+      name: 'default',
+      image: 'default.png'
     },
     players: [],
     ping: 0
