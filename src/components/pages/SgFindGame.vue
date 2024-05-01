@@ -10,30 +10,8 @@ const router = useRouter()
 
 const socket: Socket = inject('socket') as Socket
 
-socket.emit('getRooms')
-socket.on('rooms', (rooms: Room[]) => {
-  console.log(rooms)
-})
-
 const selectedRoom = ref<Room | null>(null)
-const rooms = ref<Room[]>([
-  {
-    id: 'gaz654g46rfga89a',
-    name: 'zghr',
-    map: {
-      id: 0,
-      name: 'rectangle',
-      image: 'rectangle.png'
-    },
-    mode: {
-      id: 0,
-      name: 'default',
-      image: 'default.png'
-    },
-    players: [],
-    ping: 0
-  }
-])
+let rooms = ref<Room[] | null>(null)
 
 const toggleSelectRoom = (room: Room) => {
   if (selectedRoom.value === room) {
@@ -43,10 +21,18 @@ const toggleSelectRoom = (room: Room) => {
   }
 }
 
+socket.emit('getRooms')
+socket.on('rooms', (r: Room[]) => {
+  console.log(r)
+  rooms.value = r
+})
+
+socket.on('newRoom', (r: Room[]) => {
+  rooms.value = r
+})
+
 const joinRoom = () => {
-  router.push('/play')
-  socket.emit('joinRoom', selectedRoom.value)
-  // router.push('/character-select')
+  router.push('/create-room?id=' + selectedRoom.value?.id)
 }
 </script>
 
@@ -62,8 +48,12 @@ const joinRoom = () => {
           <th>Players</th>
           <th>Ping</th>
         </tr>
-        <tr v-for="room in rooms" :key="room.id" :class="[{ selected: room === selectedRoom }, 'row']"
-          @click="toggleSelectRoom(room)">
+        <tr
+          v-for="room in rooms"
+          :key="room.id"
+          :class="[{ selected: room === selectedRoom }, 'row']"
+          @click="toggleSelectRoom(room)"
+        >
           <td>{{ room.id }}</td>
           <td>{{ room.name }}</td>
           <td>{{ room.map.name }}</td>

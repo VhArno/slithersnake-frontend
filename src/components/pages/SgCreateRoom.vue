@@ -214,7 +214,7 @@ const leaveGame = () => {
           <div>
             <h3>Map</h3>
             <div class="map-select">
-              <SgButton @click="prevMap" class="select-btn"
+              <SgButton v-if="creator" @click="prevMap" class="select-btn"
                 ><i class="fa-solid fa-chevron-left"></i
               ></SgButton>
               <div class="maps">
@@ -223,7 +223,7 @@ const leaveGame = () => {
                   <img :src="selectedMap?.image" alt="map image" />
                 </div>
               </div>
-              <SgButton @click="nextMap" class="select-btn"
+              <SgButton v-if="creator" @click="nextMap" class="select-btn"
                 ><i class="fa-solid fa-chevron-right"></i
               ></SgButton>
             </div>
@@ -231,7 +231,7 @@ const leaveGame = () => {
           <div>
             <h3>Gamemode</h3>
             <div class="gamemode-select">
-              <SgButton @click="prevMode" class="select-btn"
+              <SgButton v-if="creator" @click="prevMode" class="select-btn"
                 ><i class="fa-solid fa-chevron-left"></i
               ></SgButton>
               <div class="gamemodes">
@@ -240,7 +240,7 @@ const leaveGame = () => {
                   <img :src="selectedMode?.image" alt="mode image" />
                 </div>
               </div>
-              <SgButton @click="nextMode" class="select-btn"
+              <SgButton v-if="creator" @click="nextMode" class="select-btn"
                 ><i class="fa-solid fa-chevron-right"></i
               ></SgButton>
             </div>
