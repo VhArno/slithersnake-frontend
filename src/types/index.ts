@@ -7,7 +7,7 @@ export interface Room {
   name: string
   map: Map
   mode: GameMode
-  players: []
+  players: Player[]
   ping: number
 }
 

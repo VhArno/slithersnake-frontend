@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUrlSearchParams, useClipboard } from '@vueuse/core'
 import SgButton from '../atoms/SgButton.vue'
-import { inject, ref } from 'vue'
+import { computed, inject, ref, watchEffect } from 'vue'
 import type { Room, Map, GameMode, Player } from '@/types/'
 import SgToast from '../atoms/SgToast.vue'
 import { v4 as uuidv4 } from 'uuid'
@@ -12,6 +12,7 @@ import { storeToRefs } from 'pinia'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { Socket } from 'socket.io-client'
+import { watch } from 'fs'
 
 // pinia
 /* maps store */
@@ -29,6 +30,8 @@ const { modes } = storeToRefs(modesStore)
 /* settings store */
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
+
+const currentRoom = ref<Room | null>(null)
 
 // router
 
@@ -85,7 +88,6 @@ const showToast = ref<boolean>(false)
 const toggleToast = () => {
   showToast.value = !showToast.value
 }
-
 
 const selectedMap = ref<Map>(maps.value[0])
 const selectedMode = ref<GameMode>(modes.value[0])
@@ -150,6 +152,20 @@ socket.on('gameStarted', (roomId) => {
   }
 })
 
+watchEffect(() => {
+  const params = useUrlSearchParams('history')
+  currentRoom.value = {
+    id: params.id + '',
+    name: 'test room',
+    map: selectedMap.value,
+    mode: selectedMode.value,
+    players: players.value,
+    ping: 0
+  }
+  console.log(currentRoom.value)
+})
+
+
 const leaveGame = () => {
   router.push('/')
 }
@@ -163,35 +179,38 @@ const leaveGame = () => {
 
     <div class="settings">
       <div class="bg-gray players">
+        <h2>Players</h2>
+        <ul class="player-list">
+          <li v-for="player in players" :key="player.id">
+            {{ player.username }} (lvl. <span>{{ player.level }}</span
+            >)
+          </li>
+        </ul>
         <div>
-          <h2>Players</h2>
-          <ul class="player-list">
-            <li v-for="player in players" :key="player.id">
-              {{ player.username }} (lvl. <span>{{ player.level }}</span>)
-            </li>
-          </ul>
+          <SgButton @click="invite">Invite</SgButton>
         </div>
+      </div>
 
-            <SgButton @click="invite">Invite</SgButton>
-        </div>
-
-        <div class="bg-gray options">
+      <div class="bg-gray options">
         <h2>Game options</h2>
         <div class="game-options">
           <div>
             <h3>Map</h3>
             <div class="map-select">
-              <SgButton @click="prevMap" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
+              <SgButton @click="prevMap" class="select-btn"
+                ><i class="fa-solid fa-chevron-left"></i
+              ></SgButton>
               <div class="maps">
                 <div>
                   <p>{{ selectedMap?.name }}</p>
                   <img :src="selectedMap?.image" alt="map image" />
                 </div>
               </div>
-              <SgButton @click="nextMap" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
+              <SgButton @click="nextMap" class="select-btn"
+                ><i class="fa-solid fa-chevron-right"></i
+              ></SgButton>
             </div>
           </div>
-
           <div>
             <h3>Gamemode</h3>
             <div class="gamemode-select">
@@ -210,12 +229,14 @@ const leaveGame = () => {
             </div>
           </div>
         </div>
-        <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
-        <SgButton v-if="creator" @click="startGame">Start game</SgButton>
-        <SgButton @click="leaveGame">Leave game</SgButton>
       </div>
     </div>
-    </section>
+    <div class="controls">
+      <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
+      <SgButton v-if="creator" @click="startGame">Start game</SgButton>
+      <SgButton @click="leaveGame">Leave game</SgButton>
+    </div>
+  </section>
 </template>
 
 <style scoped lang="scss">
@@ -260,73 +281,57 @@ const leaveGame = () => {
         flex-flow: row;
         align-items: center;
         margin-top: 1rem;
+        justify-content: space-between;
 
         .gamemodes,
         .maps {
-          flex-grow: 1;
+          flex: 5;
           width: 100%;
           text-align: center;
-        }
 
-        .players {
-          display: flex;
-          flex-flow: column;
-        }
-
-        .options {
-          .game-options {
-            display: flex;
-            flex-flow: column;
-            gap: 1rem;
-            margin: 1em 0em;
+          img {
+            height: 10em;
+            width: 100%;
+            object-fit: contain;
           }
+        }
 
-            .gamemode-select, .map-select {
-                display: flex;
-                flex-flow: row;
-                align-items: center;
-                margin-top: 1rem;
-
-                .gamemodes, .maps {
-                    flex-grow: 1;
-                    width: 100%;
-                    text-align: center;
-                }
-            }
-        SgButton {
-          flex-shrink: 3;
-          padding: 0;
-          background-color: transparent;
+        .select-btn {
+          flex: 1;
         }
       }
     }
   }
+  .controls {
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+  }
 }
 
-  /* BREAKPOINTS */
-  @media (width >=65em) {
-    .create {
-      width: 60%;
-      margin: 2rem auto;
+/* BREAKPOINTS */
+@media (width >=65em) {
+  .create {
+    width: 60%;
+    margin: 2rem auto;
 
-      .settings {
-        flex-flow: row;
+    .settings {
+      flex-flow: row;
 
-        .bg-gray {
-          flex: 1;
-          width: 100%;
-        }
-
-        .players {
-          display: flex;
-          flex-flow: column;
-          justify-content: space-between;
-        }
+      .bg-gray {
+        flex: 1;
+        width: 100%;
       }
 
-      .sound-range {
-        width: 30%
+      .players {
+        display: flex;
+        flex-flow: column;
+        justify-content: space-between;
       }
+    }
+
+    .sound-range {
+      width: 30%;
     }
   }
 }
