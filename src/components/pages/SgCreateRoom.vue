@@ -51,13 +51,6 @@ const player = ref<Player>({
   skins: []
 })
 
-if (sessionStorage.getItem('creator')) {
-  const randomGuid: string = uuidv4()
-  const params = useUrlSearchParams('history')
-  params.id = randomGuid
-  socket.emit('createRoom', params.id, player)
-}
-
 socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
   console.log('player joined room')
@@ -71,7 +64,7 @@ socket.on('joinedRoom', (room: Room) => {
 const params = useUrlSearchParams('history')
 socket.emit('getPlayers', params.id)
 socket.on('players', (room: Room) => {
-  players.value = room.players
+  currentRoom.value = room
 })
 
 if (!sessionStorage.getItem('creator')) {
@@ -101,6 +94,16 @@ const invite = () => {
   if (copied) {
     toggleToast()
   }
+}
+
+if (sessionStorage.getItem('creator')) {
+  const randomGuid: string = uuidv4()
+  const params = useUrlSearchParams('history')
+  params.id = randomGuid
+
+  setTimeout(() => {
+    socket.emit('createRoom', currentRoom.value, player)
+  }, 2000)
 }
 
 /* Previous and next buttons */
@@ -167,9 +170,18 @@ watchEffect(() => {
     players: players.value,
     ping: 0
   }
-  console.log(currentRoom.value)
+
+  if (sessionStorage.getItem('creator')) {
+    socket.emit('settingsChanged', currentRoom.value)
+  }
 })
 
+socket.on('settingsChanged', (room: Room) => {
+  if (room.id === currentRoom.value?.id) {
+    selectedMap.value = room.map
+    selectedMode.value = room.mode
+  }
+})
 
 const leaveGame = () => {
   router.push('/')
