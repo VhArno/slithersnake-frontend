@@ -30,7 +30,7 @@ export interface Skin {
 }
 
 export interface Player {
-    id: number
+    id: string
     username: string
     email: string
     level: number

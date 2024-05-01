@@ -38,6 +38,10 @@ const props = defineProps<{
   background-color: green;
 }
 
+.enemy{
+  background-color: orange;
+}
+
 .food {
   background-color: red;
 }

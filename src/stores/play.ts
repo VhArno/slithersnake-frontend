@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { inject, ref } from 'vue'
-import { onKeyStroke } from '@vueuse/core'
+import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
-import type { Character, PowerUp } from '@/types'
+import type { Character, Player, PowerUp } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
@@ -38,21 +38,29 @@ export const usePlayStore = defineStore('play', () => {
   const numRows = 20 // Aantal rijen
   const numCols = 20 // Aantal kolommen
 
+  const players = ref<Player[]>([])
+
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
+  const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
   const food = ref<{ x: number; y: number }>({ x: 0, y: 0 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
-  let gameLoopInterval = 0
-  let powerUpTimeOut = 0
   const powerUpAvailable = ref<boolean>(false)
   const interval = ref<number>(5)
   const character = ref<Character>()
 
+  //init game intervals
+  let gameLoopInterval = setInterval(() => {})
+  let socketInterval = setInterval(() => {})
+  let powerUpTimeOut = setInterval(() => {})
+
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
+
+  const params = useUrlSearchParams('history')
 
   function initializeSocket(s: Socket) {
     socket = s
@@ -60,6 +68,8 @@ export const usePlayStore = defineStore('play', () => {
 
   // initialiseren
   function initializeGame() {
+    players.value = JSON.parse(sessionStorage.getItem("players")!)
+    console.log(players.value)
     //Sla de geselecteerde character op
     character.value = charStore.selectedCharacter
     interval.value = character.value.attributes.speed
@@ -70,9 +80,19 @@ export const usePlayStore = defineStore('play', () => {
       Array.from({ length: numCols }, () => 'empty')
     )
 
+
     // spawn slang
-    const startX = Math.floor(numCols / 2)
-    const startY = Math.floor(numRows / 2)
+    let startX = Math.floor(numCols / 2)
+    let startY = Math.floor(numRows / 2)
+
+    if(players.value.length >= 2){
+      for(let i = 0; i < players.value.length; i++){
+        if(players.value[i].id === params.playerId){
+          startX = Math.floor(numCols / (2 + (2 * i)))
+          startY = Math.floor(numRows / 2)
+        }
+      }
+    }
 
     snake.value = [{ x: startX, y: startY }]
 
@@ -90,7 +110,7 @@ export const usePlayStore = defineStore('play', () => {
   //eindigt de game
   const endGame = () => {
     clearInterval(gameLoopInterval)
-
+    clearInterval(socketInterval)
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
     gameMusic.value.pause()
@@ -186,16 +206,32 @@ export const usePlayStore = defineStore('play', () => {
     }
   }
 
+  function moveEnemySnake() {
+    enemySnake.value.forEach((segment) => {
+      const { x, y } = segment
+      gameGrid.value[y][x] = 'enemy'
+    })
+  }
+
   const startInterval = () => {
     // console.log(socket)
-    setInterval(() => {
-      socket?.emit('sendPlayerData')
+    socketInterval = setInterval(() => {
+      socket?.emit('sendPlayerData', snake.value, params.playerId)
       socket?.emit('getPlayerData')
     }, 100)
 
-    socket?.on('playerData', () => {
-      console.log('player data received')
+    socket?.on('getData', (snake) => {
+      if (params.playerId !== snake.id) {
+        console.log('enemy snake moved!')
+        console.log(snake)
+        enemySnake.value = snake.data
+        updateGameGrid()
+      }
     })
+
+    // socket?.on('sendData', () => {
+    //   console.log('player data sent')
+    // })
   }
 
   // Start de game loop om de spelstatus bij te werken
@@ -348,11 +384,13 @@ export const usePlayStore = defineStore('play', () => {
       gameGrid.value[yP][xP] = 'empty'
     }
 
-    // Plaats de slang op het speelveld
+    // Plaats de slangen op het speelveld
     snake.value.forEach((segment) => {
       const { x, y } = segment
       gameGrid.value[y][x] = 'snake'
     })
+
+    moveEnemySnake()
 
     // Plaats het voedsel op het speelveld
     const { x, y } = food.value
