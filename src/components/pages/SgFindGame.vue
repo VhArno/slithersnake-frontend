@@ -3,42 +3,15 @@ import { ref } from 'vue'
 import SgButton from '../atoms/SgButton.vue'
 import type { Room } from '@/types/'
 import { useRouter } from 'vue-router'
+import { inject } from 'vue'
+import { Socket } from 'socket.io-client'
 
 const router = useRouter()
 
-const socket = JSON.parse(sessionStorage.getItem('socket') || '{}')
+const socket: Socket = inject('socket') as Socket
 
 const selectedRoom = ref<Room | null>(null)
-const rooms = ref<Room[]>([
-  {
-    id: '5h4bg168zer4h56',
-    name: 'fafafaf',
-    map: {
-      id: 0,
-      name: 'rectangle'
-    },
-    mode: {
-      id: 0,
-      name: 'default'
-    },
-    players: [],
-    ping: 0
-  },
-  {
-    id: 'gaz654g46rfga89a',
-    name: 'zghr',
-    map: {
-      id: 0,
-      name: 'rectangle'
-    },
-    mode: {
-      id: 0,
-      name: 'default'
-    },
-    players: [],
-    ping: 0
-  }
-])
+let rooms = ref<Room[] | null>(null)
 
 const toggleSelectRoom = (room: Room) => {
   if (selectedRoom.value === room) {
@@ -48,10 +21,18 @@ const toggleSelectRoom = (room: Room) => {
   }
 }
 
+socket.emit('getRooms')
+socket.on('rooms', (r: Room[]) => {
+  console.log(r)
+  rooms.value = r
+})
+
+socket.on('newRoom', (r: Room[]) => {
+  rooms.value = r
+})
+
 const joinRoom = () => {
-  router.push('/play')
-  socket.emit('joinRoom', selectedRoom.value)
-  // router.push('/character-select')
+  router.push('/create-room?id=' + selectedRoom.value?.id)
 }
 </script>
 
@@ -67,8 +48,12 @@ const joinRoom = () => {
           <th>Players</th>
           <th>Ping</th>
         </tr>
-        <tr v-for="room in rooms" :key="room.id" :class="[{ selected: room === selectedRoom }, 'row']"
-          @click="toggleSelectRoom(room)">
+        <tr
+          v-for="room in rooms"
+          :key="room.id"
+          :class="[{ selected: room === selectedRoom }, 'row']"
+          @click="toggleSelectRoom(room)"
+        >
           <td>{{ room.id }}</td>
           <td>{{ room.name }}</td>
           <td>{{ room.map.name }}</td>
