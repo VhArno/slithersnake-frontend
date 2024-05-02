@@ -16,14 +16,12 @@ import { Socket } from 'socket.io-client'
 // pinia
 /* maps store */
 const mapsStore = useMapsStore()
-mapsStore.loadMaps()
 const { maps } = storeToRefs(mapsStore)
 
 const creator = sessionStorage.getItem('creator')
 
 /* modes store */
 const modesStore = useGamemodesStore()
-modesStore.loadModes()
 const { modes } = storeToRefs(modesStore)
 
 /* settings store */

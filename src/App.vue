@@ -5,11 +5,18 @@ import { useSettingsStore } from './stores/settings'
 import { provide } from 'vue'
 
 import { io, Socket } from 'socket.io-client'
+import { useMapsStore } from './stores/maps'
+import { useGamemodesStore } from './stores/gamemodes'
 
+/* Use stores */
 const settingsStore = useSettingsStore()
+const mapsStore = useMapsStore()
+const modesStore = useGamemodesStore()
 
 onMounted(() => {
   settingsStore.loadData()
+  modesStore.loadModes()
+  mapsStore.loadMaps()
 })
 
 settingsStore.$subscribe(() => {
