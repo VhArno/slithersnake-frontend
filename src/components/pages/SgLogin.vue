@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import axios from 'axios';
 import SgButton from '../atoms/SgButton.vue';
-import { authAxios, myAxios } from '@/instances/myAxios';
 import { ref } from 'vue';
-import { postLogin, getUser, getCsrfCookie } from '@/services/dataService'
 import { useAuthStore } from '@/stores/auth';
 
 const email = ref<string>('')
@@ -18,7 +15,8 @@ function login() {
     if (email.value && password.value) {
         authStore.login({ email: email.value, password: password.value })
     } else {
-        errors.value.push('Fill in all fields')
+        email.value ? '' : errors.value.push('Fill in an email address')
+        password.value ? '' : errors.value.push('Fill in the password field')
     }
 }
 </script>
