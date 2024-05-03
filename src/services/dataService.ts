@@ -30,7 +30,7 @@ const getCsrfCookie = async <T>(): Promise<AxiosResponse<T>> => {
     return authAxios.get<T>('/sanctum/csrf-cookie', {baseURL: import.meta.env.VITE_BASE_URL})
 }
 
-const postLogin = async <T>(payload: RegisterPayload): Promise<AxiosResponse<T>> => {
+const postLogin = async <T>(payload: {email: string, password: string}): Promise<AxiosResponse<T>> => {
     return authAxios.post<T>(`/login`, {
         email: payload.email,
         password: payload.password
