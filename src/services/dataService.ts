@@ -37,8 +37,16 @@ const postLogin = async <T>(payload: {email: string, password: string}): Promise
     })
 }
 
-const getUser = async <T>(): Promise<AxiosResponse<T>> => {
-    return authAxios.get<T>(`/users`)
+const postLogout = async <T>(): Promise<AxiosResponse<T>> => {
+    return authAxios.post<T>(`/logout`)
 }
 
-export { getMap, getMaps, getGamemode, getGamemodes, getSkins, getCsrfCookie, postLogin, getUser }
+const postRegister = async <T>(payload: RegisterPayload): Promise<AxiosResponse<T>> => {
+    return authAxios.post<T>(`/register`, payload)
+}
+
+const getUser = async <T>(): Promise<AxiosResponse<T>> => {
+    return authAxios.get<T>(`/user`)
+}
+
+export { getMap, getMaps, getGamemode, getGamemodes, getSkins, getCsrfCookie, postLogin, postLogout, postRegister, getUser }
