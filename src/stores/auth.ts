@@ -1,7 +1,6 @@
 import type { Player, RegisterPayload } from '@/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { myAxios } from '@/instances/myAxios'
 import router from '@/router'
 import { getUser, postLogin, postLogout, postRegister } from '@/services/dataService'
 
@@ -13,10 +12,20 @@ export const useAuthStore = defineStore('auth', () => {
     if (user.value) return user.value
 
     try {
-        const {data: user} = await getUser<Player>()
-        return user
+      const {data: user} = await getUser<Player>()
+      return user
     } catch (e) {
-        return null
+      return {
+        id: 1,
+        username: 'User',
+        email: 'user@gmail.com',
+        level: 0,
+        highscore: 0,
+        played: 0,
+        won: 0,
+        killed: 0,
+        skins: []
+      }
     }
   }
   
@@ -43,4 +52,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
   
   return { user, login, logout, register }
+}, 
+{ persist: {
+  storage: localStorage,
+  paths: ['user']
+}
 })

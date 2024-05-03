@@ -17,6 +17,10 @@ const winPerc = computed(() => {
 
 // username prompt
 const showPrompt = ref<boolean>(false)
+
+function logout() {
+  authStore.logout()
+}
 </script>
 
 <template>
@@ -64,7 +68,7 @@ const showPrompt = ref<boolean>(false)
         </ul>
     </div>
     <div>
-      <RouterLink to="/login">Logout</RouterLink>
+      <SgButton @click="logout">Logout</SgButton>
     </div>
   </section>
 </template>

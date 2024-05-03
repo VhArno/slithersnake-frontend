@@ -2,13 +2,16 @@
 import { useAuthStore } from '@/stores/auth';
 import SgButton from '../atoms/SgButton.vue';
 import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import router from '@/router';
+
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 
 const username = ref<string>('')
 const email = ref<string>('')
 const password = ref<string>('')
 const errors = ref<string[]>([])
-
-const authStore = useAuthStore()
 
 function register() {
     errors.value = []
