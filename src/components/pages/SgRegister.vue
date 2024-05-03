@@ -6,7 +6,6 @@ import { ref } from 'vue';
 const username = ref<string>('')
 const email = ref<string>('')
 const password = ref<string>('')
-
 const errors = ref<string[]>([])
 
 const authStore = useAuthStore()
@@ -35,7 +34,7 @@ function register() {
 
             <div class="form-div">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" value="" v-model="username">
+                <input type="text" id="username" name="username" v-model="username">
             </div>
 
             <div class="form-div">
