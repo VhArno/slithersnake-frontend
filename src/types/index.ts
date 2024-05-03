@@ -78,4 +78,11 @@ export interface PowerUp {
     // color: string
 }
 
+export interface User {
 
+}
+
+export interface RegisterPayload {
+    email: string,
+    password: string
+}
