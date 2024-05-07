@@ -69,7 +69,7 @@ async function register() {
             </div>
             <div class="form-div">
                 <label for="passwordRepeat">Repeat password</label>
-                <input type="passwordRepeat" id="passwordRepeat" name="passwordRepeat" value="" v-model="password">
+                <input type="password" id="passwordRepeat" name="passwordRepeat" value="" v-model="passwordRepeat">
             </div>
 
             <SgButton @click.prevent="register">register</SgButton>

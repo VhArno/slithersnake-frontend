@@ -10,10 +10,14 @@ const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
 
 const winPerc = computed(() => {
-  const won = user.value?.won ?? 0
-  const played = user.value?.played ?? 1
-  return (won / played) * 100
-})
+  const gamesWon = user.value?.games_won ?? 0;
+  let gamesPlayed = user.value?.games_played ?? 1;
+
+  gamesPlayed = gamesPlayed === 0 ? 1 : gamesPlayed;
+  
+  return gamesWon / gamesPlayed;
+});
+
 
 // username prompt
 const showPrompt = ref<boolean>(false)
@@ -24,7 +28,7 @@ function logout() {
 </script>
 
 <template>
-  <SgPrompt v-show="showPrompt" v-model:showPrompt="showPrompt" @update:username="(v) => user?.username ? user.username = v : ''"></SgPrompt>
+  <SgPrompt v-show="showPrompt" v-model:showPrompt="showPrompt" :username="user?.username?user.username : ''"></SgPrompt>
   <section class="profile">
     <div class="user-profile">
         <div class="user-info">
@@ -47,11 +51,11 @@ function logout() {
           </li>
           <li>
             <h3>Games played</h3>
-            <p>{{ user?.played }}</p>
+            <p>{{ user?.games_played }}</p>
           </li>
           <li>
             <h3>Games won</h3>
-            <p>{{ user?.won }}</p>
+            <p>{{ user?.games_won }}</p>
           </li>
           <li>
             <h3>Win percentage</h3>
@@ -59,11 +63,11 @@ function logout() {
           </li>
           <li>
             <h3>Kills</h3>
-            <p>{{ user?.killed }}</p>
+            <p>{{ user?.players_killed }}</p>
           </li>
           <li>
             <h3>Skins unlocked</h3>
-            <p>{{ user?.skins.length }}</p>
+            <p>{{ user?.skins?.length }}</p>
           </li>
         </ul>
     </div>

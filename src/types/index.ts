@@ -35,9 +35,9 @@ export interface Player {
     email: string
     level: number
     highscore: number
-    played: number
-    won: number
-    killed: number
+    games_played: number
+    games_won: number
+    players_killed: number
     skins: Skin[]
     role: string
 }

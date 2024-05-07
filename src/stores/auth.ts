@@ -2,7 +2,7 @@ import type { Player, RegisterPayload } from '@/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import router from '@/router'
-import { getCsrfCookie, getUser, postLogin, postLogout, postRegister } from '@/services/dataService'
+import { getCsrfCookie, getUser, patchUser, postLogin, postLogout, postRegister } from '@/services/dataService'
 
 
 export const useAuthStore = defineStore('auth', () => {
@@ -31,18 +31,6 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (e) {
       console.error(e)
       logout()
-      return {
-        id: 1,
-        username: 'User',
-        email: 'user@gmail.com',
-        level: 0,
-        highscore: 0,
-        played: 0,
-        won: 0,
-        killed: 0,
-        skins: [],
-        role: ''
-      }
       return null
     }
   }
@@ -82,8 +70,17 @@ export const useAuthStore = defineStore('auth', () => {
       return err.response.data.message
     }
   }
+
+  const patch = async (username: string) => {
+    try {
+      await patchUser(username)
+    } catch(err: any) {
+      console.log(err.response.data.message)
+      return err.response.data.message
+    }
+  }
   
-  return { user, isAuthenticated, isAdmin, readUserDetails, login, logout, register }
+  return { user, isAuthenticated, isAdmin, readUserDetails, login, logout, register, patch }
 }, 
 { persist: {
   storage: localStorage,
