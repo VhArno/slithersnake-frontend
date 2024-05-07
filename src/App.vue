@@ -7,11 +7,14 @@ import { provide } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import { useMapsStore } from './stores/maps'
 import { useGamemodesStore } from './stores/gamemodes'
+import { useAuthStore } from './stores/auth'
 
 /* Use stores */
 const settingsStore = useSettingsStore()
 const mapsStore = useMapsStore()
 const modesStore = useGamemodesStore()
+
+useAuthStore().readUserDetails()
 
 onMounted(() => {
   settingsStore.loadData()

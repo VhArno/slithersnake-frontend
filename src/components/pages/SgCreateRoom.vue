@@ -43,7 +43,8 @@ const player = ref<Player>({
   played: 0,
   won: 0,
   killed: 0,
-  skins: []
+  skins: [],
+  role: ''
 })
 
 if (sessionStorage.getItem('creator')) {

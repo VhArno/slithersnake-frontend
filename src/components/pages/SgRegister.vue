@@ -4,6 +4,11 @@ import SgButton from '../atoms/SgButton.vue';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import router from '@/router';
+import { useTitle } from '@vueuse/core';
+import { useFormValidator } from '@/composables/formValidator';
+
+const title = useTitle()
+title.value = 'Register | Slithersnake'
 
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
@@ -11,17 +16,31 @@ const { user } = storeToRefs(authStore)
 const username = ref<string>('')
 const email = ref<string>('')
 const password = ref<string>('')
+const passwordRepeat = ref<string>('')
 const errors = ref<string[]>([])
 
-function register() {
-    errors.value = []
-    if (username.value && email.value && password.value) {
-        authStore.register({ username: username.value, email: email.value, password: password.value })
-    } else {
-        username.value ? '' : errors.value.push('Fill in an username')
-        email.value ? '' : errors.value.push('Fill in an email address')
-        password.value ? '' : errors.value.push('Fill in the password field')
-    }
+async function register() {
+  errors.value = []
+
+  const payload = {
+    username: username.value,
+    email: email.value,
+    password: password.value,
+    passwordRepeat: passwordRepeat.value
+  }
+
+  const { valid, errs } = useFormValidator(payload)
+
+  console.log(payload)
+
+  if (valid.value) {
+    console.log("Form validator valid")
+    const message = await authStore.register(payload)
+    errors.value.push(message)
+  } else {
+    console.log("Form validator invalid")
+    errors.value.push(...errs.value)
+  }
 }
 </script>
 
@@ -47,6 +66,10 @@ function register() {
             <div class="form-div">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" value="" v-model="password">
+            </div>
+            <div class="form-div">
+                <label for="passwordRepeat">Repeat password</label>
+                <input type="passwordRepeat" id="passwordRepeat" name="passwordRepeat" value="" v-model="password">
             </div>
 
             <SgButton @click.prevent="register">register</SgButton>

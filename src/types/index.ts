@@ -39,6 +39,7 @@ export interface Player {
     won: number
     killed: number
     skins: Skin[]
+    role: string
 }
 
 export interface Keybinds {
@@ -81,5 +82,6 @@ export interface PowerUp {
 export interface RegisterPayload {
     username: string,
     email: string,
-    password: string
+    password: string,
+    passwordRepeat?: string
 }

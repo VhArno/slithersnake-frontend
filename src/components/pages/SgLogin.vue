@@ -4,6 +4,10 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import router from '@/router';
+import { useTitle } from '@vueuse/core';
+
+const title = useTitle()
+title.value = 'Login | Slithersnake'
 
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
@@ -13,14 +17,15 @@ const password = ref<string>('')
 
 const errors = ref<string[]>([])
 
-function login() {
-    errors.value = []
-    if (email.value && password.value) {
-        authStore.login({ email: email.value, password: password.value })
-    } else {
-        email.value ? '' : errors.value.push('Fill in an email address')
-        password.value ? '' : errors.value.push('Fill in the password field')
-    }
+async function login() {
+  errors.value = []
+  if (email.value && password.value) {
+    const message = await authStore.login({ email: email.value, password: password.value })
+    errors.value.push(message)
+  } else {
+    email.value ? '' : errors.value.push('Fill in an email address')
+    password.value ? '' : errors.value.push('Fill in the password field')
+  }
 }
 </script>
 
