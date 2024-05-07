@@ -1,7 +1,32 @@
 <script setup lang="ts">
 import SgButton from '../atoms/SgButton.vue';
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { storeToRefs } from 'pinia';
+import router from '@/router';
+import { useTitle } from '@vueuse/core';
 
+const title = useTitle()
+title.value = 'Login | Slithersnake'
 
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
+
+const email = ref<string>('')
+const password = ref<string>('')
+
+const errors = ref<string[]>([])
+
+async function login() {
+  errors.value = []
+  if (email.value && password.value) {
+    const message = await authStore.login({ email: email.value, password: password.value })
+    errors.value.push(message)
+  } else {
+    email.value ? '' : errors.value.push('Fill in an email address')
+    password.value ? '' : errors.value.push('Fill in the password field')
+  }
+}
 </script>
 
 <template>
@@ -11,16 +36,19 @@ import SgButton from '../atoms/SgButton.vue';
                 <img src="/img/profile-picture.jpg">
                 <h2>Login</h2>
             </div>
+
+            <div class="errors" v-for="(err, index) in errors" :key="index">{{ err }}</div>
+
             <div class="form-div">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="">
+                <input type="email" id="email" name="email" value="" v-model="email">
             </div>
             <div class="form-div">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" value="">
+                <input type="password" id="password" name="password" value="" v-model="password">
             </div>
 
-            <SgButton>Login</SgButton>
+            <SgButton @click.prevent="login">Login</SgButton>
             <RouterLink to="/register" class="link">New to SlitherGrid?</RouterLink>
         </form>
     </section>
@@ -46,6 +74,10 @@ import SgButton from '../atoms/SgButton.vue';
         width: 80%;
         margin-left: auto;
         margin-right: auto;
+
+        .errors {
+            color: red
+        }
 
         .form-intro {
             display: flex;

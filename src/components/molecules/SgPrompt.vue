@@ -1,21 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import SgButton from '../atoms/SgButton.vue';
 import { onKeyStroke } from '@vueuse/core';
+import { useAuthStore } from '@/stores/auth';
 
 const model = defineModel('showPrompt')
 
-const username = ref<string>('')
-
-const emit = defineEmits<{
-    'update:username': [username: string]
+const props = defineProps<{
+    username: string
 }>()
 
 const handleClick = () => {
-    if (username.value !== '') {
-        model.value = false
-        emit('update:username', username.value)
-    }
+    useAuthStore().patch(props.username)
+    model.value = false
 }
 
 // watch for escape
@@ -29,7 +25,7 @@ onKeyStroke('Escape', (s) => {
     <div class="popup">
         <div class="popup-content">
             <label for="username">Change username</label>
-            <input type="text" id="username" name="username" v-model="username">
+            <input type="text" id="username" name="username" :value="username">
             <SgButton @click="handleClick()">Submit</SgButton>
         </div>
     </div>

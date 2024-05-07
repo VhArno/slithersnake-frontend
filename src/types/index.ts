@@ -35,10 +35,11 @@ export interface Player {
     email: string
     level: number
     highscore: number
-    played: number
-    won: number
-    killed: number
+    games_played: number
+    games_won: number
+    players_killed: number
     skins: Skin[]
+    role: string
 }
 
 export interface Keybinds {
@@ -78,4 +79,9 @@ export interface PowerUp {
     // color: string
 }
 
-
+export interface RegisterPayload {
+    username: string,
+    email: string,
+    password: string,
+    passwordRepeat?: string
+}

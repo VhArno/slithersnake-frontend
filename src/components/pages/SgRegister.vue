@@ -1,35 +1,85 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+import SgButton from '../atoms/SgButton.vue';
+import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import router from '@/router';
+import { useTitle } from '@vueuse/core';
+import { useFormValidator } from '@/composables/formValidator';
 
+const title = useTitle()
+title.value = 'Register | Slithersnake'
+
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
+
+const username = ref<string>('')
+const email = ref<string>('')
+const password = ref<string>('')
+const passwordRepeat = ref<string>('')
+const errors = ref<string[]>([])
+
+async function register() {
+  errors.value = []
+
+  const payload = {
+    username: username.value,
+    email: email.value,
+    password: password.value,
+    passwordRepeat: passwordRepeat.value
+  }
+
+  const { valid, errs } = useFormValidator(payload)
+
+  console.log(payload)
+
+  if (valid.value) {
+    console.log("Form validator valid")
+    const message = await authStore.register(payload)
+    errors.value.push(message)
+  } else {
+    console.log("Form validator invalid")
+    errors.value.push(...errs.value)
+  }
+}
 </script>
 
 <template>
-    <section class="login">
-        <form id="login-form" method="post">
+    <section class="register">
+        <form id="register-form" method="post">
             <div class="form-intro">
                 <img src="/img/profile-picture.jpg">
-                <h2>Login</h2>
+                <h2>register</h2>
             </div>
+
+            <div class="errors" v-for="(err, index) in errors" :key="index">{{ err }}</div>
+
             <div class="form-div">
                 <label for="username">Username</label>
-                <input type="username" id="username" name="username" value="">
+                <input type="text" id="username" name="username" v-model="username">
             </div>
+
             <div class="form-div">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="">
+                <input type="email" id="email" name="email" value="" v-model="email">
             </div>
             <div class="form-div">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" value="">
+                <input type="password" id="password" name="password" value="" v-model="password">
+            </div>
+            <div class="form-div">
+                <label for="passwordRepeat">Repeat password</label>
+                <input type="password" id="passwordRepeat" name="passwordRepeat" value="" v-model="passwordRepeat">
             </div>
 
-            <button>Login</button>
-            <RouterLink to="/login">Already have an account?</RouterLink>
+            <SgButton @click.prevent="register">register</SgButton>
+            <RouterLink to="/register">Already have an account?</RouterLink>
         </form>
     </section>
 </template>
 
 <style scoped lang="scss">
-.login {
+.register {
     color: var(--default-text-dark);
     background-color: var(--bg2-dark);
     margin: 2rem;
@@ -39,7 +89,7 @@
     margin-left: auto;
     margin-right: auto;
 
-    #login-form {
+    #register-form {
         display: flex;
         flex-flow: column;
         align-items: center;
@@ -48,6 +98,10 @@
         width: 80%;
         margin-left: auto;
         margin-right: auto;
+
+        .errors {
+            color: red
+        }
 
         .form-intro {
             display: flex;
@@ -65,7 +119,7 @@
             flex-flow: column;
             width: 100%;
 
-            input[type="email"], input[type="password"] {
+            input[type="text"],input[type="email"], input[type="password"] {
                 height: 2.3em;
                 border-radius: 5px;
                 border: none;
@@ -77,17 +131,17 @@
         }
 
         a {
-            color: var(--default-text-dark);
+            color: var(--accent-light);
         }
     }
 }
 
 /* BREAKPOINTS */
 @media (width >= 65em) {
-    .login {
+    .register {
         width: 40%;
 
-        #login-form {
+        #register-form {
             width: 60%;
         }
     }

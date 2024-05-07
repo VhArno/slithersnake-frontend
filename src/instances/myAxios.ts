@@ -1,7 +1,13 @@
 import axios from 'axios'
 
 const myAxios = axios.create({
-  baseURL: import.meta.env.BASE_API_URL || 'http://localhost:8080/api'
+  baseURL: `${import.meta.env.VITE_BASE_URL}/api` || 'http://localhost:8080/api',
 })
 
-export { myAxios }
+const authAxios = axios.create({
+  baseURL: `${import.meta.env.VITE_BASE_URL}/api` || 'http://localhost:8080/api',
+  withCredentials: true,
+  withXSRFToken: true
+})
+
+export { myAxios, authAxios }
