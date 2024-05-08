@@ -46,7 +46,14 @@ if (socket) {
     <RouterView />
   </main>
 
-  <footer></footer>
+  <footer>
+  </footer>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+main {
+  flex: 1;
+  position: relative;
+  max-height: 100vh;
+}
+</style>

@@ -35,10 +35,10 @@ const goSettings = () => {
 
 <style scoped lang="scss">
 .main-window {
-  width: 100%;
-  padding: 3rem 0rem;
   background-image: url('/src/assets/img/SgBackground.jpg');
   background-size: cover;
+  height: 94vh;
+  display: flex;
 
   .main-menu {
     display: flex;
@@ -72,11 +72,11 @@ const goSettings = () => {
 @media (width >= 65em) {
   .main-window {
     padding: 5rem 0rem;
-    background-size: contain;
+    background-size: cover;
+    height: 76vh;
 
     .main-menu {
       width: 30%;
-      margin: 0 auto;
       padding: 2rem 0rem;
       border-radius: 10px;
       background-color: var(--bg2-dark);
