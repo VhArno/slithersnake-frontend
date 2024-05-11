@@ -15,11 +15,9 @@ const props = defineProps<{
 </template>
 
 <style scoped lang="scss">
-#app {
-  display: flex;
-  flex-flow: column;
-  justify-content: center;
-  align-items: center;
+.grid {
+  border: 20px solid green;
+  width: fit-content;
 }
 
 .row {
@@ -34,8 +32,16 @@ const props = defineProps<{
   background-color: yellow;
 }
 
+.snake:first-child {
+  background-image: url('/public/img/skin1_head.svg');
+}
+
 .snake {
-  background-color: green;
+  background-image: url('/public/img/skin1_body.svg');
+}
+
+.snake-head {
+  background-image: url('/public/img/skin1_head.svg');
 }
 
 .food {
@@ -56,10 +62,6 @@ p {
   width: 20px; /* Adjust based on desired cell size */
   height: 20px; /* Adjust based on desired cell size */
   border: 1px solid #ccc; /* Optional: Add borders for visualization */
-}
-
-.snake {
-  background-color: green; /* Color for snake cells */
 }
 
 .food {

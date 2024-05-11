@@ -101,8 +101,8 @@ export const usePlayStore = defineStore('play', () => {
       console.error('Something went wrong')
     })
 
-    alert('game over!')
-    restartGame()
+    /*alert('game over!')
+    restartGame()*/
   }
 
   //herstart de game
