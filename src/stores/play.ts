@@ -386,6 +386,21 @@ export const usePlayStore = defineStore('play', () => {
         return
       }
     }
+
+    // Controleer botsingen met andere snake
+
+    for (let i = 1; i < snake.value.length; i++) {
+      if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {
+        gameOver.value = true
+        return
+      }
+    }
+
+    // Controleer botsingen met andere snake head
+    if (head.x == enemySnake.value[0].x && head.y == enemySnake.value[0].y) {
+      gameOver.value = true
+      return
+    }
   }
 
   // Werk het speelveld bij op basis van de huidige status
