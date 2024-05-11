@@ -113,7 +113,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 1041px) {
+@media (max-width: 1400px) {
   .main-sec {
     flex-flow: column;
     margin: 2rem auto;
@@ -131,9 +131,8 @@ onMounted(() => {
       border-radius: 10px;
       color: var(--default-text-dark);
       background-color: var(--bg2-dark);
-      right: 0;
-      width: 60%;
-      margin: 2rem auto
+      right:auto;
+      margin: 2rem;
     }
   }
 }

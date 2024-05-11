@@ -36,7 +36,7 @@ export const usePlayStore = defineStore('play', () => {
   const { keybinds, volume } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
-  const numCols = 20 // Aantal kolommen
+  const numCols = 25 // Aantal kolommen
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang

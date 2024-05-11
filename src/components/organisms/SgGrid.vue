@@ -16,17 +16,22 @@ const props = defineProps<{
 
 <style scoped lang="scss">
 .grid {
-  border-width: 30px; /* Set border width */
-  border-style: solid; /* Set border style */
-  border-image-source: url('/src/assets/img/360_F_270217079_JhxcnAedqOXr8sHNpbAk7zTAryQitbL2.jpg'); /* Specify the path to your image */
-  border-image-slice: 20; /* Define how the image should be sliced */
-  border-image-repeat: no-repeat; /* Specify how the image should be repeated */
-  background-size: contain;
+  /*border-width: 30px;
+  border-style: solid; 
+  border-image-source: url('/src/assets/img/playBg.jpg'); 
+  border-image-slice: 20; 
+  border-image-repeat: no-repeat;
+  background-size: contain;*/
+
+  background-image: url('/src/assets/img/playBg.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 10px solid green;
 }
 
 .row {
   display: flex;
-  background-color: #ccc;
+  //background-color: #ccc;
 }
 
 .powerUp{
@@ -66,7 +71,9 @@ p {
 .cell {
   width: 30px; /* Adjust based on desired cell size */
   height: 30px; /* Adjust based on desired cell size */
-  border: 1px solid var(--main-bg-dark); /* Optional: Add borders for visualization */
+  //border: 1px solid var(--main-bg-dark); /* Optional: Add borders for visualization */
+
+  border: 1px solid #ffffff3b;
 }
 
 .food {
