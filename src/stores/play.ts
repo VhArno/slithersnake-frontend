@@ -350,8 +350,14 @@ export const usePlayStore = defineStore('play', () => {
 
     // Plaats de slang op het speelveld
     snake.value.forEach((segment) => {
-      const { x, y } = segment
+      if (segment === snake.value[0]) {
+        const { x, y } = segment
+        gameGrid.value[y][x] = 'snake-head'
+      } else {
+        const { x, y } = segment
       gameGrid.value[y][x] = 'snake'
+      }
+      
     })
 
     // Plaats het voedsel op het speelveld
