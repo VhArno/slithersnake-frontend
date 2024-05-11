@@ -75,14 +75,18 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .main-sec {
-  position: relative;
   display: flex;
-  flex-flow: row;
-  justify-content: space-around;
+  flex-flow: row wrap;
+  justify-content: center;
+  position: relative;
   margin-top: 2rem;
+  gap: 2rem;
 
   .scoreboard {
     position: absolute;
+    right: 2rem;
+    height: calc(100% - 2rem);
+
     display: flex;
     flex-flow: column;
     justify-content: space-between;
@@ -90,8 +94,6 @@ onMounted(() => {
     border-radius: 10px;
     color: var(--default-text-dark);
     background-color: var(--bg2-dark);
-    right: 2rem;
-    height: 100%;
 
     .players {
       display: flex;
@@ -114,26 +116,10 @@ onMounted(() => {
 }
 
 @media (max-width: 1400px) {
-  .main-sec {
-    flex-flow: column;
-    margin: 2rem auto;
-
-    .grid {
-      margin: 0 auto;
-    }
-
-    .scoreboard {
-      position: relative;
-      display: flex;
-      flex-flow: column;
-      justify-content: space-between;
-      padding: 1rem;
-      border-radius: 10px;
-      color: var(--default-text-dark);
-      background-color: var(--bg2-dark);
-      right:auto;
-      margin: 2rem;
-    }
+  .scoreboard {
+    position: static !important;
+    height: auto !important;
+    width: 60%;
   }
 }
 </style>
