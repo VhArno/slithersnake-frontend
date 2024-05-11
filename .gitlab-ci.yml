@@ -5,7 +5,6 @@ variables:
 
 stages:
   - lint
-  - test
   - deploy
 
 cache:
@@ -29,11 +28,6 @@ lint:
   script:
     - pnpm lint
     - pnpm lint --fix
-
-test:
-  stage: test
-  script:
-    - pnpm lint
 
 plesk:
   stage: deploy
