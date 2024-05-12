@@ -40,9 +40,9 @@ const player = ref<Player>({
   email: '',
   level: Math.floor(Math.random() * (100 - 0 + 1)) + 0,
   highscore: 0,
-  played: 0,
-  won: 0,
-  killed: 0,
+  games_played: 0,
+  games_won: 0,
+  players_killed: 0,
   skins: [],
   role: ''
 })
