@@ -9,10 +9,16 @@ defineProps<{
 
 const skinStore = useSkinsStore()
 const { selectedSkin } = storeToRefs(skinStore)
+
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === ' ') {
+    event.preventDefault()
+  }
+}
 </script>
 
 <template>
-  <div class="grid">
+  <div class="grid" tabindex="0" @keydown.prevent="handleKeyDown">
     <div v-for="(row, rowIndex) in gameGrid" :key="rowIndex" class="row">
       <div v-for="(cell, colIndex) in row" ref="cells" :key="colIndex" 
         :class="['cell', cell, { 'snake': cell === 'snake', 'snake-head': cell === 'snake-head' }]" 
