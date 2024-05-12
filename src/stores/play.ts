@@ -45,8 +45,8 @@ export const usePlayStore = defineStore('play', () => {
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
-  let gameLoopInterval = 0
-  let powerUpTimeOut = 0
+  let gameLoopInterval: NodeJS.Timeout
+  let powerUpTimeOut: NodeJS.Timeout
   const powerUpAvailable = ref<boolean>(false)
   const interval = ref<number>(5)
   const character = ref<Character>()
