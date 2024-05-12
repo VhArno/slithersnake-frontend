@@ -37,8 +37,8 @@ const goSettings = () => {
 .main-window {
   background-image: url('/src/assets/img/SgBackground.jpg');
   background-size: cover;
-  height: 94vh;
-  display: flex;
+  height: 76vh;
+  padding-top: 10rem;
 
   .main-menu {
     display: flex;
