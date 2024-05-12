@@ -26,7 +26,8 @@ export interface GameMode {
 export interface Skin {
   id: number
   name: string
-  img?: string
+  imgHead: string
+  imgBody: string
 }
 
 export interface Player {

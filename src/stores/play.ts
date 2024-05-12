@@ -355,9 +355,8 @@ export const usePlayStore = defineStore('play', () => {
         gameGrid.value[y][x] = 'snake-head'
       } else {
         const { x, y } = segment
-      gameGrid.value[y][x] = 'snake'
+        gameGrid.value[y][x] = 'snake'
       }
-      
     })
 
     // Plaats het voedsel op het speelveld

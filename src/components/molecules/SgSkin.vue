@@ -9,7 +9,12 @@ defineProps<{
 <template>
     <div class="skin">
         <p>{{ skin.name }}</p>
-        <img :src="skin.img" :alt="skin.name">
+        <div class="images">
+            <img :src="skin.imgHead" :alt="skin.name">
+            <img :src="skin.imgBody" :alt="skin.name">
+            <img :src="skin.imgBody" :alt="skin.name">
+            <img :src="skin.imgBody" :alt="skin.name">
+        </div>
     </div>
 </template>
 
@@ -24,6 +29,15 @@ defineProps<{
     background-color: var(--dark-gray);
     border-radius: 10px;
     margin: 0 auto;
+
+    .images {
+        display: flex;
+        flex-flow: row;
+
+        img {
+            transform: rotate(-90deg);
+        }
+    }
 
     &:not(.selected):hover {
         cursor: pointer;
