@@ -36,7 +36,7 @@ export const usePlayStore = defineStore('play', () => {
   const { keybinds, volume } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
-  const numCols = 20 // Aantal kolommen
+  const numCols = 25 // Aantal kolommen
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
@@ -45,8 +45,8 @@ export const usePlayStore = defineStore('play', () => {
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
-  let gameLoopInterval: NodeJS.Timeout;
-  let powerUpTimeOut: NodeJS.Timeout;
+  let gameLoopInterval: NodeJS.Timeout
+  let powerUpTimeOut: NodeJS.Timeout
   const powerUpAvailable = ref<boolean>(false)
   const interval = ref<number>(5)
   const character = ref<Character>()
@@ -101,8 +101,8 @@ export const usePlayStore = defineStore('play', () => {
       console.error('Something went wrong')
     })
 
-    alert('game over!')
-    restartGame()
+    /*alert('game over!')
+    restartGame()*/
   }
 
   //herstart de game
@@ -350,8 +350,13 @@ export const usePlayStore = defineStore('play', () => {
 
     // Plaats de slang op het speelveld
     snake.value.forEach((segment) => {
-      const { x, y } = segment
-      gameGrid.value[y][x] = 'snake'
+      if (segment === snake.value[0]) {
+        const { x, y } = segment
+        gameGrid.value[y][x] = 'snake-head'
+      } else {
+        const { x, y } = segment
+        gameGrid.value[y][x] = 'snake'
+      }
     })
 
     // Plaats het voedsel op het speelveld

@@ -76,20 +76,20 @@ onMounted(() => {
 <style scoped lang="scss">
 .main-sec {
   display: flex;
-  flex-flow: row;
-
-  .grid {
-    margin: 2rem;
-    flex: 4;
-    height: 100%;
-  }
+  flex-flow: row wrap;
+  justify-content: center;
+  position: relative;
+  margin-top: 2rem;
+  gap: 2rem;
 
   .scoreboard {
-    flex: 1;
+    position: absolute;
+    right: 2rem;
+    height: calc(100% - 2rem);
+
     display: flex;
     flex-flow: column;
     justify-content: space-between;
-    margin: 2rem;
     padding: 1rem;
     border-radius: 10px;
     color: var(--default-text-dark);
@@ -112,6 +112,14 @@ onMounted(() => {
       flex-flow: column;
       gap: 1rem;
     }
+  }
+}
+
+@media (max-width: 1400px) {
+  .scoreboard {
+    position: static !important;
+    height: auto !important;
+    width: 60%;
   }
 }
 </style>
