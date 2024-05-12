@@ -45,23 +45,32 @@ const isSelected = (skin: Skin) => {
     }
 
     .skin-list {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 2rem; 
-        justify-content: center; 
-        align-items: center; 
-        text-align: center;
-        margin: 1rem; 
+        display: flex;
+        flex-flow: column;
+        gap: 2rem;
+        margin-top: 1rem;
+        justify-content: center;
+        align-items: center;
+        
+        .skin {
+            width: 80%;
+        }
     }
 }
 
 
 /* BREAKPOINTS */
-@media (width >= 65em) {
+@media (width >= 50em) {
     .skin-section {
         width: 60%;
         .skin-list {
-            grid-template-columns: repeat(3, 1fr); 
+            flex-flow: row wrap;
+            max-width: 100%;
+
+            .skin {
+                width: calc(fit-content + 1rem);
+                max-width: 25%;
+            }
         }
     }
 }

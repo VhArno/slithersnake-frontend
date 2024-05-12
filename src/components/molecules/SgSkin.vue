@@ -8,12 +8,12 @@ defineProps<{
 
 <template>
     <div class="skin">
-        <p>{{ skin.name }}</p>
+        <h3>{{ skin.name }}</h3>
         <div class="images">
-            <img :src="skin.imgHead" :alt="skin.name">
-            <img :src="skin.imgBody" :alt="skin.name">
-            <img :src="skin.imgBody" :alt="skin.name">
-            <img :src="skin.imgBody" :alt="skin.name">
+            <img :src="skin.imgHead" :alt="skin.name" class="image">
+            <img :src="skin.imgBody" :alt="skin.name" class="image">
+            <img :src="skin.imgBody" :alt="skin.name" class="image">
+            <img :src="skin.imgBody" :alt="skin.name" class="image">
         </div>
     </div>
 </template>
@@ -28,25 +28,34 @@ defineProps<{
     padding: 2rem;
     background-color: var(--dark-gray);
     border-radius: 10px;
-    margin: 0 auto;
+    gap: 1.5rem;
 
     .images {
         display: flex;
-        flex-flow: row;
 
         img {
-            transform: rotate(-90deg);
+            width: 3rem;
+            animation: moveUpDown 1.5s infinite alternate;
         }
     }
 
     &:not(.selected):hover {
         cursor: pointer;
-        border: 3px solid var(--accent);
+        outline: 3px solid var(--accent);
     }
 }
 
 .selected {
     cursor: pointer;
-    border: 3px solid var(--selected);
+    outline: 3px solid var(--selected);
+}
+
+@keyframes moveUpDown {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-20px);
+  }
 }
 </style>
