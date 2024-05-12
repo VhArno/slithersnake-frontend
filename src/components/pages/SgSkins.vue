@@ -6,7 +6,6 @@ import { storeToRefs } from 'pinia'
 
 // skins store
 const skinStore = useSkinsStore()
-skinStore.loadSkins()
 
 const { skins } = storeToRefs(skinStore)
 
