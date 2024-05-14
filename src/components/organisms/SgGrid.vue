@@ -30,7 +30,7 @@ const props = defineProps<{
   border: 1px solid #ccc;
 }
 
-.powerUp{
+.powerUp {
   background-color: yellow;
 }
 
@@ -40,6 +40,10 @@ const props = defineProps<{
 
 .food {
   background-color: red;
+}
+
+.obstacles {
+  background-color: brown;
 }
 
 p {

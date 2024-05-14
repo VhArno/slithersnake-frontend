@@ -89,6 +89,11 @@ export const usePlayStore = defineStore('play', () => {
     // Plaats food
     generateFood()
 
+    //add some obstacles
+    addObstacle(5, 5)
+    addObstacle(5, 6)
+    addObstacle(5, 7)
+
     powerUpTimeOut = setTimeout(() => {
       generatePowerUp()
     }, 5000)
@@ -314,6 +319,14 @@ export const usePlayStore = defineStore('play', () => {
       return
     }
 
+    //controleer op botsing met obstacles
+    obstacles.value.forEach((obstacle) => {
+      if (head.x === obstacle.x && head.y === obstacle.y) {
+        gameOver.value = true
+        return
+      }
+    })
+
     // Controleer botsingen met zichzelf
 
     for (let i = 1; i < snake.value.length; i++) {
@@ -350,6 +363,11 @@ export const usePlayStore = defineStore('play', () => {
     // Plaats het voedsel op het speelveld
     const { x, y } = food.value
     gameGrid.value[y][x] = 'food'
+
+    obstacles.value.forEach((obstacle) => {
+      const { x, y } = obstacle
+      gameGrid.value[y][x] = 'obstacles'
+    })
   }
 
   const router = useRouter()
