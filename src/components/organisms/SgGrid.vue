@@ -31,7 +31,8 @@ const props = defineProps<{
 }
 
 .powerUp {
-  background-color: yellow;
+  background-image: url('../../assets/img/swiftness.png');
+  background-size: cover;
 }
 
 .snake {
@@ -66,9 +67,5 @@ p {
 
 .snake {
   background-color: green; /* Color for snake cells */
-}
-
-.food {
-  background-color: red; /* Color for food cell */
 }
 </style>
