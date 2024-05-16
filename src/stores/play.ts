@@ -51,6 +51,10 @@ export const usePlayStore = defineStore('play', () => {
   const powerUpAvailable = ref<boolean>(false)
   const interval = ref<number>(10)
   const character = ref<Character>()
+  const ghosted = ref<boolean>(false)
+  const invisible = ref<boolean>(false)
+  const enemyGhosted = ref<boolean>(false)
+  const enemyInvisible = ref<boolean>(false)
 
   //init game intervals
   let gameLoopInterval = setInterval(() => {})
@@ -134,7 +138,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('generateFood', foodX, foodY)
   }
 
-  //logica van speedboost powerUpn
+  //logica van speedboost powerUp
   const speedBoost = function () {
     console.log('speed boost')
     clearInterval(gameLoopInterval)
@@ -177,6 +181,18 @@ export const usePlayStore = defineStore('play', () => {
     }, 4000)
   }
 
+  const ghost = function () {
+    console.log('player ' + params.playerId + ' ghosted')
+
+    socket?.emit('activateGhost', params.playerId)
+    setTimeout(() => {
+      console.log('ghost over')
+      socket?.emit('deactivateGhost', params.playerId)
+    }, 10000)
+  }
+
+  const invisibility = function () {}
+
   function generatePowerUp() {
     socket?.emit('setPowerUpAvailability', true)
 
@@ -199,6 +215,12 @@ export const usePlayStore = defineStore('play', () => {
       case 'speedboost':
         speedBoost()
         break
+      case 'ghost':
+        ghost()
+        break
+      case 'invisibility':
+        speedBoost()
+        break
     }
   }
 
@@ -206,6 +228,10 @@ export const usePlayStore = defineStore('play', () => {
     enemySnake.value.forEach((segment) => {
       const { x, y } = segment
       gameGrid.value[y][x] = 'enemy'
+      if(enemyGhosted.value){
+        gameGrid.value[y][x] = 'ghostedEnemy'
+
+      }
     })
   }
 
@@ -249,12 +275,39 @@ export const usePlayStore = defineStore('play', () => {
       food.value = { x: foodX, y: foodY }
     })
 
-    socket?.on('showPowerUp', (powerX, powerY) => {
-      powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
+    socket?.on('showPowerUp', (powerX, powerY, random) => {
+      switch (random) {
+        case 1:
+          powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
+          break
+        case 2:
+          powerUp.value = { id: 2, name: 'ghost', x: powerX, y: powerY }
+          break
+        case 3:
+          powerUp.value = { id: 3, name: 'invisibility', x: powerX, y: powerY }
+          break
+      }
     })
 
     socket?.on('setPowerUpAvailability', (bool) => {
       powerUpAvailable.value = bool
+    })
+
+    socket?.on('activateGhost', (id) => {
+      if (id === params.playerId) {
+        ghosted.value = true
+      }else{
+        //enemy spelers worden ghosted
+        enemyGhosted.value = true
+      }
+    })
+
+    socket?.on('deactivateGhost', (id) => {
+      if (id === params.playerId) {
+        ghosted.value = false
+      }else{
+        enemyGhosted.value = false
+      }
     })
 
     gameLoopInterval = setInterval(
@@ -378,28 +431,30 @@ export const usePlayStore = defineStore('play', () => {
       return
     }
 
-    // Controleer botsingen met zichzelf
+    if (!ghosted.value) {
+      // Controleer botsingen met zichzelf
 
-    for (let i = 1; i < snake.value.length; i++) {
-      if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
+      for (let i = 1; i < snake.value.length; i++) {
+        if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
+          gameOver.value = true
+          return
+        }
+      }
+
+      // Controleer botsingen met andere snake
+
+      for (let i = 1; i < enemySnake.value.length; i++) {
+        if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {
+          gameOver.value = true
+          return
+        }
+      }
+
+      // Controleer botsingen met andere snake head
+      if (head.x == enemySnake.value[0].x && head.y == enemySnake.value[0].y) {
         gameOver.value = true
         return
       }
-    }
-
-    // Controleer botsingen met andere snake
-
-    for (let i = 1; i < snake.value.length; i++) {
-      if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {
-        gameOver.value = true
-        return
-      }
-    }
-
-    // Controleer botsingen met andere snake head
-    if (head.x == enemySnake.value[0].x && head.y == enemySnake.value[0].y) {
-      gameOver.value = true
-      return
     }
   }
 
@@ -424,6 +479,10 @@ export const usePlayStore = defineStore('play', () => {
     snake.value.forEach((segment) => {
       const { x, y } = segment
       gameGrid.value[y][x] = 'snake'
+      if(ghosted.value){
+        gameGrid.value[y][x] = 'ghostedSnake'
+
+      }
     })
 
     moveEnemySnake()

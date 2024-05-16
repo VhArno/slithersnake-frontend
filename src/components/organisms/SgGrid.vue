@@ -30,7 +30,7 @@ const props = defineProps<{
   border: 1px solid #ccc;
 }
 
-.powerUp{
+.powerUp {
   background-color: yellow;
 }
 
@@ -38,8 +38,16 @@ const props = defineProps<{
   background-color: green;
 }
 
-.enemy{
+.enemy {
   background-color: orange;
+}
+
+.ghostedSnake {
+  background-color: rgba(131, 195, 131, 0.649);
+}
+
+.ghostedEnemy {
+  background-color: rgba(131, 195, 131, 0.649);
 }
 
 .food {
