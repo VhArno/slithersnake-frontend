@@ -39,11 +39,13 @@ const props = defineProps<{
 }
 
 .food {
-  background-color: red;
+  background-image: url('../../assets/img/apple.png');
+  background-size: cover;
 }
 
 .obstacles {
-  background-color: brown;
+  background-image: url('../../assets/img/obstacle.jpg');
+  background-size: cover;
 }
 
 p {
