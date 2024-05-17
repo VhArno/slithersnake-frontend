@@ -3,7 +3,7 @@ import { inject, ref } from 'vue'
 import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
-import type { Character, Player, PowerUp } from '@/types'
+import type { Character, PowerUp, IngamePlayer } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
@@ -38,11 +38,11 @@ export const usePlayStore = defineStore('play', () => {
   const numRows = 20 // Aantal rijen
   const numCols = 20 // Aantal kolommen
 
-  const players = ref<Player[]>([])
+  const players = ref<IngamePlayer[]>([])
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
-  const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
+  const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichamen van de enemy slangen
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   const direction = ref('right') //richting van de slang
@@ -91,7 +91,7 @@ export const usePlayStore = defineStore('play', () => {
     if (players.value.length >= 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
-          startX = Math.floor(numCols / (2 + 2 * i))
+          startX = Math.floor(numCols / (2 + players.value.length * i))
           startY = Math.floor(numRows / 2)
         }
       }
@@ -225,14 +225,25 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   function moveEnemySnake() {
-    enemySnake.value.forEach((segment) => {
-      const { x, y } = segment
-      gameGrid.value[y][x] = 'enemy'
-      if(enemyGhosted.value){
-        gameGrid.value[y][x] = 'ghostedEnemy'
-
+    players.value.forEach((e) => {
+      if (e.id !== params.playerId) {
+        e.data.forEach((segment) => {
+          const { x, y } = segment
+          gameGrid.value[y][x] = 'enemy'
+          if (enemyGhosted.value) {
+            gameGrid.value[y][x] = 'ghostedEnemy'
+          }
+        })
       }
     })
+    // enemySnake.value.forEach((segment) => {
+    //   const { x, y } = segment
+    //   gameGrid.value[y][x] = 'enemy'
+    //   if(enemyGhosted.value){
+    //     gameGrid.value[y][x] = 'ghostedEnemy'
+
+    //   }
+    // })
   }
 
   const startInterval = () => {
@@ -252,7 +263,13 @@ export const usePlayStore = defineStore('play', () => {
       if (params.playerId !== snake.id) {
         console.log('enemy snake moved!')
         console.log(snake)
-        enemySnake.value = snake.data
+        // enemySnake.value = snake.data
+
+        players.value.forEach((e) => {
+          if (e.id === snake.id) {
+            e.data = snake.data
+          }
+        })
       }
     })
 
@@ -296,7 +313,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.on('activateGhost', (id) => {
       if (id === params.playerId) {
         ghosted.value = true
-      }else{
+      } else {
         //enemy spelers worden ghosted
         enemyGhosted.value = true
       }
@@ -305,7 +322,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.on('deactivateGhost', (id) => {
       if (id === params.playerId) {
         ghosted.value = false
-      }else{
+      } else {
         enemyGhosted.value = false
       }
     })
@@ -443,18 +460,38 @@ export const usePlayStore = defineStore('play', () => {
 
       // Controleer botsingen met andere snake
 
-      for (let i = 1; i < enemySnake.value.length; i++) {
-        if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {
-          gameOver.value = true
-          return
+      players.value.forEach((e) => {
+        if (e.id !== params.playerId) {
+          for (let i = 1; i < e.data.length; i++) {
+            if (head.x === e.data[i].x && head.y === e.data[i].y) {
+              gameOver.value = true
+              return
+            }
+          }
         }
-      }
+      })
+
+      // for (let i = 1; i < enemySnake.value.length; i++) {
+      //   if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {
+      //     gameOver.value = true
+      //     return
+      //   }
+      // }
 
       // Controleer botsingen met andere snake head
-      if (head.x == enemySnake.value[0].x && head.y == enemySnake.value[0].y) {
-        gameOver.value = true
-        return
-      }
+
+      players.value.forEach((e) => {
+        if (e.id !== params.playerId) {
+          if (head.x == e.data[0].x && head.y == e.data[0].y) {
+            gameOver.value = true
+            return
+          }
+        }
+      })
+      // if (head.x == enemySnake.value[0].x && head.y == enemySnake.value[0].y) {
+      //   gameOver.value = true
+      //   return
+      // }
     }
   }
 
@@ -479,9 +516,8 @@ export const usePlayStore = defineStore('play', () => {
     snake.value.forEach((segment) => {
       const { x, y } = segment
       gameGrid.value[y][x] = 'snake'
-      if(ghosted.value){
+      if (ghosted.value) {
         gameGrid.value[y][x] = 'ghostedSnake'
-
       }
     })
 

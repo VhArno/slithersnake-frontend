@@ -39,6 +39,14 @@ export interface Player {
     won: number
     killed: number
     skins: Skin[]
+
+}
+
+export interface IngamePlayer {
+    id: string
+    ghosted: false,
+    invisible: false,
+    data: Array<{ x: number; y: number }>
 }
 
 export interface Keybinds {
