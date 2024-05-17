@@ -17,8 +17,6 @@ const pickupSound = ref()
 const endGameSound = ref()
 const gameStatus = ref()
 
-
-
 const playStore = usePlayStore()
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
@@ -41,7 +39,6 @@ onMounted(() => {
     gameStatus.value = 'started'
   })
 })
-
 </script>
 
 <template>
@@ -64,12 +61,28 @@ onMounted(() => {
         <SgButton class="leave-btn" @click="playStore.leaveGame">Verlaten</SgButton>
       </div>
     </div>
-    <audio ref="endGameSound" hidden preload="auto" src="/src/assets/sounds/game_end-defeat.wav"
-      :volume="volume / 100"></audio>
-    <audio ref="gameMusic" hidden loop preload="auto" src="/src/assets/sounds/game_music.wav"
-      :volume="volume / 100"></audio>
-    <audio ref="pickupSound" hidden preload="auto" src="/src/assets/sounds/power-up_pickup.wav"
-      :volume="volume / 100"></audio>
+    <audio
+      ref="endGameSound"
+      hidden
+      preload="auto"
+      src="/src/assets/sounds/game_end-defeat.wav"
+      :volume="volume / 100"
+    ></audio>
+    <audio
+      ref="gameMusic"
+      hidden
+      loop
+      preload="auto"
+      src="/src/assets/sounds/game_music.wav"
+      :volume="volume / 100"
+    ></audio>
+    <audio
+      ref="pickupSound"
+      hidden
+      preload="auto"
+      src="/src/assets/sounds/power-up_pickup.wav"
+      :volume="volume / 100"
+    ></audio>
   </section>
 </template>
 
@@ -100,7 +113,7 @@ onMounted(() => {
       flex-flow: column;
       gap: 1rem;
 
-      >div {
+      > div {
         display: flex;
         flex-flow: row;
         justify-content: space-between;

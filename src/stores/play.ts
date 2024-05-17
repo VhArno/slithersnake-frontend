@@ -12,6 +12,7 @@ import { io, Socket } from 'socket.io-client'
 let socket: Socket | null = null
 
 export const usePlayStore = defineStore('play', () => {
+
   // Audios
   const gameMusic = ref()
   const pickupSound = ref()
@@ -39,6 +40,7 @@ export const usePlayStore = defineStore('play', () => {
   const numCols = 25 // Aantal kolommen
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
+
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
   const food = ref<{ x: number; y: number }>({ x: 0, y: 0 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
@@ -54,6 +56,13 @@ export const usePlayStore = defineStore('play', () => {
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
 
+  //obstakels toevoegen
+  // Obstacles
+  const obstacles = ref<Array<{ x: number; y: number }>>([])
+
+  function addObstacle(x: number, y: number) {
+    obstacles.value.push({ x, y })
+  }
   function initializeSocket(s: Socket) {
     socket = s
   }
@@ -82,6 +91,11 @@ export const usePlayStore = defineStore('play', () => {
 
     // Plaats food
     generateFood()
+
+    //add some obstacles
+    addObstacle(5, 5)
+    addObstacle(5, 6)
+    addObstacle(5, 7)
 
     powerUpTimeOut = setTimeout(() => {
       generatePowerUp()
@@ -321,6 +335,14 @@ export const usePlayStore = defineStore('play', () => {
       return
     }
 
+    //controleer op botsing met obstacles
+    obstacles.value.forEach((obstacle) => {
+      if (head.x === obstacle.x && head.y === obstacle.y) {
+        gameOver.value = true
+        return
+      }
+    })
+
     // Controleer botsingen met zichzelf
 
     for (let i = 1; i < snake.value.length; i++) {
@@ -362,6 +384,11 @@ export const usePlayStore = defineStore('play', () => {
     // Plaats het voedsel op het speelveld
     const { x, y } = food.value
     gameGrid.value[y][x] = 'food'
+
+    obstacles.value.forEach((obstacle) => {
+      const { x, y } = obstacle
+      gameGrid.value[y][x] = 'obstacles'
+    })
   }
 
   const router = useRouter()
