@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUrlSearchParams, useClipboard } from '@vueuse/core'
 import SgButton from '../atoms/SgButton.vue'
-import { inject, ref } from 'vue'
+import { computed, inject, ref, watchEffect } from 'vue'
 import type { Room, Map, GameMode, Player } from '@/types/'
 import SgToast from '../atoms/SgToast.vue'
 import { v4 as uuidv4 } from 'uuid'
@@ -12,6 +12,7 @@ import { storeToRefs } from 'pinia'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { Socket } from 'socket.io-client'
+import { watch } from 'fs'
 
 // pinia
 /* maps store */
@@ -28,6 +29,8 @@ const { modes } = storeToRefs(modesStore)
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
 
+const currentRoom = ref<Room | null>(null)
+
 // router
 
 const socket: Socket = inject('socket') as Socket
@@ -35,7 +38,8 @@ const router = useRouter()
 const players = ref<Player[]>([])
 
 const player = ref<Player>({
-  id: Math.floor(Math.random() * (100 - 0 + 1)) + 0,
+  id: 'player' + Math.floor(Math.random() * (10000 - 0 + 1)) + 0,
+  // id: 'player' + 0,
   username: 'test user',
   email: '',
   level: Math.floor(Math.random() * (100 - 0 + 1)) + 0,
@@ -47,15 +51,9 @@ const player = ref<Player>({
   role: ''
 })
 
-if (sessionStorage.getItem('creator')) {
-  const randomGuid: string = uuidv4()
-  const params = useUrlSearchParams('history')
-  params.id = randomGuid
-  socket.emit('createRoom', params.id, player)
-}
-
 socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
+  sessionStorage.setItem("players", JSON.stringify(room.players))
   console.log('player joined room')
   if (params.id === room.id) {
     players.value = room.players
@@ -67,7 +65,7 @@ socket.on('joinedRoom', (room: Room) => {
 const params = useUrlSearchParams('history')
 socket.emit('getPlayers', params.id)
 socket.on('players', (room: Room) => {
-  players.value = room.players
+  currentRoom.value = room
 })
 
 if (!sessionStorage.getItem('creator')) {
@@ -85,7 +83,6 @@ const toggleToast = () => {
   showToast.value = !showToast.value
 }
 
-
 const selectedMap = ref<Map>(maps.value[0])
 const selectedMode = ref<GameMode>(modes.value[0])
 
@@ -98,6 +95,16 @@ const invite = () => {
   if (copied) {
     toggleToast()
   }
+}
+
+if (sessionStorage.getItem('creator')) {
+  const randomGuid: string = uuidv4()
+  const params = useUrlSearchParams('history')
+  params.id = randomGuid
+
+  setTimeout(() => {
+    socket.emit('createRoom', currentRoom.value, player)
+  }, 2000)
 }
 
 /* Previous and next buttons */
@@ -141,11 +148,40 @@ const startGame = () => {
 
 socket.on('gameStarted', (roomId: string) => {
   console.log('game started')
+  console.log(player.value.id)
   const params = useUrlSearchParams('history')
   if (params.id && roomId) {
     if (roomId === params.id) {
-      router.push('/play?id=' + roomId)
+      router.push('/play?id=' + roomId + '&playerId=' + player.value.id)
     }
+  }
+})
+
+watchEffect(() => {
+  selectedMap.value = maps.value[0]
+  selectedMode.value = modes.value[0]
+})
+
+watchEffect(() => {
+  const params = useUrlSearchParams('history')
+  currentRoom.value = {
+    id: params.id + '',
+    name: 'test room',
+    map: selectedMap.value,
+    mode: selectedMode.value,
+    players: players.value,
+    ping: 0
+  }
+
+  if (sessionStorage.getItem('creator')) {
+    socket.emit('settingsChanged', currentRoom.value)
+  }
+})
+
+socket.on('settingsChanged', (room: Room) => {
+  if (room.id === currentRoom.value?.id) {
+    selectedMap.value = room.map
+    selectedMode.value = room.mode
   }
 })
 
@@ -173,44 +209,52 @@ const leaveGame = () => {
                 </div>
             </div>
 
-            <div class="bg-gray options">
-                <h2>Game options</h2>
-                <div class="game-options">
-                    <div>
-                        <h3>Map</h3>
-                        <div class="map-select">
-                            <SgButton @click="prevMap" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
-                            <div class="maps">
-                                <div>
-                                    <p>{{ selectedMap?.name }}</p>
-                                    <img :src="selectedMap?.image" alt="map image" />
-                                </div>
-                            </div>
-                            <SgButton @click="nextMap" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
-                        </div> 
-                    </div>
-                    <div>
-                        <h3>Gamemode</h3>
-                        <div class="gamemode-select">
-                            <SgButton @click="prevMode" class="select-btn"><i class="fa-solid fa-chevron-left"></i></SgButton>
-                            <div class="gamemodes">
-                                <div>
-                                    <p>{{ selectedMode?.name }}</p>
-                                    <img :src="selectedMode?.image" alt="mode image" />
-                                </div>
-                            </div>
-                            <SgButton @click="nextMode" class="select-btn"><i class="fa-solid fa-chevron-right"></i></SgButton>
-                        </div>
-                    </div>
+      <div class="bg-gray options">
+        <h2>Game options</h2>
+        <div class="game-options">
+          <div>
+            <h3>Map</h3>
+            <div class="map-select">
+              <SgButton v-if="creator" @click="prevMap" class="select-btn"
+                ><i class="fa-solid fa-chevron-left"></i
+              ></SgButton>
+              <div class="maps">
+                <div>
+                  <p>{{ selectedMap?.name }}</p>
+                  <img :src="selectedMap?.image" alt="map image" />
                 </div>
+              </div>
+              <SgButton v-if="creator" @click="nextMap" class="select-btn"
+                ><i class="fa-solid fa-chevron-right"></i
+              ></SgButton>
             </div>
+          </div>
+          <div>
+            <h3>Gamemode</h3>
+            <div class="gamemode-select">
+              <SgButton v-if="creator" @click="prevMode" class="select-btn"
+                ><i class="fa-solid fa-chevron-left"></i
+              ></SgButton>
+              <div class="gamemodes">
+                <div>
+                  <p>{{ selectedMode?.name }}</p>
+                  <img :src="selectedMode?.image" alt="mode image" />
+                </div>
+              </div>
+              <SgButton v-if="creator" @click="nextMode" class="select-btn"
+                ><i class="fa-solid fa-chevron-right"></i
+              ></SgButton>
+            </div>
+          </div>
         </div>
-        <div class="controls">
-            <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
-            <SgButton v-if="creator" @click="startGame">Start game</SgButton>
-            <SgButton @click="leaveGame">Leave game</SgButton>
-        </div>
-    </section>
+      </div>
+    </div>
+    <div class="controls">
+      <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
+      <SgButton v-if="creator" @click="startGame">Start game</SgButton>
+      <SgButton @click="leaveGame">Leave game</SgButton>
+    </div>
+  </section>
 </template>
 
 <style scoped lang="scss">
@@ -230,82 +274,83 @@ const leaveGame = () => {
         flex-flow: column;
         gap: 1rem;
 
-        .bg-gray {
-            padding: 1rem;
-            border-radius: 10px;
-            background-color: var(--dark-gray);
-        }
-
-        .players {
-            display: flex;
-            flex-flow: column;
-        }
-
-        .options {
-            .game-options {
-                display: flex;
-                flex-flow: column;
-                gap: 1rem;
-                margin: 1em 0em;
-            }
-
-            .gamemode-select, .map-select {
-                display: flex;
-                flex-flow: row;
-                align-items: center;
-                margin-top: 1rem;
-                justify-content: space-between;
-
-                .gamemodes, .maps {
-                flex: 5;
-                width: 100%;
-                text-align: center;
-
-                img {
-                    height: 10em;
-                    width: 100%;
-                    object-fit: contain;
-                }
-                }
-
-                .select-btn {
-                    flex: 1;
-                }
-            }
-        }
+    .bg-gray {
+      padding: 1rem;
+      border-radius: 10px;
+      background-color: var(--dark-gray);
     }
-    .controls {
+
+    .players {
       display: flex;
       flex-flow: column;
-      gap: 1rem
     }
 
-}
-
-  /* BREAKPOINTS */
-  @media (width >=65em) {
-    .create {
-      width: 60%;
-      margin: 2rem auto;
-
-      .settings {
-        flex-flow: row;
-
-        .bg-gray {
-          flex: 1;
-          width: 100%;
-        }
-
-        .players {
-          display: flex;
-          flex-flow: column;
-          justify-content: space-between;
-        }
+    .options {
+      .game-options {
+        display: flex;
+        flex-flow: column;
+        gap: 1rem;
+        margin: 1em 0em;
       }
 
-      .sound-range {
-        width: 30%
+      .gamemode-select,
+      .map-select {
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        margin-top: 1rem;
+        justify-content: space-between;
+
+        .gamemodes,
+        .maps {
+          flex: 5;
+          width: 100%;
+          text-align: center;
+
+          img {
+            height: 10em;
+            width: 100%;
+            object-fit: contain;
+          }
+        }
+
+        .select-btn {
+          flex: 1;
+        }
       }
     }
   }
+  .controls {
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+  }
+}
+
+/* BREAKPOINTS */
+@media (width >=65em) {
+  .create {
+    width: 60%;
+    margin: 2rem auto;
+
+    .settings {
+      flex-flow: row;
+
+      .bg-gray {
+        flex: 1;
+        width: 100%;
+      }
+
+      .players {
+        display: flex;
+        flex-flow: column;
+        justify-content: space-between;
+      }
+    }
+
+    .sound-range {
+      width: 30%;
+    }
+  }
+}
 </style>

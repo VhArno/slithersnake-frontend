@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { inject, ref } from 'vue'
-import { onKeyStroke } from '@vueuse/core'
+import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
-import type { Character, PowerUp } from '@/types'
+import type { Character, PowerUp, IngamePlayer } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
@@ -37,24 +37,36 @@ export const usePlayStore = defineStore('play', () => {
   const { keybinds, volume } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
-  const numCols = 25 // Aantal kolommen
+  const numCols = 20 // Aantal kolommen
+
+  const players = ref<IngamePlayer[]>([])
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
 
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
-  const food = ref<{ x: number; y: number }>({ x: 0, y: 0 })
+  const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichamen van de enemy slangen
+  const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
-  let gameLoopInterval: NodeJS.Timeout
-  let powerUpTimeOut: NodeJS.Timeout
   const powerUpAvailable = ref<boolean>(false)
-  const interval = ref<number>(5)
+  const interval = ref<number>(10)
   const character = ref<Character>()
+  const ghosted = ref<boolean>(false)
+  const invisible = ref<boolean>(false)
+  const enemyGhosted = ref<boolean>(false)
+  const enemyInvisible = ref<boolean>(false)
+
+  //init game intervals
+  let gameLoopInterval = setInterval(() => {})
+  let socketInterval = setInterval(() => {})
+  let powerUpTimeOut = setInterval(() => {})
 
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
+
+  const params = useUrlSearchParams('history')
 
   //obstakels toevoegen
   // Obstacles
@@ -69,6 +81,8 @@ export const usePlayStore = defineStore('play', () => {
 
   // initialiseren
   function initializeGame() {
+    players.value = JSON.parse(sessionStorage.getItem('players')!)
+    console.log(players.value)
     //Sla de geselecteerde character op
     character.value = charStore.selectedCharacter
     interval.value = character.value.attributes.speed
@@ -80,8 +94,17 @@ export const usePlayStore = defineStore('play', () => {
     )
 
     // spawn slang
-    const startX = Math.floor(numCols / 2)
-    const startY = Math.floor(numRows / 2)
+    let startX = Math.floor(numCols / 2)
+    let startY = Math.floor(numRows / 2)
+
+    if (players.value.length >= 2) {
+      for (let i = 0; i < players.value.length; i++) {
+        if (players.value[i].id === params.playerId) {
+          startX = Math.floor(numCols / (2 + players.value.length * i))
+          startY = Math.floor(numRows / 2)
+        }
+      }
+    }
 
     snake.value = [{ x: startX, y: startY }]
 
@@ -89,22 +112,15 @@ export const usePlayStore = defineStore('play', () => {
       snake.value.push({ x: startX, y: startY + i })
     }
 
-    // Plaats food
-    generateFood()
-
     //add some obstacles
     addObstacle(5, 5)
     addObstacle(5, 6)
     addObstacle(5, 7)
-
-    powerUpTimeOut = setTimeout(() => {
-      generatePowerUp()
-    }, 5000)
   }
   //eindigt de game
   const endGame = () => {
     clearInterval(gameLoopInterval)
-
+    clearInterval(socketInterval)
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
     gameMusic.value.pause()
@@ -133,10 +149,10 @@ export const usePlayStore = defineStore('play', () => {
       foodY = Math.floor(Math.random() * numRows)
     } while (gameGrid.value[foodY][foodX] !== 'empty')
 
-    food.value = { x: foodX, y: foodY }
+    socket?.emit('generateFood', foodX, foodY)
   }
 
-  //logica van speedboost powerUpn
+  //logica van speedboost powerUp
   const speedBoost = function () {
     console.log('speed boost')
     clearInterval(gameLoopInterval)
@@ -144,6 +160,7 @@ export const usePlayStore = defineStore('play', () => {
       () => {
         if (!gameOver.value) {
           directionChanged.value = false
+          checkCollisions()
           moveSnake()
           checkCollisions()
           if (!gameOver.value) {
@@ -163,6 +180,7 @@ export const usePlayStore = defineStore('play', () => {
         () => {
           if (!gameOver.value) {
             directionChanged.value = false
+            checkCollisions()
             moveSnake()
             checkCollisions()
             if (!gameOver.value) {
@@ -177,8 +195,20 @@ export const usePlayStore = defineStore('play', () => {
     }, 4000)
   }
 
+  const ghost = function () {
+    console.log('player ' + params.playerId + ' ghosted')
+
+    socket?.emit('activateGhost', params.playerId)
+    setTimeout(() => {
+      console.log('ghost over')
+      socket?.emit('deactivateGhost', params.playerId)
+    }, 10000)
+  }
+
+  const invisibility = function () {}
+
   function generatePowerUp() {
-    powerUpAvailable.value = true
+    socket?.emit('setPowerUpAvailability', true)
 
     let powerX, powerY
     do {
@@ -188,37 +218,134 @@ export const usePlayStore = defineStore('play', () => {
 
     powerUp.value.x = powerX
     powerUp.value.y = powerY
+
+    socket?.emit('generatePowerUp', powerX, powerY)
   }
 
   function pickupPowerUp() {
-    powerUpAvailable.value = false
+    socket?.emit('setPowerUpAvailability', false)
 
     switch (powerUp.value.name) {
       case 'speedboost':
         speedBoost()
         break
+      case 'ghost':
+        ghost()
+        break
+      case 'invisibility':
+        speedBoost()
+        break
     }
+  }
+
+  function moveEnemySnake() {
+    players.value.forEach((e) => {
+      if (e.id !== params.playerId) {
+        e.data.forEach((segment) => {
+          const { x, y } = segment
+          gameGrid.value[y][x] = 'enemy'
+          if (enemyGhosted.value) {
+            gameGrid.value[y][x] = 'ghostedEnemy'
+          }
+        })
+      }
+    })
+    // enemySnake.value.forEach((segment) => {
+    //   const { x, y } = segment
+    //   gameGrid.value[y][x] = 'enemy'
+    //   if(enemyGhosted.value){
+    //     gameGrid.value[y][x] = 'ghostedEnemy'
+
+    //   }
+    // })
   }
 
   const startInterval = () => {
     // console.log(socket)
-    setInterval(() => {
-      socket?.emit('sendPlayerData')
+    socketInterval = setInterval(() => {
+      socket?.emit('sendPlayerData', snake.value, params.playerId)
       socket?.emit('getPlayerData')
+
+      if (!gameOver.value) {
+        updateGameGrid()
+      } else {
+        endGame()
+      }
     }, 100)
 
-    socket?.on('playerData', () => {
-      console.log('player data received')
+    socket?.on('getData', (snake) => {
+      if (params.playerId !== snake.id) {
+        console.log('enemy snake moved!')
+        console.log(snake)
+        // enemySnake.value = snake.data
+
+        players.value.forEach((e) => {
+          if (e.id === snake.id) {
+            e.data = snake.data
+          }
+        })
+      }
     })
+
+    // socket?.on('sendData', () => {
+    //   console.log('player data sent')
+    // })
   }
 
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
+    // Genereer eerste voedsel
+    generateFood()
+    //genereer eerste powerUp
+    powerUpTimeOut = setTimeout(() => {
+      generatePowerUp()
+    }, 5000)
+
+    socket?.on('showFood', (foodX, foodY) => {
+      food.value = { x: foodX, y: foodY }
+    })
+
+    socket?.on('showPowerUp', (powerX, powerY, random) => {
+      switch (random) {
+        case 1:
+          powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
+          break
+        case 2:
+          powerUp.value = { id: 2, name: 'ghost', x: powerX, y: powerY }
+          break
+        case 3:
+          powerUp.value = { id: 3, name: 'invisibility', x: powerX, y: powerY }
+          break
+      }
+    })
+
+    socket?.on('setPowerUpAvailability', (bool) => {
+      powerUpAvailable.value = bool
+    })
+
+    socket?.on('activateGhost', (id) => {
+      if (id === params.playerId) {
+        ghosted.value = true
+      } else {
+        //enemy spelers worden ghosted
+        enemyGhosted.value = true
+      }
+    })
+
+    socket?.on('deactivateGhost', (id) => {
+      if (id === params.playerId) {
+        ghosted.value = false
+      } else {
+        enemyGhosted.value = false
+      }
+    })
+
     gameLoopInterval = setInterval(
       () => {
         if (!gameOver.value) {
           directionChanged.value = false
+          checkCollisions()
           moveSnake()
           checkCollisions()
           if (!gameOver.value) {
@@ -316,7 +443,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
-      powerUpAvailable.value = false
+      socket?.emit('setPowerUpAvailability', false)
       //genereer een nieuwe powerUp na aantal seconden
       console.log('power up picked up')
       pickupPowerUp()
@@ -343,13 +470,58 @@ export const usePlayStore = defineStore('play', () => {
       }
     })
 
-    // Controleer botsingen met zichzelf
-
-    for (let i = 1; i < snake.value.length; i++) {
-      if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
+    //controleer op botsing met obstacles
+    obstacles.value.forEach((obstacle) => {
+      if (head.x === obstacle.x && head.y === obstacle.y) {
         gameOver.value = true
         return
       }
+    })
+
+    if (!ghosted.value) {
+      // Controleer botsingen met zichzelf
+
+      for (let i = 1; i < snake.value.length; i++) {
+        if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
+          gameOver.value = true
+          return
+        }
+      }
+
+      // Controleer botsingen met andere snake
+
+      players.value.forEach((e) => {
+        if (e.id !== params.playerId) {
+          for (let i = 1; i < e.data.length; i++) {
+            if (head.x === e.data[i].x && head.y === e.data[i].y) {
+              gameOver.value = true
+              return
+            }
+          }
+        }
+      })
+
+      // for (let i = 1; i < enemySnake.value.length; i++) {
+      //   if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {
+      //     gameOver.value = true
+      //     return
+      //   }
+      // }
+
+      // Controleer botsingen met andere snake head
+
+      players.value.forEach((e) => {
+        if (e.id !== params.playerId) {
+          if (head.x == e.data[0].x && head.y == e.data[0].y) {
+            gameOver.value = true
+            return
+          }
+        }
+      })
+      // if (head.x == enemySnake.value[0].x && head.y == enemySnake.value[0].y) {
+      //   gameOver.value = true
+      //   return
+      // }
     }
   }
 
@@ -370,7 +542,7 @@ export const usePlayStore = defineStore('play', () => {
       gameGrid.value[yP][xP] = 'empty'
     }
 
-    // Plaats de slang op het speelveld
+    // Plaats de slangen op het speelveld
     snake.value.forEach((segment) => {
       if (segment === snake.value[0]) {
         const { x, y } = segment
@@ -379,7 +551,12 @@ export const usePlayStore = defineStore('play', () => {
         const { x, y } = segment
         gameGrid.value[y][x] = 'snake'
       }
+      if (ghosted.value) {
+        gameGrid.value[y][x] = 'ghostedSnake'
+      }
     })
+
+    moveEnemySnake()
 
     // Plaats het voedsel op het speelveld
     const { x, y } = food.value

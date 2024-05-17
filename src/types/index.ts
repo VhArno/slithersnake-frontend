@@ -7,7 +7,7 @@ export interface Room {
   name: string
   map: Map
   mode: GameMode
-  players: []
+  players: Player[]
   ping: number
 }
 
@@ -31,7 +31,7 @@ export interface Skin {
 }
 
 export interface Player {
-    id: number
+    id: string
     username: string
     email: string
     level: number
@@ -41,6 +41,14 @@ export interface Player {
     players_killed: number
     skins: Skin[]
     role: string
+
+}
+
+export interface IngamePlayer {
+    id: string
+    ghosted: false,
+    invisible: false,
+    data: Array<{ x: number; y: number }>
 }
 
 export interface Keybinds {

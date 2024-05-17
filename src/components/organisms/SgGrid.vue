@@ -80,6 +80,18 @@ const handleKeyDown = (event: KeyboardEvent) => {
   border: 10px solid green;
 }
 
+.enemy {
+  background-color: orange;
+}
+
+.ghostedSnake {
+  background-color: rgba(131, 195, 131, 0.649);
+}
+
+.ghostedEnemy {
+  background-color: rgba(131, 195, 131, 0.649);
+}
+
 .food {
   background-image: url('../../assets/img/apple.png');
   background-size: cover;
