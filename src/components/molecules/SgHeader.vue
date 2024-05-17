@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+
 
 </script>
 <template>
@@ -12,8 +14,9 @@
         <h1>Slithersnake</h1>
     </RouterLink>
     <ul class="menu-list">
-        <li><RouterLink to="/profile">profile <i class="fa-solid fa-user"></i></RouterLink></li>
-        <li><RouterLink to="/settings">Settings <i class="fa-solid fa-gear"></i></RouterLink></li>
+        <li><RouterLink v-if="useAuthStore().isAuthenticated" :to="{ name: 'profile'}">profile <i class="fa-solid fa-user"></i></RouterLink></li>
+        <li><RouterLink v-if="!useAuthStore().isAuthenticated" :to="{ name: 'login'}">Login<i class="fa-solid fa-right-to-bracket"></i></RouterLink></li>
+        <li><RouterLink :to="{ name: 'settings'}">Settings <i class="fa-solid fa-gear"></i></RouterLink></li>
     </ul>
     </nav>
 </template>

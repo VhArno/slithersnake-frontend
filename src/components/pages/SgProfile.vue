@@ -3,31 +3,32 @@ import type { Player } from '@/types'
 import SgButton from '@/components/atoms/SgButton.vue'
 import SgPrompt from '@/components/molecules/SgPrompt.vue'
 import { computed, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth';
+import { storeToRefs } from 'pinia';
 
-const user = ref<Player>({
-  id: 0,
-  username: '',
-  email: '',
-  level: 0,
-  highscore: 0,
-  played: 0,
-  won: 0,
-  killed: 0,
-  skins: []
-})
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 
 const winPerc = computed(() => {
-  const won = user.value?.won ?? 0
-  const played = user.value?.played ?? 1
-  return (won / played) * 100
-})
+  const gamesWon = user.value?.games_won ?? 0;
+  let gamesPlayed = user.value?.games_played ?? 1;
+
+  gamesPlayed = gamesPlayed === 0 ? 1 : gamesPlayed;
+  
+  return gamesWon / gamesPlayed;
+});
+
 
 // username prompt
 const showPrompt = ref<boolean>(false)
+
+function logout() {
+  authStore.logout()
+}
 </script>
 
 <template>
-  <SgPrompt v-show="showPrompt" v-model:showPrompt="showPrompt" @update:username="(v) => user.username = v"></SgPrompt>
+  <SgPrompt v-show="showPrompt" v-model:showPrompt="showPrompt" :username="user?.username?user.username : ''"></SgPrompt>
   <section class="profile">
     <div class="user-profile">
         <div class="user-info">
@@ -50,11 +51,11 @@ const showPrompt = ref<boolean>(false)
           </li>
           <li>
             <h3>Games played</h3>
-            <p>{{ user?.played }}</p>
+            <p>{{ user?.games_played }}</p>
           </li>
           <li>
             <h3>Games won</h3>
-            <p>{{ user?.won }}</p>
+            <p>{{ user?.games_won }}</p>
           </li>
           <li>
             <h3>Win percentage</h3>
@@ -62,16 +63,16 @@ const showPrompt = ref<boolean>(false)
           </li>
           <li>
             <h3>Kills</h3>
-            <p>{{ user?.killed }}</p>
+            <p>{{ user?.players_killed }}</p>
           </li>
           <li>
             <h3>Skins unlocked</h3>
-            <p>{{ user?.skins.length }}</p>
+            <p>{{ user?.skins?.length }}</p>
           </li>
         </ul>
     </div>
     <div>
-      <RouterLink to="/login">Logout</RouterLink>
+      <SgButton @click="logout">Logout</SgButton>
     </div>
   </section>
 </template>

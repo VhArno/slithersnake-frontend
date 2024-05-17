@@ -9,7 +9,7 @@ import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
 
-const socket: Socket = inject('socket') as Socket
+let socket: Socket | null = null
 
 export const usePlayStore = defineStore('play', () => {
 
@@ -37,7 +37,7 @@ export const usePlayStore = defineStore('play', () => {
   const { keybinds, volume } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
-  const numCols = 20 // Aantal kolommen
+  const numCols = 25 // Aantal kolommen
 
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
 
@@ -47,8 +47,8 @@ export const usePlayStore = defineStore('play', () => {
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
-  let gameLoopInterval = 0
-  let powerUpTimeOut = 0
+  let gameLoopInterval: NodeJS.Timeout
+  let powerUpTimeOut: NodeJS.Timeout
   const powerUpAvailable = ref<boolean>(false)
   const interval = ref<number>(5)
   const character = ref<Character>()
@@ -62,6 +62,9 @@ export const usePlayStore = defineStore('play', () => {
 
   function addObstacle(x: number, y: number) {
     obstacles.value.push({ x, y })
+  }
+  function initializeSocket(s: Socket) {
+    socket = s
   }
 
   // initialiseren
@@ -112,8 +115,8 @@ export const usePlayStore = defineStore('play', () => {
       console.error('Something went wrong')
     })
 
-    alert('game over!')
-    restartGame()
+    /*alert('game over!')
+    restartGame()*/
   }
 
   //herstart de game
@@ -197,8 +200,21 @@ export const usePlayStore = defineStore('play', () => {
     }
   }
 
+  const startInterval = () => {
+    // console.log(socket)
+    setInterval(() => {
+      socket?.emit('sendPlayerData')
+      socket?.emit('getPlayerData')
+    }, 100)
+
+    socket?.on('playerData', () => {
+      console.log('player data received')
+    })
+  }
+
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
+    startInterval()
     gameLoopInterval = setInterval(
       () => {
         if (!gameOver.value) {
@@ -356,8 +372,13 @@ export const usePlayStore = defineStore('play', () => {
 
     // Plaats de slang op het speelveld
     snake.value.forEach((segment) => {
-      const { x, y } = segment
-      gameGrid.value[y][x] = 'snake'
+      if (segment === snake.value[0]) {
+        const { x, y } = segment
+        gameGrid.value[y][x] = 'snake-head'
+      } else {
+        const { x, y } = segment
+        gameGrid.value[y][x] = 'snake'
+      }
     })
 
     // Plaats het voedsel op het speelveld
@@ -395,6 +416,7 @@ export const usePlayStore = defineStore('play', () => {
     moveSnake,
     checkCollisions,
     updateGameGrid,
-    leaveGame
+    leaveGame,
+    initializeSocket
   }
 })

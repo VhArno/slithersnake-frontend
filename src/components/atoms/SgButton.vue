@@ -21,6 +21,7 @@
 
         &:disabled {
             cursor: not-allowed;
+            background-color: var(--accent-dark);
 
             &:hover {
                 background-color: var(--accent-dark);

@@ -14,13 +14,15 @@ const rooms = ref<Room[]>([
     id: '5h4bg168zer4h56',
     name: 'fafafaf',
     map: {
-      id: 0,
-      name: 'rectangle'
-    },
+    id: 0,
+    name: 'rectangle',
+    image: ''
+},
     mode: {
-      id: 0,
-      name: 'default'
-    },
+    id: 0,
+    name: 'default',
+    image: ''
+},
     players: [],
     ping: 0
   },
@@ -28,13 +30,15 @@ const rooms = ref<Room[]>([
     id: 'gaz654g46rfga89a',
     name: 'zghr',
     map: {
-      id: 0,
-      name: 'rectangle'
-    },
+    id: 0,
+    name: 'rectangle',
+    image: ''
+},
     mode: {
-      id: 0,
-      name: 'default'
-    },
+    id: 0,
+    name: 'default',
+    image: ''
+},
     players: [],
     ping: 0
   }
@@ -189,6 +193,12 @@ const joinRoom = () => {
         display: flex;
         flex-flow: column;
         color: var(--default-text-dark);
+      }
+
+      .form-button {
+        button {
+          padding: 0.5rem 2rem;
+        }
       }
     }
   }

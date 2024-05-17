@@ -20,7 +20,7 @@ setTimeout(() => {
 <style scoped>
   .toast {
     position: fixed;
-    bottom: 20px;
+    top: 60px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #333;
