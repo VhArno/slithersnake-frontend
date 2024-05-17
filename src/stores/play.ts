@@ -12,7 +12,6 @@ import { io, Socket } from 'socket.io-client'
 let socket: Socket | null = null
 
 export const usePlayStore = defineStore('play', () => {
-
   // Audios
   const gameMusic = ref()
   const pickupSound = ref()
@@ -47,7 +46,7 @@ export const usePlayStore = defineStore('play', () => {
   const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichamen van de enemy slangen
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
-  const direction = ref('right') //richting van de slang
+  const direction = ref('up') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
   const powerUpAvailable = ref<boolean>(false)
@@ -97,10 +96,10 @@ export const usePlayStore = defineStore('play', () => {
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
 
-    if (players.value.length >= 2) {
+     if (players.value.length >= 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
-          startX = Math.floor(numCols / (2 + players.value.length * i))
+          startX = Math.floor(numCols / (players.value.length + players.value.length * i) + (numCols / players.value.length) * i)
           startY = Math.floor(numRows / 2)
         }
       }
@@ -547,12 +546,15 @@ export const usePlayStore = defineStore('play', () => {
       if (segment === snake.value[0]) {
         const { x, y } = segment
         gameGrid.value[y][x] = 'snake-head'
+        if (ghosted.value) {
+          gameGrid.value[y][x] = 'ghostedSnakeHead'
+        }
       } else {
         const { x, y } = segment
         gameGrid.value[y][x] = 'snake'
-      }
-      if (ghosted.value) {
-        gameGrid.value[y][x] = 'ghostedSnake'
+        if (ghosted.value) {
+          gameGrid.value[y][x] = 'ghostedSnake'
+        }
       }
     })
 

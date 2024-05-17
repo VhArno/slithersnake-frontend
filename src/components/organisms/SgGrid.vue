@@ -84,6 +84,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background-color: orange;
 }
 
+.ghostedSnakeHead {
+  background-color: rgba(131, 195, 131, 0.649);
+}
+
 .ghostedSnake {
   background-color: rgba(131, 195, 131, 0.649);
 }
