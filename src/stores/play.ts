@@ -30,6 +30,9 @@ export const usePlayStore = defineStore('play', () => {
     endGameSound.value = sound
   }
 
+    //gamemode bijhouden
+    const gameMode = ref<string>('walls')
+
   // instellingen opslaan
   const settingsStore = useSettingsStore()
   const charStore = useCharStore()
@@ -97,6 +100,9 @@ export const usePlayStore = defineStore('play', () => {
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
 
+    console.log('generate walls')
+    generateWalls()
+
     if (players.value.length >= 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
@@ -113,9 +119,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     //add some obstacles
-    addObstacle(5, 5)
-    addObstacle(5, 6)
-    addObstacle(5, 7)
+    
   }
   //eindigt de game
   const endGame = () => {
@@ -150,6 +154,18 @@ export const usePlayStore = defineStore('play', () => {
     } while (gameGrid.value[foodY][foodX] !== 'empty')
 
     socket?.emit('generateFood', foodX, foodY)
+  }
+
+  function generateWalls(){
+    if(gameMode.value === 'walls'){
+      // Add some obstacles
+      const numObstacles = Math.max(15, Math.floor(Math.random() * 6) + 1); // Random number of obstacles between 1 and 6, but at least 15
+      for (let i = 0; i < numObstacles; i++) {
+        const obstacleX = Math.floor(Math.random() * numCols);
+        const obstacleY = Math.floor(Math.random() * numRows);
+        addObstacle(obstacleX, obstacleY);
+      }
+    }
   }
 
   //logica van speedboost powerUp
@@ -297,6 +313,7 @@ export const usePlayStore = defineStore('play', () => {
     startInterval()
     // Genereer eerste voedsel
     generateFood()
+    
     //genereer eerste powerUp
     powerUpTimeOut = setTimeout(() => {
       generatePowerUp()
