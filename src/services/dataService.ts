@@ -50,7 +50,9 @@ const getUser = async <T>(): Promise<AxiosResponse<T>> => {
 }
 
 const patchUser = async <T>(username: string): Promise<AxiosResponse<T>> => {
-    return authAxios.patch<T>(`/user`, username)
+    return authAxios.patch<T>(`/user`, {
+        username: username
+    })
 }
 
 export { getMap, getMaps, getGamemode, getGamemodes, getSkins, getCsrfCookie, postLogin, postLogout, postRegister, getUser, patchUser }

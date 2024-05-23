@@ -80,7 +80,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   
-  return { user, isAuthenticated, isAdmin, readUserDetails, login, logout, register, patch }
+  return { user, isAuthenticated, isAdmin, readUserDetails, getUserDetails, login, logout, register, patch }
 }, 
 { persist: {
   storage: localStorage,

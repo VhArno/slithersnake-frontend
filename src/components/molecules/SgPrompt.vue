@@ -4,20 +4,22 @@ import { onKeyStroke } from '@vueuse/core';
 import { useAuthStore } from '@/stores/auth';
 
 const model = defineModel('showPrompt')
+const modelValue = defineModel<String>('modelValue')
 
-const props = defineProps<{
-    username: string
+const emit = defineEmits<{
+  updateUsername: [newUsername: string]
 }>()
 
 const handleClick = () => {
-    useAuthStore().patch(props.username)
-    model.value = false
+  useAuthStore().patch(modelValue.value as string)
+  emit('updateUsername', modelValue.value as string)
+  model.value = false
 }
 
 // watch for escape
 onKeyStroke('Escape', (s) => {
-    s.preventDefault()
-    model.value = false
+  s.preventDefault()
+  model.value = false
 })
 </script>
 
@@ -25,7 +27,7 @@ onKeyStroke('Escape', (s) => {
     <div class="popup">
         <div class="popup-content">
             <label for="username">Change username</label>
-            <input type="text" id="username" name="username" :value="username">
+            <input type="text" id="username" name="username" v-model="modelValue">
             <SgButton @click="handleClick()">Submit</SgButton>
         </div>
     </div>
