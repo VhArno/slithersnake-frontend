@@ -62,7 +62,7 @@ const goSettings = () => {
       }
 
       &:hover {
-        background-color: #6e6e6e;
+        background-color: var(--btn-hover);
       }
     }
   }
@@ -80,20 +80,6 @@ const goSettings = () => {
       padding: 2rem 0rem;
       border-radius: 10px;
       background-color: var(--bg2-dark);
-
-      button {
-        width: 80%;
-        background-color: var(--dark-gray);
-
-        a {
-          text-decoration: none;      
-          color: var(--default-text-dark);
-        }
-
-        &:hover {
-          background-color: #6e6e6e;
-        }
-      }
     }
   }
 }

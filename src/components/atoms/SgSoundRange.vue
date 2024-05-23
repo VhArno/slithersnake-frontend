@@ -25,11 +25,11 @@ const modelValue = defineModel('modelValue')
   --slider-bg: var(--dark-gray);
   --slider-border-radius: 999px;
   /* level */
-  --level-color: #fff;
+  --level-color: var(--default-text-dark);
   --level-transition-duration: .1s;
   /* icon */
   --icon-margin: 15px;
-  --icon-color: #fff;
+  --icon-color: var(--default-text-dark);
   --icon-size: 25px;
 }
 

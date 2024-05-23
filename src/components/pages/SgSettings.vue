@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import SgCheckbox from '../atoms/SgCheckbox.vue';
-import SgSoundRange from '../atoms/SgSoundRange.vue';
-import { useSettingsStore } from '@/stores/settings';
+import SgCheckbox from '../atoms/SgCheckbox.vue'
+import SgSoundRange from '../atoms/SgSoundRange.vue'
+import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
-import SgKeybindOverlay from '../molecules/SgKeybindOverlay.vue';
-import { ref } from 'vue';
+import SgKeybindOverlay from '../molecules/SgKeybindOverlay.vue'
+import { ref, watch } from 'vue'
+import { useDark, useToggle } from '@vueuse/core'
 
 // settings store
 const settingsStore = useSettingsStore()
 const { keybinds, volume, darkMode } = storeToRefs(settingsStore)
 
+// color mode
+const isDark = useDark()
+const toggleDark = useToggle(isDark)
+
 const selectedKey = ref<string>('')
+
+watch(isDark, () => {
+  darkMode.value = isDark.value
+})
 </script>
 
 <template>
@@ -19,11 +28,10 @@ const selectedKey = ref<string>('')
   <SgKeybindOverlay v-if="selectedKey == 'up'" v-model:keybind="keybinds.up" v-model:selectedkey="selectedKey"></SgKeybindOverlay>
   <SgKeybindOverlay v-if="selectedKey == 'down'" v-model:keybind="keybinds.down" v-model:selectedkey="selectedKey"></SgKeybindOverlay>
 
-  <div class="settings">
+  <div class="settings dark">
     <div class="title-div">
       <h2>Settings</h2>
     </div>
-
         <div class="sound-div horz-div">
           <h3>Sound</h3>
           <div>
@@ -33,7 +41,7 @@ const selectedKey = ref<string>('')
 
         <div class="mode-div horz-div">
           <h3>Dark mode</h3>
-          <SgCheckbox v-model:modelValue="darkMode"></SgCheckbox>
+          <SgCheckbox @update:modelValue="toggleDark()" v-model:modelValue="darkMode"></SgCheckbox>
         </div>
 
         <div class="controls-div">
@@ -134,6 +142,7 @@ const selectedKey = ref<string>('')
 
         &:hover {
           cursor: pointer;
+          color: var(--btn-color);
           background-color: var(--accent);
         }
 
