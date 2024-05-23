@@ -6,7 +6,7 @@
     button {
         font-size: 1.1em;
         cursor: pointer;
-        color: var(--default-text-dark);
+        color: var(--btn-color);
         background-color: var(--accent);
         border: none;
         padding-top: 0.6rem;
