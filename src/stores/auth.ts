@@ -10,12 +10,18 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false)
   const isAdmin = ref<boolean>(false)
 
-  const readUserDetails = () => {
+  const readUserDetails = async () => {
     try {
       if (user.value !== null) {
-        initUser()
+        await initUser().catch(() => {
+          user.value = null
+          isAuthenticated.value = false
+          isAdmin.value = false
+        })
       } else {
-        logout()
+        user.value = null
+        isAuthenticated.value = false
+        isAdmin.value = false
       }
     } catch (err) {
       console.log(err)
@@ -36,7 +42,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   
   const initUser = async () => {
-    user.value = await getUserDetails()
+    user.value = await getUserDetails().catch()
     isAuthenticated.value = true
     if (user.value?.role == 'admin') isAdmin.value = true
   }
@@ -44,6 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (payload: { email: string; password: string }) => {
     try {
       user.value = null
+      await getCsrfCookie()
       await postLogin(payload)
       await initUser()
       router.push({ name: 'profile' })
@@ -53,8 +60,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
   
   const logout = async () => {
-    await postLogout()
-    await getCsrfCookie()
+    await postLogout().catch(() => {})
+
     user.value = null
     isAuthenticated.value = false
     isAdmin.value = false
