@@ -53,6 +53,7 @@ export const usePlayStore = defineStore('play', () => {
   const score = ref(0)
   const gameOver = ref(false)
   const powerUpAvailable = ref<boolean>(false)
+
   const powerUpActive = ref<boolean>(false)
   const interval = ref<number>(10)
   const character = ref<Character>()
@@ -231,20 +232,19 @@ export const usePlayStore = defineStore('play', () => {
       }
     }
 
-    // Use setInterval to check regularly
     const intervalId = setInterval(() => {
       if (!gameOver.value) {
         eatApple()
       } else {
         clearInterval(intervalId)
-        powerUpActive.value = false // Set powerUpActive to false when game is over
+        powerUpActive.value = false 
       }
-    }, 1000)
+    }, 2000 / (interval.value * 2))
 
     // Stop the interval after 30 seconds
     setTimeout(() => {
       clearInterval(intervalId)
-      powerUpActive.value = false // Set powerUpActive to false 
+      powerUpActive.value = false 
     }, 10000)
   }
 
