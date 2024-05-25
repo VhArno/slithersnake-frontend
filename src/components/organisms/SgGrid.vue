@@ -111,6 +111,16 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background-size: cover;
 }
 
+.ghost {
+  background-image: url('../../assets/img/ghost.png');
+  background-size: cover;
+}
+
+.invisibility {
+  background-image: url('../../assets/img/invisibility.png');
+  background-size: cover;
+}
+
 p {
   text-align: center;
   font-size: 24px;
