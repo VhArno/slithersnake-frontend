@@ -66,8 +66,10 @@ export const usePlayStore = defineStore('play', () => {
 
   const random = ref<number>(4)
 
-  const swiftness = ref<PowerUp>({ id: 1, name: 'speedboost', x: powerUpX.value, y: powerUpY.value })
+  //const PowerUp 
   const magnet = ref<PowerUp>({id: 4, name: 'magnet', x:powerUpX.value, y:powerUpY.value})
+  const ghostt = ref<PowerUp>({id: 3, name: 'ghost', x:powerUpX.value, y:powerUpY.value})
+  const swiftness = ref<PowerUp>({ id: 1, name: 'speedboost', x: powerUpX.value, y: powerUpY.value })
   //init game intervals
   let gameLoopInterval = setInterval(() => {})
   let socketInterval = setInterval(() => {})
@@ -287,7 +289,6 @@ export const usePlayStore = defineStore('play', () => {
         socket?.emit('generateMagnet', powerUpX.value, powerUpY.value)
         break
     }
-    magnet.value = { id: 4, name: 'magnet', x: powerUpX.value, y: powerUpY.value }
   }
   
   function pickupPowerUp() {
