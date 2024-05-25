@@ -269,8 +269,8 @@ export const usePlayStore = defineStore('play', () => {
     } while (gameGrid.value[powerUp.value.x][powerUp.value.y] !== 'empty')
 
     // Random power up genereren
-    //const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
-    const random = 4;
+    const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
+    
     console.log('random ' + random)
   
     switch (random) {
