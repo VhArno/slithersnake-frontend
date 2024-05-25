@@ -18,8 +18,10 @@ import { watch } from 'fs'
 /* maps store */
 const mapsStore = useMapsStore()
 const { maps } = storeToRefs(mapsStore)
-
-const creator = sessionStorage.getItem('creator')
+ let creator = false
+watchEffect(() => {
+  creator = sessionStorage.getItem('creator') === 'true'
+});
 
 /* modes store */
 const modesStore = useGamemodesStore()
@@ -62,14 +64,14 @@ if (sessionStorage.getItem('creator')) {
 }
 
 socket.on('gameBusy', (gId, pId) => {
-  if (socket.id === pId){
+  if (socket.id === pId) {
     router.push('/')
   }
-});
+})
 
 socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
-  sessionStorage.setItem("players", JSON.stringify(room.players))
+  sessionStorage.setItem('players', JSON.stringify(room.players))
   console.log('player joined room')
   console.log(room)
   console.log(params.id)
@@ -78,6 +80,20 @@ socket.on('joinedRoom', (room: Room) => {
     console.log(players.value)
     socket.emit('getPlayers', params.id)
   }
+})
+
+socket.on('newCreator', (plId) => {
+  console.log('new creator')
+  console.log(plId)
+  console.log(socket.id)
+  if (socket.id === plId) {
+    sessionStorage.setItem('creator', 'true')
+    creator = true
+  }
+})
+
+socket.on('playerLeft', (room: Room) => {
+  players.value = room.players
 })
 
 const params = useUrlSearchParams('history')
@@ -114,7 +130,6 @@ const invite = () => {
     toggleToast()
   }
 }
-
 
 /* Previous and next buttons */
 // Method to switch to the previous map
@@ -194,7 +209,8 @@ socket.on('settingsChanged', (room: Room) => {
   }
 })
 
-const leaveGame = () => {
+const leaveGame = async () => {
+  await socket.emit('leaveRoom', socket.id,)
   router.push('/')
 }
 </script>
