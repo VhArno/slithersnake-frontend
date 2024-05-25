@@ -60,10 +60,6 @@ export const usePlayStore = defineStore('play', () => {
   const enemyGhosted = ref<boolean>(false)
   const enemyInvisible = ref<boolean>(false)
 
-  //X en Y bepalen van de nog niet vastgestelde powerup
-  const powerUpX = ref<number>(0)
-  const powerUpY = ref<number>(0)
-
   //const PowerUp 
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   //init game intervals
@@ -223,13 +219,12 @@ export const usePlayStore = defineStore('play', () => {
       const distanceY = Math.abs(head.y - food.value.y)
 
       //kijkt naar afstand tussen snake head en food
-      return distanceX <= 1 && distanceY <= 1
+      return distanceX <= 3 && distanceY <= 3
     }
 
     const eatApple = () => {
       if (isAppleNearby()) {
-        score.value++
-        generateFood()
+        FoodCollision()
       }
     }
 
@@ -247,7 +242,6 @@ export const usePlayStore = defineStore('play', () => {
       clearInterval(intervalId)
     }, 30000)
   }
-  
 
   const ghost = function () {
     console.log('player ' + params.playerId + ' ghosted')
@@ -265,30 +259,31 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('setPowerUpAvailability', true)  
     // Random positie genereren
     do {
-      powerUpX.value = Math.floor(Math.random() * numCols)
-      powerUpY.value = Math.floor(Math.random() * numRows)
-    } while (gameGrid.value[powerUpY.value][powerUpX.value] !== 'empty')
+      powerUp.value.x = Math.floor(Math.random() * numCols)
+      powerUp.value.y = Math.floor(Math.random() * numRows)
+    } while (gameGrid.value[powerUp.value.x][powerUp.value.y] !== 'empty')
 
     // Random power up genereren
-    const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
+    //const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
+    const random = 4;
     console.log('random ' + random)
   
     switch (random) {
       case 1:
-        powerUp.value = { id: 1, name: 'swiftness', x: powerUpX.value, y: powerUpY.value }
+        powerUp.value = { id: 1, name: 'swiftness', x: powerUp.value.x, y: powerUp.value.y }
         break
       case 2:
-        powerUp.value = { id: 2, name: 'ghost', x: powerUpX.value, y: powerUpY.value }
+        powerUp.value = { id: 2, name: 'ghost', x: powerUp.value.x, y: powerUp.value.y }
         break
       case 3:
-        powerUp.value = { id: 3, name: 'invisibility', x: powerUpX.value, y: powerUpY.value }
+        powerUp.value = { id: 3, name: 'invisibility', x: powerUp.value.x, y: powerUp.value.y }
         break
       case 4: // Add this case
-        powerUp.value = { id: 4, name: 'magnet', x: powerUpX.value, y: powerUpY.value }
+        powerUp.value = { id: 4, name: 'magnet', x: powerUp.value.x, y: powerUp.value.y }
         break
     }
 
-    socket?.emit('generatePowerUp', powerUpX.value, powerUpY.value)
+    socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
   }
   
   function pickupPowerUp() {
@@ -366,6 +361,7 @@ export const usePlayStore = defineStore('play', () => {
 
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
+
     startInterval()
     // Genereer eerste voedsel
     generateFood()
@@ -505,20 +501,12 @@ export const usePlayStore = defineStore('play', () => {
     snake.value.unshift(newHead)
 
     if (newHead.x === food.value.x && newHead.y === food.value.y) {
-      score.value++
-
-      // Play pick up sound
-      pickupSound.value.currentTime = 0
-      pickupSound.value.play().catch(() => {
-        console.error('Something went wrong')
-      })
-
-      generateFood() // Genereer nieuw voedsel
+      FoodCollision()
     } else {
       snake.value.pop() // Verwijder het einde van de slang
     }
 
-    if (newHead.x === powerUpX.value && newHead.y === powerUpY.value && powerUpAvailable.value) {
+    if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
       socket?.emit('setPowerUpAvailability', false)
       //genereer een nieuwe powerUp na aantal seconden
       console.log('power up picked up')
@@ -529,6 +517,19 @@ export const usePlayStore = defineStore('play', () => {
       }, 20000)
     }
   }
+
+
+  function FoodCollision(){
+    score.value++
+    // Play pick up sound
+    pickupSound.value.currentTime = 0
+    pickupSound.value.play().catch(() => {
+      console.error('Something went wrong')
+    })
+    generateFood() // Genereer nieuw voedsel
+  }
+
+
 
   function checkCollisions() {
     const head = snake.value[0]
@@ -613,23 +614,23 @@ export const usePlayStore = defineStore('play', () => {
       switch (powerUp.value.id) {
         case 1:
           console.log('swiftness')
-          gameGrid.value[powerUpY.value][powerUpX.value] = 'swiftness'
+          gameGrid.value[powerUp.value.y][powerUp.value.x] = 'swiftness'
           break
         case 2:
           console.log('ghost')
-          gameGrid.value[powerUpY.value][powerUpX.value] = 'ghost'
+          gameGrid.value[powerUp.value.x][powerUp.value.x] = 'ghost'
           break
         case 3:
           console.log('invisibility')
-          gameGrid.value[powerUpY.value][powerUpX.value] = 'invisibility'
+          gameGrid.value[powerUp.value.x][powerUp.value.x] = 'invisibility'
           break
         case 4: // Add this case
           console.log('magnet')
-          gameGrid.value[powerUpY.value][powerUpX.value] = 'magnet'
+          gameGrid.value[powerUp.value.y][powerUp.value.x] = 'magnet'
           break
       }
     } else {
-      gameGrid.value[powerUpY.value][powerUpX.value] = 'empty'
+      gameGrid.value[powerUp.value.y][powerUp.value.x] = 'empty'
     }
 
     // Plaats de slangen op het speelveld
