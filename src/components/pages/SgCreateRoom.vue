@@ -17,13 +17,15 @@ import { watch } from 'fs'
 // pinia
 /* maps store */
 const mapsStore = useMapsStore()
-const { maps } = storeToRefs(mapsStore)
+const { selectedMap, maps } = storeToRefs(mapsStore)
+selectedMap.value = maps.value[0]
 
 const creator = sessionStorage.getItem('creator')
 
 /* modes store */
 const modesStore = useGamemodesStore()
-const { modes } = storeToRefs(modesStore)
+const { selectedMode, modes } = storeToRefs(modesStore)
+selectedMode.value = modes.value[0]
 
 /* settings store */
 const settingsStore = useSettingsStore()
@@ -82,9 +84,6 @@ const showToast = ref<boolean>(false)
 const toggleToast = () => {
   showToast.value = !showToast.value
 }
-
-const selectedMap = ref<Map>(maps.value[0])
-const selectedMode = ref<GameMode>(modes.value[0])
 
 /* invite button */
 const source = ref('Hello')
@@ -167,8 +166,8 @@ watchEffect(() => {
   currentRoom.value = {
     id: params.id + '',
     name: 'test room',
-    map: selectedMap.value,
-    mode: selectedMode.value,
+    map: selectedMap.value ? selectedMap.value : maps.value[0],
+    mode: selectedMode.value ? selectedMode.value : modes.value[0],
     players: players.value,
     ping: 0
   }
