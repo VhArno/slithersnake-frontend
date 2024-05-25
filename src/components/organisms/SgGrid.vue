@@ -69,8 +69,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 }
 
 .powerUp {
-  background-image: url('../../assets/img/swiftness.png');
-  background-size: cover;
+  background-color: aqua;
 }
 
 .grid {

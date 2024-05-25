@@ -36,7 +36,7 @@ export const usePlayStore = defineStore('play', () => {
   // instellingen opslaan
   const settingsStore = useSettingsStore()
   const charStore = useCharStore()
-  const powerStore = usePowerUpStore()
+  //const powerStore = usePowerUpStore()
   const { keybinds, volume } = storeToRefs(settingsStore)
 
   const numRows = 20 // Aantal rijen
@@ -79,7 +79,6 @@ export const usePlayStore = defineStore('play', () => {
   const params = useUrlSearchParams('history')
 
   //obstakels toevoegen
-  // Obstacles
   const obstacles = ref<Array<{ x: number; y: number }>>([])
 
   function addObstacle(x: number, y: number) {
@@ -229,26 +228,12 @@ export const usePlayStore = defineStore('play', () => {
       return distanceX <= 1 && distanceY <= 1
     }
   
-    const moveToApple = () => {
-      const head = snake.value[0]
-  
-      if (head.x < food.value.x) {
-        direction.value = 'right'
-      } else if (head.x > food.value.x) {
-        direction.value = 'left'
-      } else if (head.y < food.value.y) {
-        direction.value = 'down'
-      } else if (head.y > food.value.y) {
-        direction.value = 'up'
-      }
-    }
-  
     const eatApple = () => {
       if (isAppleNearby()) {
-        moveToApple()
+        score.value++
+        generateFood()
       }
     }
-  
     // Use setInterval to check regularly
     const intervalId = setInterval(() => {
       if (!gameOver.value) {
@@ -270,41 +255,39 @@ export const usePlayStore = defineStore('play', () => {
     }, 10000)
   }
 
-  const invisibility = function () {}
+  //const invisibility = function () {}
 
-  function generateSwiftness() {
+  function generatePowerUp() {
     socket?.emit('setPowerUpAvailability', true)
   
-    let powerX, powerY
+    
     do {
-      powerX = Math.floor(Math.random() * numCols)
-      powerY = Math.floor(Math.random() * numRows)
-    } while (gameGrid.value[powerY][powerX] !== 'empty')
-  
-    swiftness.value.x = powerX
-    swiftness.value.y = powerY
+      powerUpX.value = Math.floor(Math.random() * numCols)
+      powerUpY.value = Math.floor(Math.random() * numRows)
+    } while (gameGrid.value[powerUpY.value][powerUpX.value] !== 'empty')
+
   // Random power up genereren
    //random.value = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
   
     switch (random.value) {
       case 1:
-        swiftness.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
-        socket?.emit('generateSwiftness', powerX, powerY)
+        swiftness.value = { id: 1, name: 'speedboost', x: powerUpX.value, y: powerUpY.value }
+        socket?.emit('generateSwiftness', powerUpX.value, powerUpY.value)
         break
       case 2:
-        swiftness.value = { id: 2, name: 'ghost', x: powerX, y: powerY }
-        socket?.emit('generateSwiftness', powerX, powerY)
+        swiftness.value = { id: 2, name: 'ghost', x: powerUpX.value, y: powerUpY.value }
+        socket?.emit('generateSwiftness', powerUpX.value, powerUpY.value)
         break
       case 3:
-        swiftness.value = { id: 3, name: 'invisibility', x: powerX, y: powerY }
-        socket?.emit('generateSwiftness', powerX, powerY)
+        swiftness.value = { id: 3, name: 'invisibility', x: powerUpX.value, y: powerUpY.value }
+        socket?.emit('generateSwiftness', powerUpX.value, powerUpY.value)
         break
       case 4: // Add this case
-        magnet.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
-        socket?.emit('generateMagnet', powerX, powerY)
+        magnet.value = { id: 4, name: 'magnet', x: powerUpX.value, y: powerUpY.value }
+        socket?.emit('generateMagnet', powerUpX.value, powerUpY.value)
         break
     }
-    magnet.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
+    magnet.value = { id: 4, name: 'magnet', x: powerUpX.value, y: powerUpY.value }
   }
   
   function pickupPowerUp() {
@@ -388,7 +371,8 @@ export const usePlayStore = defineStore('play', () => {
     
     //genereer eerste powerUp
     powerUpTimeOut = setTimeout(() => {
-      generateSwiftness()
+
+      generatePowerUp()
 
     }, 5000)
 
@@ -541,7 +525,8 @@ export const usePlayStore = defineStore('play', () => {
       console.log('power up picked up')
       pickupPowerUp()
       powerUpTimeOut = setTimeout(() => {
-        generateSwiftness()
+        generatePowerUp()
+
       }, 20000)
     }
   }
@@ -625,14 +610,25 @@ export const usePlayStore = defineStore('play', () => {
       row.fill('empty')
     })
 
-    //coordinaten van powerUp
-    const xP = powerUpX.value
-    const yP = powerUpY.value
+    
 
     if (powerUpAvailable.value) {
-      gameGrid.value[yP][xP] = 'powerUp'
+      switch (random.value) {
+        case 1:
+          gameGrid.value[powerUpY.value][powerUpX.value] = 'swiftness'
+          break
+        case 2:
+          gameGrid.value[powerUpY.value][powerUpX.value] = 'swiftness'
+          break
+        case 3:
+          gameGrid.value[powerUpY.value][powerUpX.value] = 'swiftness'
+          break
+        case 4: // Add this case
+        gameGrid.value[powerUpY.value][powerUpX.value] = 'magnet'
+          break
+      }
     } else {
-      gameGrid.value[yP][xP] = 'empty'
+      gameGrid.value[powerUpY.value][powerUpX.value] = 'empty'
     }
 
     // Plaats de slangen op het speelveld
