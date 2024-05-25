@@ -107,6 +107,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background-size: cover;
 }
 
+.swiftness {
+  background-image: url('../../assets/img/swiftness.png');
+  background-size: cover;
+}
+
 p {
   text-align: center;
   font-size: 24px;
