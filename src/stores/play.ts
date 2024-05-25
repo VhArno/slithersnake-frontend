@@ -53,6 +53,7 @@ export const usePlayStore = defineStore('play', () => {
   const score = ref(0)
   const gameOver = ref(false)
   const powerUpAvailable = ref<boolean>(false)
+  const powerUpActive = ref<boolean>(false)
   const interval = ref<number>(10)
   const character = ref<Character>()
   const ghosted = ref<boolean>(false)
@@ -225,6 +226,8 @@ export const usePlayStore = defineStore('play', () => {
     const eatApple = () => {
       if (isAppleNearby()) {
         FoodCollision()
+      } else {
+        snake.value.pop()
       }
     }
 
@@ -234,13 +237,15 @@ export const usePlayStore = defineStore('play', () => {
         eatApple()
       } else {
         clearInterval(intervalId)
+        powerUpActive.value = false // Set powerUpActive to false when game is over
       }
-    }, 200)
+    }, 1000)
 
     // Stop the interval after 30 seconds
     setTimeout(() => {
       clearInterval(intervalId)
-    }, 30000)
+      powerUpActive.value = false // Set powerUpActive to false 
+    }, 10000)
   }
 
   const ghost = function () {
@@ -287,6 +292,7 @@ export const usePlayStore = defineStore('play', () => {
   }
   
   function pickupPowerUp() {
+    powerUpActive.value = true
     socket?.emit('setPowerUpAvailability', false)
 
     switch (powerUp.value.id) {
@@ -500,10 +506,13 @@ export const usePlayStore = defineStore('play', () => {
     // Plaats de nieuwe kop van de slang
     snake.value.unshift(newHead)
 
-    if (newHead.x === food.value.x && newHead.y === food.value.y) {
-      FoodCollision()
-    } else {
-      snake.value.pop() // Verwijder het einde van de slang
+    //check if magnet is active
+    if (!(powerUp.value.id === 4 && powerUpActive.value === true)) {
+      if (newHead.x === food.value.x && newHead.y === food.value.y) {
+        FoodCollision()
+      } else {
+        snake.value.pop() // Verwijder het einde van de slang
+      }
     }
 
     if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
