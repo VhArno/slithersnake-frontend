@@ -50,6 +50,7 @@ export const usePlayStore = defineStore('play', () => {
   const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichamen van de enemy slangen
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
+  const magnet = ref<PowerUp>({id: 4, name: 'magnet', x:0, y:0})
   const direction = ref('right') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
@@ -297,6 +298,7 @@ export const usePlayStore = defineStore('play', () => {
     }*/
 
     powerUp.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
+    
   
     socket?.emit('generatePowerUp', powerX, powerY)
   }
