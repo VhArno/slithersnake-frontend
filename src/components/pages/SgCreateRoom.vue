@@ -166,11 +166,12 @@ const startGame = () => {
   // router.push('/play')
   const params = useUrlSearchParams('history')
   if (params.id) {
-    socket.emit('startGame', params.id)
+    socket.emit('startGame', currentRoom.value)
   }
 }
 
 socket.on('gameStarted', (roomId: string) => {
+  console.log(roomId)
   console.log('game started')
   console.log(player.value.id)
   const params = useUrlSearchParams('history')
