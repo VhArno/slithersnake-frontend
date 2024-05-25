@@ -67,9 +67,12 @@ export const usePlayStore = defineStore('play', () => {
   const random = ref<number>(4)
 
   //const PowerUp 
+  const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
+  /*
   const magnet = ref<PowerUp>({id: 4, name: 'magnet', x:powerUpX.value, y:powerUpY.value})
   const ghostt = ref<PowerUp>({id: 3, name: 'ghost', x:powerUpX.value, y:powerUpY.value})
   const swiftness = ref<PowerUp>({ id: 1, name: 'speedboost', x: powerUpX.value, y: powerUpY.value })
+  */
   //init game intervals
   let gameLoopInterval = setInterval(() => {})
   let socketInterval = setInterval(() => {})
@@ -260,9 +263,7 @@ export const usePlayStore = defineStore('play', () => {
   //const invisibility = function () {}
 
   function generatePowerUp() {
-    socket?.emit('setPowerUpAvailability', true)
-  
-    
+    socket?.emit('setPowerUpAvailability', true)  
     do {
       powerUpX.value = Math.floor(Math.random() * numCols)
       powerUpY.value = Math.floor(Math.random() * numRows)
@@ -271,30 +272,28 @@ export const usePlayStore = defineStore('play', () => {
   // Random power up genereren
    //random.value = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
   
-    switch (random.value) {
+    switch (powerUp.value.id) {
       case 1:
-        swiftness.value = { id: 1, name: 'speedboost', x: powerUpX.value, y: powerUpY.value }
-        socket?.emit('generateSwiftness', powerUpX.value, powerUpY.value)
+        powerUp.value = { id: 1, name: 'swiftness', x: powerUpX.value, y: powerUpY.value }
         break
       case 2:
-        swiftness.value = { id: 2, name: 'ghost', x: powerUpX.value, y: powerUpY.value }
-        socket?.emit('generateSwiftness', powerUpX.value, powerUpY.value)
+        powerUp.value = { id: 2, name: 'ghost', x: powerUpX.value, y: powerUpY.value }
         break
       case 3:
-        swiftness.value = { id: 3, name: 'invisibility', x: powerUpX.value, y: powerUpY.value }
-        socket?.emit('generateSwiftness', powerUpX.value, powerUpY.value)
+        powerUp.value = { id: 3, name: 'invisibility', x: powerUpX.value, y: powerUpY.value }
         break
       case 4: // Add this case
-        magnet.value = { id: 4, name: 'magnet', x: powerUpX.value, y: powerUpY.value }
-        socket?.emit('generateMagnet', powerUpX.value, powerUpY.value)
+        powerUp.value = { id: 4, name: 'magnet', x: powerUpX.value, y: powerUpY.value }
         break
     }
+
+    socket?.emit('generatePowerUp', powerUpX.value, powerUpY.value)
   }
   
   function pickupPowerUp() {
     socket?.emit('setPowerUpAvailability', false)
 
-    switch (random.value) {
+    switch (powerUp.value.id) {
       case 1:
         speedBoost()
         break
@@ -382,18 +381,18 @@ export const usePlayStore = defineStore('play', () => {
     })
 
     socket?.on('showPowerUp', (powerX, powerY, random) => {
-      switch (random) {
+      switch (powerUp.value.id) {
         case 1:
-          swiftness.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
+          powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
           break
         case 2:
-          swiftness.value = { id: 2, name: 'ghost', x: powerX, y: powerY }
+          powerUp.value = { id: 2, name: 'ghost', x: powerX, y: powerY }
           break
         case 3:
-          swiftness.value = { id: 3, name: 'invisibility', x: powerX, y: powerY }
+          powerUp.value = { id: 3, name: 'invisibility', x: powerX, y: powerY }
           break
         case 4:
-          magnet.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
+          powerUp.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
           break
       }    
     })
