@@ -211,6 +211,48 @@ export const usePlayStore = defineStore('play', () => {
     }, 4000)
   }
 
+  const magnetApple = function() {
+    console.log('magnet apple')
+  
+    const isAppleNearby = () => {
+      const head = snake.value[0]
+      const distanceX = Math.abs(head.x - food.value.x)
+      const distanceY = Math.abs(head.y - food.value.y)
+  
+      return distanceX <= 1 && distanceY <= 1
+    }
+  
+    const moveToApple = () => {
+      const head = snake.value[0]
+  
+      if (head.x < food.value.x) {
+        direction.value = 'right'
+      } else if (head.x > food.value.x) {
+        direction.value = 'left'
+      } else if (head.y < food.value.y) {
+        direction.value = 'down'
+      } else if (head.y > food.value.y) {
+        direction.value = 'up'
+      }
+    }
+  
+    const eatApple = () => {
+      if (isAppleNearby()) {
+        moveToApple()
+      }
+    }
+  
+    // Use setInterval to check regularly
+    const intervalId = setInterval(() => {
+      if (!gameOver.value) {
+        eatApple()
+      } else {
+        clearInterval(intervalId)
+      }
+    }, 200) // Check every 200ms, adjust as necessary
+  }
+  
+
   const ghost = function () {
     console.log('player ' + params.playerId + ' ghosted')
 
@@ -225,18 +267,40 @@ export const usePlayStore = defineStore('play', () => {
 
   function generatePowerUp() {
     socket?.emit('setPowerUpAvailability', true)
-
+  
     let powerX, powerY
     do {
       powerX = Math.floor(Math.random() * numCols)
       powerY = Math.floor(Math.random() * numRows)
     } while (gameGrid.value[powerY][powerX] !== 'empty')
-
+  
     powerUp.value.x = powerX
     powerUp.value.y = powerY
+  
+    // Random power up genereren
+    const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
+  
+    /*
+    switch (random) {
+      case 1:
+        powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
+        break
+      case 2:
+        powerUp.value = { id: 2, name: 'ghost', x: powerX, y: powerY }
+        break
+      case 3:
+        powerUp.value = { id: 3, name: 'invisibility', x: powerX, y: powerY }
+        break
+      case 4: // Add this case
+        powerUp.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
+        break
+    }*/
 
+    powerUp.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
+  
     socket?.emit('generatePowerUp', powerX, powerY)
   }
+  
 
   function pickupPowerUp() {
     socket?.emit('setPowerUpAvailability', false)
@@ -250,6 +314,9 @@ export const usePlayStore = defineStore('play', () => {
         break
       case 'invisibility':
         speedBoost()
+        break
+      case 'magnet':
+        magnetApple()
         break
     }
   }
@@ -334,7 +401,11 @@ export const usePlayStore = defineStore('play', () => {
         case 3:
           powerUp.value = { id: 3, name: 'invisibility', x: powerX, y: powerY }
           break
+        case 4:
+          powerUp.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
+          break
       }
+       
     })
 
     socket?.on('setPowerUpAvailability', (bool) => {

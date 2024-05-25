@@ -102,6 +102,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background-size: cover;
 }
 
+.magnet {
+  background-image: url('../../assets/img/magnet.png');
+  background-size: cover;
+}
+
 p {
   text-align: center;
   font-size: 24px;
