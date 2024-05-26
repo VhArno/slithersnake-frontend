@@ -10,7 +10,7 @@ import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
 import { useGamemodesStore } from './gamemodes'
 import { useMapsStore } from './maps'
-import { clearInterval } from 'timers'
+
 
 let socket: Socket | null = null
 
@@ -63,14 +63,14 @@ export const usePlayStore = defineStore('play', () => {
   const enemyInvisible = ref<boolean>(false)
 
   //time if limited-time mode is selected
-  const remainingTime = ref(3 * 60) // 3 minutes
+  const remainingTime = ref<number>(3 * 60) // 3 minutes
   //const PowerUp 
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   //init game intervals
   let gameLoopInterval = setInterval(() => {})
   let socketInterval = setInterval(() => {})
   let powerUpTimeOut = setInterval(() => {})
-  let timerInterval = setInterval(() => {})
+  let timerInterval = setInterval(() => {});
 
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
@@ -102,7 +102,6 @@ export const usePlayStore = defineStore('play', () => {
 
     //reset tijd
     remainingTime.value = 3 * 60 
-
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
@@ -369,6 +368,9 @@ export const usePlayStore = defineStore('play', () => {
     startInterval()
     if(selectedMode.value && selectedMode.value.name === 'limited-time'){
       startTimer()
+    }
+    else {
+      remainingTime.value = 0
     }
     // Genereer eerste voedsel
     generateFood()
@@ -672,7 +674,6 @@ export const usePlayStore = defineStore('play', () => {
 
     // Start the timer
     function startTimer() {
-      remainingTime.value = 3 * 60 // 3 minutes in seconds
       timerInterval = setInterval(() => {
         if (remainingTime.value > 0) {
           remainingTime.value -= 1
