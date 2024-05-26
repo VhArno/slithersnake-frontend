@@ -10,11 +10,11 @@ import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
 import { useGamemodesStore } from './gamemodes'
 import { useMapsStore } from './maps'
+import { clearInterval } from 'timers'
 
 let socket: Socket | null = null
 
 export const usePlayStore = defineStore('play', () => {
-
   // Audios
   const gameMusic = ref()
   const pickupSound = ref()
@@ -45,11 +45,8 @@ export const usePlayStore = defineStore('play', () => {
 
   const numRows = 20 // Aantal rijen
   const numCols = 20 // Aantal kolommen
-
   const players = ref<IngamePlayer[]>([])
-
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
-
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
   const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichamen van de enemy slangen
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
@@ -57,7 +54,6 @@ export const usePlayStore = defineStore('play', () => {
   const score = ref(0)
   const gameOver = ref(false)
   const powerUpAvailable = ref<boolean>(false)
-
   const powerUpActive = ref<boolean>(false)
   const interval = ref<number>(10)
   const character = ref<Character>()
@@ -66,16 +62,18 @@ export const usePlayStore = defineStore('play', () => {
   const enemyGhosted = ref<boolean>(false)
   const enemyInvisible = ref<boolean>(false)
 
+  //time if limited-time mode is selected
+  const remainingTime = ref(3 * 60) // 3 minutes
   //const PowerUp 
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   //init game intervals
   let gameLoopInterval = setInterval(() => {})
   let socketInterval = setInterval(() => {})
   let powerUpTimeOut = setInterval(() => {})
+  let timerInterval = setInterval(() => {})
 
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
-
   const params = useUrlSearchParams('history')
 
   //obstakels toevoegen
@@ -102,6 +100,9 @@ export const usePlayStore = defineStore('play', () => {
       Array.from({ length: numCols }, () => 'empty')
     )
 
+    //reset tijd
+    remainingTime.value = 3 * 60 
+
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
@@ -120,7 +121,6 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     snake.value = [{ x: startX, y: startY }]
-
     for (let i = 1; i < character.value.attributes.startLength; i++) {
       snake.value.push({ x: startX, y: startY + i })
     }
@@ -130,6 +130,7 @@ export const usePlayStore = defineStore('play', () => {
   const endGame = () => {
     clearInterval(gameLoopInterval)
     clearInterval(socketInterval)
+    clearInterval(timerInterval)
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
     gameMusic.value.pause()
@@ -262,7 +263,6 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   //const invisibility = function () {}
-
   function generatePowerUp() {
     socket?.emit('setPowerUpAvailability', true)  
     // Random positie genereren
@@ -273,9 +273,6 @@ export const usePlayStore = defineStore('play', () => {
 
     // Random power up genereren
     const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
-    
-    console.log('random ' + random)
-  
     switch (random) {
       case 1:
         powerUp.value = { id: 1, name: 'swiftness', x: powerUp.value.x, y: powerUp.value.y }
@@ -290,7 +287,6 @@ export const usePlayStore = defineStore('play', () => {
         powerUp.value = { id: 4, name: 'magnet', x: powerUp.value.x, y: powerUp.value.y }
         break
     }
-
     socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
   }
   
@@ -370,12 +366,13 @@ export const usePlayStore = defineStore('play', () => {
 
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
-
     startInterval()
+    if(selectedMode.value && selectedMode.value.name === 'limited-time'){
+      startTimer()
+    }
     // Genereer eerste voedsel
     generateFood()
-
-    //genereer powerUp
+    //genereer powerUp indien powerup mode is selected
     if(selectedMode.value && selectedMode.value.name === 'power-ups'){
       powerUpTimeOut = setTimeout(() => {
         generatePowerUp()
@@ -655,7 +652,6 @@ export const usePlayStore = defineStore('play', () => {
         gameGrid.value[y][x] = 'ghostedSnake'
       }
     })
-
     moveEnemySnake()
 
     // Plaats het voedsel op het speelveld
@@ -673,6 +669,19 @@ export const usePlayStore = defineStore('play', () => {
   const leaveGame = () => {
     router.push('/')
   }
+
+    // Start the timer
+    function startTimer() {
+      remainingTime.value = 3 * 60 // 3 minutes in seconds
+      timerInterval = setInterval(() => {
+        if (remainingTime.value > 0) {
+          remainingTime.value -= 1
+        } else {
+          clearInterval(timerInterval)
+          endGame()
+        }
+      }, 1000) // Decrement every second
+    }
 
   return {
     setGameMusic,
@@ -694,6 +703,7 @@ export const usePlayStore = defineStore('play', () => {
     checkCollisions,
     updateGameGrid,
     leaveGame,
-    initializeSocket
+    initializeSocket,
+    remainingTime
   }
 })
