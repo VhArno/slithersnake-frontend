@@ -11,7 +11,6 @@ import { io, Socket } from 'socket.io-client'
 import { useGamemodesStore } from './gamemodes'
 import { useMapsStore } from './maps'
 
-
 let socket: Socket | null = null
 
 export const usePlayStore = defineStore('play', () => {
@@ -622,19 +621,15 @@ export const usePlayStore = defineStore('play', () => {
     if (powerUpAvailable.value) {
       switch (powerUp.value.id) {
         case 1:
-          console.log('swiftness')
           gameGrid.value[powerUp.value.y][powerUp.value.x] = 'swiftness'
           break
         case 2:
-          console.log('ghost')
           gameGrid.value[powerUp.value.x][powerUp.value.x] = 'ghost'
           break
         case 3:
-          console.log('invisibility')
           gameGrid.value[powerUp.value.x][powerUp.value.x] = 'invisibility'
           break
         case 4: // Add this case
-          console.log('magnet')
           gameGrid.value[powerUp.value.y][powerUp.value.x] = 'magnet'
           break
       }
@@ -658,12 +653,14 @@ export const usePlayStore = defineStore('play', () => {
         }
       }
     })
+
     moveEnemySnake()
 
     // Plaats het voedsel op het speelveld
     const { x, y } = food.value
     gameGrid.value[y][x] = 'food'
 
+    //Zet obstakels op het speelveld indien nodig
     obstacles.value.forEach((obstacle) => {
       const { x, y } = obstacle
       gameGrid.value[y][x] = 'obstacles'
