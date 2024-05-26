@@ -69,8 +69,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 }
 
 .powerUp {
-  background-image: url('../../assets/img/swiftness.png');
-  background-size: cover;
+  background-color: aqua;
 }
 
 .grid {
@@ -103,6 +102,26 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 .obstacles {
   background-image: url('../../assets/img/obstacle.jpg');
+  background-size: cover;
+}
+
+.magnet {
+  background-image: url('../../assets/img/magnet.png');
+  background-size: cover;
+}
+
+.swiftness {
+  background-image: url('../../assets/img/swiftness.png');
+  background-size: cover;
+}
+
+.ghost {
+  background-image: url('../../assets/img/ghost.png');
+  background-size: cover;
+}
+
+.invisibility {
+  background-image: url('../../assets/img/invisibility.png');
   background-size: cover;
 }
 

@@ -5,6 +5,7 @@ import { getGamemodes } from '@/services/dataService'
 
 export const useGamemodesStore = defineStore('gamemodes', () => {
     const modes = ref<GameMode[]>([])
+    const selectedMode = ref<GameMode>()
 
     const loadModes = () => {
         getGamemodes<ApiResponse>().then((response) => {
@@ -16,9 +17,10 @@ export const useGamemodesStore = defineStore('gamemodes', () => {
             }
           })
           modes.value?.push(...loadedMaps)
+          selectedMode.value = modes.value[0]
         })
         .catch((error) => console.error(error))
       }
 
-    return { modes, loadModes }
+    return { selectedMode, modes, loadModes }
 })

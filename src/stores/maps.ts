@@ -5,6 +5,7 @@ import { getMaps } from '@/services/dataService'
 
 export const useMapsStore = defineStore('maps', () => {
   const maps = ref<Map[]>([])
+  const selectedMap = ref<Map>()
 
   const loadMaps = () => {
     getMaps<ApiResponse>().then((response) => {
@@ -16,9 +17,10 @@ export const useMapsStore = defineStore('maps', () => {
         }
       })
       maps.value?.push(...loadedMaps)
+      selectedMap.value = maps.value[0]
     })
     .catch((error) => console.error(error))
   }
 
-  return { maps, loadMaps }
+  return { selectedMap, maps, loadMaps }
 })
