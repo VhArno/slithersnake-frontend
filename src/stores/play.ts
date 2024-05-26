@@ -31,22 +31,11 @@ export const usePlayStore = defineStore('play', () => {
   function setEndGameSound(sound: HTMLAudioElement) {
     endGameSound.value = sound
   }
-
-    //gamemode bijhouden
-    const gameMode = ref<string>('walls')
-
-    const gamemodeStore = useGamemodesStore()
-    const { selectedMode } = storeToRefs(gamemodeStore)
-
-    console.log('Selected game mode:', selectedMode.value)
-
-    console.log('mode')
-    console.log(selectedMode)
-
-    const map = ref<Map>()
-    const mapStore = useMapsStore()
-    const { selectedMap } = storeToRefs(mapStore)
-
+  const gamemodeStore = useGamemodesStore()
+  const { selectedMode } = storeToRefs(gamemodeStore)
+    
+  const mapStore = useMapsStore()
+  const { selectedMap } = storeToRefs(mapStore)
 
   // instellingen opslaan
   const settingsStore = useSettingsStore()
