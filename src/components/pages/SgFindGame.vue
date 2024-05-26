@@ -10,6 +10,7 @@ const router = useRouter()
 
 const socket: Socket = inject('socket') as Socket
 
+const roomUrl = ref<string | null>(null)
 const selectedRoom = ref<Room | null>(null)
 let rooms = ref<Room[] | null>(null)
 
@@ -33,6 +34,14 @@ socket.on('newRoom', (r: Room[]) => {
 
 const joinRoom = () => {
   router.push('/create-room?id=' + selectedRoom.value?.id)
+}
+
+function disabledBtn(): boolean {
+  if (selectedRoom.value !== null || roomUrl.value !== null) {
+    return false
+  }
+
+  return true
 }
 </script>
 
@@ -61,16 +70,17 @@ const joinRoom = () => {
           <td>{{ room.players.length }}</td>
           <td>{{ room.ping }}</td>
         </tr>
+        <p class="not-found" v-if="rooms === null || rooms.length <= 0">No game rooms found!</p>
       </table>
     </div>
     <div class="join-custom">
       <form class="join-form">
         <div class="form-div">
           <label for="join">Join game</label>
-          <input placeholder="Add game url..." type="text" id="join" name="join" class="input" />
+          <input placeholder="Add game url..." type="text" id="join" name="join" class="input" v-model="roomUrl"/>
         </div>
         <div class="form-button">
-          <SgButton @click="joinRoom" :disabled="!selectedRoom">Join</SgButton>
+          <SgButton @click="joinRoom" :disabled="disabledBtn()">Join</SgButton>
         </div>
       </form>
     </div>
@@ -104,8 +114,16 @@ const joinRoom = () => {
       }
     }
 
+    .not-found {
+      text-align: center;
+    }
+
     .selected {
       background-color: var(--accent);
+
+      &:hover {
+        cursor: pointer;
+      }
     }
 
     .row {
@@ -117,6 +135,7 @@ const joinRoom = () => {
       }
 
       &:not(.selected):hover {
+        cursor: pointer;
         background-color: var(--dark-gray);
       }
     }

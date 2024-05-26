@@ -109,10 +109,10 @@ export const usePlayStore = defineStore('play', () => {
       generateWalls()
     }
 
-    if (players.value.length >= 2) {
+     if (players.value.length >= 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
-          startX = Math.floor(numCols / (2 + players.value.length * i))
+          startX = Math.floor(numCols / (players.value.length + players.value.length * i) + (numCols / players.value.length) * i)
           startY = Math.floor(numRows / 2)
         }
       }
@@ -647,12 +647,15 @@ export const usePlayStore = defineStore('play', () => {
       if (segment === snake.value[0]) {
         const { x, y } = segment
         gameGrid.value[y][x] = 'snake-head'
+        if (ghosted.value) {
+          gameGrid.value[y][x] = 'ghostedSnakeHead'
+        }
       } else {
         const { x, y } = segment
         gameGrid.value[y][x] = 'snake'
-      }
-      if (ghosted.value) {
-        gameGrid.value[y][x] = 'ghostedSnake'
+        if (ghosted.value) {
+          gameGrid.value[y][x] = 'ghostedSnake'
+        }
       }
     })
     moveEnemySnake()

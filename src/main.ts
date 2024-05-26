@@ -13,4 +13,4 @@ createApp(App)
     .use(router)
     .mount('#app')
 
-await getCsrfCookie()
+await getCsrfCookie().catch(() => {})

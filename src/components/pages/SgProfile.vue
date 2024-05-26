@@ -2,7 +2,7 @@
 import type { Player } from '@/types'
 import SgButton from '@/components/atoms/SgButton.vue'
 import SgPrompt from '@/components/molecules/SgPrompt.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 
@@ -21,6 +21,14 @@ const winPerc = computed(() => {
 
 // username prompt
 const showPrompt = ref<boolean>(false)
+const newUsername = ref<String>(user.value?.username ? user.value.username : '')
+
+const updateUserInfo = (newName: string) => {
+  console.log("update username")
+  if (user.value) {
+    user.value.username = newName
+  }
+}
 
 function logout() {
   authStore.logout()
@@ -28,7 +36,7 @@ function logout() {
 </script>
 
 <template>
-  <SgPrompt v-show="showPrompt" v-model:showPrompt="showPrompt" :username="user?.username?user.username : ''"></SgPrompt>
+  <SgPrompt @updateUsername="updateUserInfo" v-show="showPrompt" v-model:showPrompt="showPrompt" v-model:modelValue="newUsername"></SgPrompt>
   <section class="profile">
     <div class="user-profile">
         <div class="user-info">

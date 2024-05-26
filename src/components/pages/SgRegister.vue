@@ -73,7 +73,7 @@ async function register() {
             </div>
 
             <SgButton @click.prevent="register">register</SgButton>
-            <RouterLink to="/register">Already have an account?</RouterLink>
+            <RouterLink to="/login">Already have an account?</RouterLink>
         </form>
     </section>
 </template>

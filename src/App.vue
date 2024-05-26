@@ -9,6 +9,8 @@ import { useMapsStore } from './stores/maps'
 import { useGamemodesStore } from './stores/gamemodes'
 import { useAuthStore } from './stores/auth'
 import { useSkinsStore } from './stores/skins'
+import { useDark } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 
 /* Use stores */
 const settingsStore = useSettingsStore()
@@ -16,6 +18,11 @@ const mapsStore = useMapsStore()
 const modesStore = useGamemodesStore()
 const skinStore = useSkinsStore()
 skinStore.loadSkins()
+
+// color mode
+const { darkMode } = storeToRefs(settingsStore)
+const isDark = useDark()
+darkMode.value = isDark.value
 
 useAuthStore().readUserDetails()
 
