@@ -63,7 +63,7 @@ export const usePlayStore = defineStore('play', () => {
   const enemyInvisible = ref<boolean>(false)
 
   //time if limited-time mode is selected
-  const remainingTime = ref<number>(3 * 60) // 3 minutes
+  const remainingTime = ref<number>(0) 
   //const PowerUp 
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   //init game intervals
@@ -100,8 +100,6 @@ export const usePlayStore = defineStore('play', () => {
       Array.from({ length: numCols }, () => 'empty')
     )
 
-    //reset tijd
-    remainingTime.value = 3 * 60 
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
@@ -110,6 +108,7 @@ export const usePlayStore = defineStore('play', () => {
       console.log('generate walls')
       generateWalls()
     }
+
     if (players.value.length >= 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
@@ -366,7 +365,9 @@ export const usePlayStore = defineStore('play', () => {
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
+    //if the gamemode is limited-time
     if(selectedMode.value && selectedMode.value.name === 'limited-time'){
+      remainingTime.value = 3*60;
       startTimer()
     }
     else {
