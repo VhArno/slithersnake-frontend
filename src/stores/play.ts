@@ -8,6 +8,8 @@ import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
+import { useGamemodesStore } from './gamemodes'
+import { useMapsStore } from './maps'
 
 let socket: Socket | null = null
 
@@ -32,6 +34,19 @@ export const usePlayStore = defineStore('play', () => {
 
     //gamemode bijhouden
     const gameMode = ref<string>('walls')
+
+    const gamemodeStore = useGamemodesStore()
+    const { selectedMode } = storeToRefs(gamemodeStore)
+
+    console.log('Selected game mode:', selectedMode.value)
+
+    console.log('mode')
+    console.log(selectedMode)
+
+    const map = ref<Map>()
+    const mapStore = useMapsStore()
+    const { selectedMap } = storeToRefs(mapStore)
+
 
   // instellingen opslaan
   const settingsStore = useSettingsStore()
@@ -101,10 +116,11 @@ export const usePlayStore = defineStore('play', () => {
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
-
-    console.log('generate walls')
-    generateWalls()
-
+    
+    if(selectedMap.value && selectedMap.value.name === 'walls'){
+      console.log('generate walls')
+      generateWalls()
+    }
     if (players.value.length >= 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
@@ -157,14 +173,12 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   function generateWalls(){
-    if(gameMode.value === 'walls'){
       // Add some obstacles
       const numObstacles = Math.max(15, Math.floor(Math.random() * 6) + 1); // Random number of obstacles between 1 and 6, but at least 15
       for (let i = 0; i < numObstacles; i++) {
         const obstacleX = Math.floor(Math.random() * numCols);
         const obstacleY = Math.floor(Math.random() * numRows);
         addObstacle(obstacleX, obstacleY);
-      }
     }
   }
 
@@ -373,9 +387,11 @@ export const usePlayStore = defineStore('play', () => {
     generateFood()
 
     //genereer powerUp
-    powerUpTimeOut = setTimeout(() => {
-      generatePowerUp()
-    }, 5000)
+    if(selectedMode.value && selectedMode.value.name === 'power-ups'){
+      powerUpTimeOut = setTimeout(() => {
+        generatePowerUp()
+      }, 5000)
+    }
 
     socket?.on('showFood', (foodX, foodY) => {
       food.value = { x: foodX, y: foodY }
