@@ -508,6 +508,11 @@ export const usePlayStore = defineStore('play', () => {
         return
     }
 
+    if(selectedMap.value && selectedMap.value.name === 'teleports'){
+      newHead.x = (newHead.x + numCols) % numCols
+      newHead.y = (newHead.y + numRows) % numRows
+    }
+
     // Plaats de nieuwe kop van de slang
     snake.value.unshift(newHead)
 
@@ -532,7 +537,6 @@ export const usePlayStore = defineStore('play', () => {
     }
   }
 
-
   function FoodCollision(){
     score.value++
     // Play pick up sound
@@ -543,24 +547,16 @@ export const usePlayStore = defineStore('play', () => {
     generateFood() // Genereer nieuw voedsel
   }
 
-
-
   function checkCollisions() {
     const head = snake.value[0]
 
-    // Controleer botsingen met de randen van het speelveld
-    if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
-      gameOver.value = true
-      return
-    }
-
-    //controleer op botsing met obstacles
-    obstacles.value.forEach((obstacle) => {
-      if (head.x === obstacle.x && head.y === obstacle.y) {
+    // Controleer botsingen met de randen van het speelveld en niet controleren als de map teleports is
+    if(!(selectedMap.value && selectedMap.value.name === 'teleports')){
+      if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
         gameOver.value = true
         return
       }
-    })
+    }
 
     //controleer op botsing met obstacles
     obstacles.value.forEach((obstacle) => {
@@ -572,7 +568,6 @@ export const usePlayStore = defineStore('play', () => {
 
     if (!ghosted.value) {
       // Controleer botsingen met zichzelf
-
       for (let i = 1; i < snake.value.length; i++) {
         if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
           gameOver.value = true
