@@ -96,7 +96,14 @@ export const usePlayStore = defineStore('play', () => {
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
 
-     if (players.value.length >= 2) {
+    if (players.value.length == 2) {
+      for (let i = 0; i < players.value.length; i++) {
+        if (players.value[i].id === params.playerId) {
+          startX = Math.floor(numCols / (2 + players.value.length * i))
+          startY = Math.floor(numRows / 2)
+        }
+      }
+    } else if (players.value.length == 3) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
           startX = Math.floor(numCols / (players.value.length + players.value.length * i) + (numCols / players.value.length) * i)
