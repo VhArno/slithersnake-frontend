@@ -8,7 +8,7 @@ import { usePlayStore } from '@/stores/play'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
 import { Socket } from 'socket.io-client'
-import { watch } from 'fs'
+//import { watch } from 'fs'
 
 //audios
 
@@ -30,7 +30,7 @@ onMounted(() => {
 
   playStore.initializeGame()
   playStore.initializeSocket(socket)
-  
+
   const grid = document.getElementById('grid')
   grid?.addEventListener('click', () => {
     if (gameStatus.value === 'started') {
@@ -47,6 +47,7 @@ onMounted(() => {
     <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
 
     <div class="scoreboard">
+      <div v-if="playStore.remainingTime != 0">Time left: {{ playStore.remainingTime }}</div>
       <div class="players">
         <h3>Scorebord</h3>
 

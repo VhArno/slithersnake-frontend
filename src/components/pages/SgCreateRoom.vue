@@ -17,13 +17,18 @@ import { watch } from 'fs'
 // pinia
 /* maps store */
 const mapsStore = useMapsStore()
-const { maps } = storeToRefs(mapsStore)
+const { selectedMap, maps } = storeToRefs(mapsStore)
+selectedMap.value = maps.value[0]
 
-const creator = sessionStorage.getItem('creator')
+let creator = false
+watchEffect(() => {
+  creator = sessionStorage.getItem('creator') === 'true'
+})
 
 /* modes store */
 const modesStore = useGamemodesStore()
-const { modes } = storeToRefs(modesStore)
+const { selectedMode, modes } = storeToRefs(modesStore)
+selectedMode.value = modes.value[0]
 
 /* settings store */
 const settingsStore = useSettingsStore()
@@ -51,15 +56,47 @@ const player = ref<Player>({
   role: ''
 })
 
+if (sessionStorage.getItem('creator')) {
+  const randomGuid: string = uuidv4()
+  const params = useUrlSearchParams('history')
+  params.id = randomGuid
+
+  setTimeout(() => {
+    socket.emit('createRoom', currentRoom.value, player, params.id)
+  }, 1000)
+}
+
+socket.on('gameBusy', (gId, pId) => {
+  if (socket.id === pId) {
+    router.push('/')
+  }
+})
+
 socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
-  sessionStorage.setItem("players", JSON.stringify(room.players))
+  sessionStorage.setItem('players', JSON.stringify(room.players))
   console.log('player joined room')
+  console.log(room)
+  console.log(params.id)
   if (params.id === room.id) {
     players.value = room.players
     console.log(players.value)
     socket.emit('getPlayers', params.id)
   }
+})
+
+socket.on('newCreator', (plId) => {
+  console.log('new creator')
+  console.log(plId)
+  console.log(socket.id)
+  if (socket.id === plId) {
+    sessionStorage.setItem('creator', 'true')
+    creator = true
+  }
+})
+
+socket.on('playerLeft', (room: Room) => {
+  players.value = room.players
 })
 
 const params = useUrlSearchParams('history')
@@ -83,9 +120,6 @@ const toggleToast = () => {
   showToast.value = !showToast.value
 }
 
-const selectedMap = ref<Map>(maps.value[0])
-const selectedMode = ref<GameMode>(modes.value[0])
-
 /* invite button */
 const source = ref('Hello')
 const { copy, copied } = useClipboard({ source })
@@ -95,16 +129,6 @@ const invite = () => {
   if (copied) {
     toggleToast()
   }
-}
-
-if (sessionStorage.getItem('creator')) {
-  const randomGuid: string = uuidv4()
-  const params = useUrlSearchParams('history')
-  params.id = randomGuid
-
-  setTimeout(() => {
-    socket.emit('createRoom', currentRoom.value, player)
-  }, 2000)
 }
 
 /* Previous and next buttons */
@@ -142,11 +166,12 @@ const startGame = () => {
   // router.push('/play')
   const params = useUrlSearchParams('history')
   if (params.id) {
-    socket.emit('startGame', params.id)
+    socket.emit('startGame', currentRoom.value)
   }
 }
 
 socket.on('gameStarted', (roomId: string) => {
+  console.log(roomId)
   console.log('game started')
   console.log(player.value.id)
   const params = useUrlSearchParams('history')
@@ -167,8 +192,8 @@ watchEffect(() => {
   currentRoom.value = {
     id: params.id + '',
     name: 'test room',
-    map: selectedMap.value,
-    mode: selectedMode.value,
+    map: selectedMap.value ? selectedMap.value : maps.value[0],
+    mode: selectedMode.value ? selectedMode.value : modes.value[0],
     players: players.value,
     ping: 0
   }
@@ -185,29 +210,31 @@ socket.on('settingsChanged', (room: Room) => {
   }
 })
 
-const leaveGame = () => {
+const leaveGame = async () => {
+  await socket.emit('leaveRoom', socket.id)
   router.push('/')
 }
 </script>
 
 <template>
-    <section class="create">
-        <div>
-            <SgToast v-if="showToast" :content="'Game link copied!'" :duration="5000"></SgToast>
-        </div>
+  <section class="create">
+    <div>
+      <SgToast v-if="showToast" :content="'Game link copied!'" :duration="5000"></SgToast>
+    </div>
 
-        <div class="settings">
-            <div class="bg-gray players">
-                <h2>Players</h2>
-                <ul class="player-list">
-                    <li v-for="player in players" :key="player.id">
-                    {{ player.username }} (lvl. <span>{{ player.level }}</span>)
-                    </li>
-                </ul>
-                <div>
-                    <SgButton @click="invite">Invite</SgButton>
-                </div>
-            </div>
+    <div class="settings">
+      <div class="bg-gray players">
+        <h2>Players</h2>
+        <ul class="player-list">
+          <li v-for="player in players" :key="player.id">
+            {{ player.username }} (lvl. <span>{{ player.level }}</span
+            >)
+          </li>
+        </ul>
+        <div>
+          <SgButton @click="invite">Invite</SgButton>
+        </div>
+      </div>
 
       <div class="bg-gray options">
         <h2>Game options</h2>
@@ -259,20 +286,20 @@ const leaveGame = () => {
 
 <style scoped lang="scss">
 .create {
+  display: flex;
+  flex-flow: column;
+  gap: 1rem;
+  width: 80%;
+  margin: 1rem auto;
+  padding: 1rem;
+  border-radius: 10px;
+  color: var(--default-text-dark);
+  background-color: var(--bg2-dark);
+
+  .settings {
     display: flex;
     flex-flow: column;
     gap: 1rem;
-    width: 80%;
-    margin: 1rem auto;
-    padding: 1rem;
-    border-radius: 10px;
-    color: var(--default-text-dark);
-    background-color: var(--bg2-dark);
-
-    .settings { 
-        display: flex;
-        flex-flow: column;
-        gap: 1rem;
 
     .bg-gray {
       padding: 1rem;
