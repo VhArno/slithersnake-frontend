@@ -21,6 +21,17 @@ const playStore = usePlayStore()
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
 
+//creeer timer van 3 seconden wanneer dit pagina is geladen
+const timer = ref(3)
+const interval = setInterval(() => {
+  timer.value--
+  if (timer.value === 0) {
+    playStore.startGameLoop()
+    gameStatus.value = 'started'
+    clearInterval(interval)
+  }
+}, 1000)
+
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
   const socket: Socket = inject('socket') as Socket
@@ -31,6 +42,7 @@ onMounted(() => {
   playStore.initializeGame()
   playStore.initializeSocket(socket)
 
+  /* got rid of click to play
   const grid = document.getElementById('grid')
   grid?.addEventListener('click', () => {
     if (gameStatus.value === 'started') {
@@ -38,12 +50,15 @@ onMounted(() => {
     }
     playStore.startGameLoop()
     gameStatus.value = 'started'
-  })
+  })*/
 })
 </script>
 
 <template>
   <section class="main-sec">
+    <div class="countdown" v-if="timer > 0">
+      {{ timer }}
+    </div>
     <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
 
     <div class="scoreboard">
@@ -96,6 +111,19 @@ onMounted(() => {
   position: relative;
   margin-top: 2rem;
   gap: 2rem;
+
+  .countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 3rem;
+    padding: 1rem 2rem;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
 
   .scoreboard {
     position: absolute;
