@@ -15,7 +15,7 @@ import { Socket } from 'socket.io-client'
 const gameMusic = ref()
 const pickupSound = ref()
 const endGameSound = ref()
-const gameStatus = ref()
+const gameStatus = ref<boolean>(false)
 
 const playStore = usePlayStore()
 const settingsStore = useSettingsStore()
@@ -23,14 +23,6 @@ const { volume } = storeToRefs(settingsStore)
 
 //creeer timer van 3 seconden wanneer dit pagina is geladen
 const timer = ref(3)
-const interval = setInterval(() => {
-  timer.value--
-  if (timer.value === 0) {
-    playStore.startGameLoop()
-    gameStatus.value = 'started'
-    clearInterval(interval)
-  }
-}, 1000)
 
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
@@ -41,6 +33,19 @@ onMounted(() => {
 
   playStore.initializeGame()
   playStore.initializeSocket(socket)
+
+  const interval = setInterval(() => {
+    timer.value--
+    if (timer.value === 0) {
+      if (gameStatus.value === true) {
+        return
+      } else {
+        playStore.startGameLoop()
+        gameStatus.value = true
+        clearInterval(interval)
+      }
+    }
+  }, 1000)
 
   /* got rid of click to play
   const grid = document.getElementById('grid')
