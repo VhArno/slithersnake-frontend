@@ -56,18 +56,28 @@ const player = ref<Player>({
   role: ''
 })
 
+// function checkStatus () {
+//   socket.emit('checkStatus', useUrlSearchParams('history').id)
+//   console.log('checking status')
+// }
+
 if (sessionStorage.getItem('creator')) {
   const randomGuid: string = uuidv4()
   const params = useUrlSearchParams('history')
   params.id = randomGuid
-
   setTimeout(() => {
     socket.emit('createRoom', currentRoom.value, player, params.id)
   }, 1000)
 }
 
-socket.on('gameBusy', (gId, pId) => {
-  if (socket.id === pId) {
+socket.on('evacuateRoom', (roomId: string) => {
+  if (roomId === useUrlSearchParams('history').id) {
+    router.push('/')
+  }
+})
+
+socket.on('gameBusy', (gId) => {
+  if (gId === useUrlSearchParams('history').id) {
     router.push('/')
   }
 })
@@ -76,8 +86,6 @@ socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
   sessionStorage.setItem('players', JSON.stringify(room.players))
   console.log('player joined room')
-  console.log(room)
-  console.log(params.id)
   if (params.id === room.id) {
     players.value = room.players
     console.log(players.value)
@@ -87,8 +95,6 @@ socket.on('joinedRoom', (room: Room) => {
 
 socket.on('newCreator', (plId) => {
   console.log('new creator')
-  console.log(plId)
-  console.log(socket.id)
   if (socket.id === plId) {
     sessionStorage.setItem('creator', 'true')
     creator = true

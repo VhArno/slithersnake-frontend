@@ -132,6 +132,7 @@ export const usePlayStore = defineStore('play', () => {
 
   //eindigt de game
   const endGame = () => {
+    console.log('game over')
     clearInterval(gameLoopInterval)
     clearInterval(socketInterval)
     clearInterval(timerInterval)
@@ -139,11 +140,14 @@ export const usePlayStore = defineStore('play', () => {
     // Pause game music
     gameMusic.value.pause()
 
+    socket?.emit('gameOver', params.id)
+
     // Play end game sound
     endGameSound.value.currentTime = 0
     endGameSound.value.play().catch(() => {
       console.error('Something went wrong')
     })
+
 
     /*alert('game over!')
     restartGame()*/
@@ -679,6 +683,7 @@ export const usePlayStore = defineStore('play', () => {
   const router = useRouter()
 
   const leaveGame = () => {
+    socket?.emit('leaveGameInProgress', params.id)
     router.push('/')
   }
 
