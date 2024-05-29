@@ -18,57 +18,57 @@ import { loginGuard } from './guards/loginGuard'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { 
+    {
       path: '/',
-      name: 'home', 
-      component: HomeView 
+      name: 'home',
+      component: HomeView
     },
-    { 
+    {
       path: '/character-select',
-      name: 'character-select', 
-      component: CharSelectView 
+      name: 'character-select',
+      component: CharSelectView
     },
-    { 
+    {
       path: '/play',
-      name: 'play', 
-      component: PlayView 
+      name: 'play',
+      component: PlayView
     },
-    { 
+    {
       path: '/find-game',
-      name: 'find-game', 
-      component: FindGame 
+      name: 'find-game',
+      component: FindGame
     },
-    { 
+    {
       path: '/create-room',
-      name: 'create-room', 
-      component: CreateRoomView },
-    { 
-  
+      name: 'create-room',
+      component: CreateRoomView
+    },
+    {
       path: '/skins',
-      name: 'skins', 
-      component: SkinsView 
+      name: 'skins',
+      component: SkinsView
     },
-    { 
+    {
       path: '/settings',
-      name: 'settings', 
-      component: SettingsView 
+      name: 'settings',
+      component: SettingsView
     },
-    { 
+    {
       path: '/profile',
-      name: 'profile', 
+      name: 'profile',
       component: ProfileView,
       meta: { requiresAuth: true },
       beforeEnter: [authGuard]
     },
-    { 
+    {
       path: '/login',
-      name: 'login', 
+      name: 'login',
       component: LoginView,
       beforeEnter: [loginGuard]
     },
-    { 
+    {
       path: '/register',
-      name: 'register', 
+      name: 'register',
       component: RegisterView,
       beforeEnter: [loginGuard]
     },
@@ -93,6 +93,12 @@ router.beforeEach((to) => {
 
   if (to.meta.role === 'admin' && !useAuthStore().isAdmin) {
     return { path: '/redirect' }
+  }
+})
+
+router.beforeEach((to, from) => {
+  if (to.path === '/create-room' && from.path === '/play') {
+    return { path: '/' }
   }
 })
 
