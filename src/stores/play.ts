@@ -276,21 +276,21 @@ export const usePlayStore = defineStore('play', () => {
     } while (gameGrid.value[powerUp.value.x][powerUp.value.y] !== 'empty')
 
     // Random power up genereren
-    const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
-    switch (random) {
-      case 1:
-        powerUp.value = { id: 1, name: 'swiftness', x: powerUp.value.x, y: powerUp.value.y }
-        break
-      case 2:
-        powerUp.value = { id: 2, name: 'ghost', x: powerUp.value.x, y: powerUp.value.y }
-        break
-      case 3:
-        powerUp.value = { id: 3, name: 'invisibility', x: powerUp.value.x, y: powerUp.value.y }
-        break
-      case 4: // Add this case
-        powerUp.value = { id: 4, name: 'magnet', x: powerUp.value.x, y: powerUp.value.y }
-        break
-    }
+    // const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
+    // switch (random) {
+    //   case 1:
+    //     powerUp.value = { id: 1, name: 'swiftness', x: powerUp.value.x, y: powerUp.value.y }
+    //     break
+    //   case 2:
+    //     powerUp.value = { id: 2, name: 'ghost', x: powerUp.value.x, y: powerUp.value.y }
+    //     break
+    //   case 3:
+    //     powerUp.value = { id: 3, name: 'invisibility', x: powerUp.value.x, y: powerUp.value.y }
+    //     break
+    //   case 4: // Add this case
+    //     powerUp.value = { id: 4, name: 'magnet', x: powerUp.value.x, y: powerUp.value.y }
+    //     break
+    // }
     socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
   }
   
@@ -315,6 +315,7 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   function moveEnemySnake() {
+    if(players.value.length > 1){
     players.value.forEach((e) => {
       if (e.id !== params.playerId) {
         e.data.forEach((segment) => {
@@ -326,6 +327,7 @@ export const usePlayStore = defineStore('play', () => {
         })
       }
     })
+  }
     // enemySnake.value.forEach((segment) => {
     //   const { x, y } = segment
     //   gameGrid.value[y][x] = 'enemy'
@@ -347,12 +349,12 @@ export const usePlayStore = defineStore('play', () => {
       } else {
         endGame()
       }
-    }, 100)
+    }, 50)
 
     socket?.on('getData', (snake) => {
       if (params.playerId !== snake.id) {
-        console.log('enemy snake moved!')
-        console.log(snake)
+        // console.log('enemy snake moved!')
+        // console.log(snake)
         // enemySnake.value = snake.data
 
         players.value.forEach((e) => {
@@ -393,7 +395,7 @@ export const usePlayStore = defineStore('play', () => {
     })
 
     socket?.on('showPowerUp', (powerX, powerY, random) => {
-      switch (powerUp.value.id) {
+      switch (random) {
         case 1:
           powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
           break
