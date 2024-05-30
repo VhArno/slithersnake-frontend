@@ -409,6 +409,8 @@ export const usePlayStore = defineStore('play', () => {
       food.value = { x: foodX, y: foodY }
     })
 
+    socket?.emit('checkGameMode');
+
     // Listen for the walls event from the server
     socket?.on('wallsGenerated', (walls: any) => {
     console.log('Walls received from server:', walls);
