@@ -19,11 +19,6 @@ import { useAuthStore } from '@/stores/auth'
 /* auth store */
 const authStore = useAuthStore()
 
-/* maps store */
-const mapsStore = useMapsStore()
-const { selectedMap, maps } = storeToRefs(mapsStore)
-selectedMap.value = maps.value[0]
-
 let creator = false
 watchEffect(() => {
   creator = sessionStorage.getItem('creator') === 'true'
@@ -52,7 +47,7 @@ const players = ref<Player[]>([])
 
 const player = ref<Player>()
 
-if(authStore.isAuthenticated && authStore.user) {
+if (authStore.isAuthenticated && authStore.user) {
   player.value = {
     id: authStore.user.id,
     username: authStore.user.username,
@@ -80,7 +75,6 @@ if(authStore.isAuthenticated && authStore.user) {
     role: ''
   }
 }
-
 
 // function checkStatus () {
 //   socket.emit('checkStatus', useUrlSearchParams('history').id)
