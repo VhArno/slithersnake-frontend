@@ -95,6 +95,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background-color: rgba(131, 195, 131, 0.649);
 }
 
+.invisibleEnemy{
+  background-color: rgba(0, 0, 255, 0);
+}
+
 .food {
   background-image: url('../../assets/img/apple.png');
   background-size: cover;

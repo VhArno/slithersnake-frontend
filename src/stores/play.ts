@@ -47,9 +47,8 @@ export const usePlayStore = defineStore('play', () => {
   const players = ref<IngamePlayer[]>([])
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
-  const enemySnake = ref<Array<{ x: number; y: number }>>([]) // Lichamen van de enemy slangen
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
-  const direction = ref('right') //richting van de slang
+  const direction = ref('up') //richting van de slang
   const score = ref(0)
   const gameOver = ref(false)
   const powerUpAvailable = ref<boolean>(false)
@@ -58,8 +57,6 @@ export const usePlayStore = defineStore('play', () => {
   const character = ref<Character>()
   const ghosted = ref<boolean>(false)
   const invisible = ref<boolean>(false)
-  const enemyGhosted = ref<boolean>(false)
-  const enemyInvisible = ref<boolean>(false)
 
   //time if limited-time mode is selected
   const remainingTime = ref<number>(0)
@@ -73,7 +70,7 @@ export const usePlayStore = defineStore('play', () => {
 
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
-  const params = useUrlSearchParams('history')
+  let params = useUrlSearchParams('history')
 
   //obstakels toevoegen
   const obstacles = ref<Array<{ x: number; y: number }>>([])
@@ -87,7 +84,9 @@ export const usePlayStore = defineStore('play', () => {
 
   // initialiseren
   function initializeGame() {
+    params = useUrlSearchParams('history')
     players.value = JSON.parse(sessionStorage.getItem('players')!)
+    console.log(params.playerId)
     console.log(players.value)
     //Sla de geselecteerde character op
     character.value = charStore.selectedCharacter
@@ -131,6 +130,8 @@ export const usePlayStore = defineStore('play', () => {
     for (let i = 1; i < character.value.attributes.startLength; i++) {
       snake.value.push({ x: startX, y: startY + i })
     }
+
+
   }
 
   //eindigt de game
@@ -275,7 +276,16 @@ export const usePlayStore = defineStore('play', () => {
     }, 10000)
   }
 
-  //const invisibility = function () {}
+  const invisibility = function () {
+    console.log('player ' + params.playerId + ' went invisible')
+
+    socket?.emit('activateInvis', params.playerId)
+    setTimeout(() => {
+      console.log('invisibility over')
+      socket?.emit('deactivateInvis', params.playerId)
+    }, 10000)
+  }
+
   function generatePowerUp() {
     socket?.emit('setPowerUpAvailability', true)
     // Random positie genereren
@@ -315,7 +325,7 @@ export const usePlayStore = defineStore('play', () => {
         ghost()
         break
       case 3:
-        speedBoost()
+        invisibility()
         break
       case 4:
         magnetApple()
@@ -333,6 +343,9 @@ export const usePlayStore = defineStore('play', () => {
             if (e.ghosted) {
               gameGrid.value[y][x] = 'ghostedEnemy'
             }
+            if (e.invisible) {
+              gameGrid.value[y][x] = 'invisibleEnemy'
+            }
           })
         }
       })
@@ -348,6 +361,9 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   const startInterval = () => {
+    players.value.forEach((e) => {
+      e.data = [{x:0, y:0}]
+    })
     // console.log(socket)
     socketInterval = setInterval(() => {
       socket?.emit('sendPlayerData', snake.value, params.playerId)
@@ -394,8 +410,8 @@ export const usePlayStore = defineStore('play', () => {
     //genereer powerUp indien powerup mode is selected
     if (selectedMode.value && selectedMode.value.name === 'power-ups') {
       powerUpTimeOut = setTimeout(() => {
-        if(players.value[0].id === params.playerId){
-        generatePowerUp()
+        if (players.value[0].id === params.playerId) {
+          generatePowerUp()
         }
       }, 5000)
     }
@@ -427,23 +443,45 @@ export const usePlayStore = defineStore('play', () => {
 
     socket?.on('activateGhost', (id) => {
       players.value.forEach((e) => {
-        if(e.id === id){
+        if (e.id === id) {
           e.ghosted = true
         }
       })
       if (id === params.playerId) {
         ghosted.value = true
-      } 
+      }
     })
 
     socket?.on('deactivateGhost', (id) => {
       players.value.forEach((e) => {
-        if(e.id === id){
+        if (e.id === id) {
           e.ghosted = false
         }
       })
       if (id === params.playerId) {
         ghosted.value = false
+      }
+    })
+
+    socket?.on('activateInvis', (id) => {
+      players.value.forEach((e) => {
+        if (e.id === id) {
+          e.invisible = true
+        }
+      })
+      if (id === params.playerId) {
+        invisible.value = true
+      }
+    })
+
+    socket?.on('deactivateInvis', (id) => {
+      players.value.forEach((e) => {
+        if (e.id === id) {
+          e.invisible = false
+        }
+      })
+      if (id === params.playerId) {
+        invisible.value = false
       }
     })
 
@@ -602,7 +640,7 @@ export const usePlayStore = defineStore('play', () => {
       players.value.forEach((e) => {
         if (e.id !== params.playerId) {
           for (let i = 1; i < e.data.length; i++) {
-            if (head.x === e.data[i].x && head.y === e.data[i].y) {
+            if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
               gameOver.value = true
               return
             }
@@ -621,7 +659,7 @@ export const usePlayStore = defineStore('play', () => {
 
       players.value.forEach((e) => {
         if (e.id !== params.playerId) {
-          if (head.x == e.data[0].x && head.y == e.data[0].y) {
+          if (head.x == e.data[0].x && head.y == e.data[0].y && !e.ghosted) {
             gameOver.value = true
             return
           }
@@ -713,6 +751,7 @@ export const usePlayStore = defineStore('play', () => {
     setGameMusic,
     setPickupSound,
     setEndGameSound,
+    endGame,
     keybinds,
     numRows,
     numCols,
