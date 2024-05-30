@@ -75,7 +75,7 @@ function logout() {
           </li>
           <li>
             <h3>Skins unlocked</h3>
-            <p>{{ user?.skins?.length }}</p>
+            <p>{{ user?.skins?.length ?? 4}}</p>
           </li>
         </ul>
     </div>

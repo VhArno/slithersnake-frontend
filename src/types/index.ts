@@ -97,6 +97,8 @@ export interface RegisterPayload {
 export interface PostUserDuelPayload {
   duel_id: number
   score: number
+  won: boolean
+  kills: number
 }
 
 export interface socketPlayer extends Player {

@@ -11,10 +11,8 @@ import { Socket } from 'socket.io-client'
 import router from '@/router'
 import { v4 as uuidv4 } from 'uuid'
 import { useAuthStore } from '@/stores/auth'
-//import { watch } from 'fs'
 
 //audios
-
 const gameMusic = ref()
 const pickupSound = ref()
 const endGameSound = ref()
@@ -113,7 +111,12 @@ const backToLobby = () => {
 
 const postUserData = () => {
   if (useAuthStore().isAuthenticated) {
-    playStore.saveUserDuelData({ duel_id: duelId.value, score: playStore.score })
+    playStore.saveUserDuelData({ 
+      duel_id: duelId.value, 
+      score: playStore.score,
+      won: false,
+      kills: playStore.kills
+    })
   }
 }
 
@@ -150,7 +153,6 @@ watchEffect(() => {
       </div>
 
       <div class="score-settings">
-        <SgSoundRange class="sound-range" v-model:modelValue="playStore.volume"></SgSoundRange>
         <SgSoundRange class="sound-range" v-model:modelValue="playStore.volume"></SgSoundRange>
         <SgButton class="leave-btn" @click="playStore.leaveGame">Verlaten</SgButton>
       </div>

@@ -46,6 +46,7 @@ export const usePlayStore = defineStore('play', () => {
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
   const direction = ref('up') //richting van de slang
   const score = ref(0)
+  const kills = ref(0)
   const gameOver = ref(false)
   const powerUpAvailable = ref<boolean>(false)
   const powerUpActive = ref<boolean>(false)
@@ -810,6 +811,7 @@ export const usePlayStore = defineStore('play', () => {
     food,
     direction,
     score,
+    kills,
     gameOver,
     volume,
     initializeGame,
