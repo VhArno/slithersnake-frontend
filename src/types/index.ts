@@ -94,3 +94,8 @@ export interface RegisterPayload {
     password: string,
     passwordRepeat?: string
 }
+
+export interface PostUserDuelPayload {
+    duel_id: number
+    score: number
+}

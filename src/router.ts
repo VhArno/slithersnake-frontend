@@ -98,7 +98,7 @@ router.beforeEach((to) => {
 
 router.beforeEach((to, from) => {
   if (to.path === '/create-room' && from.path === '/play') {
-    return { path: '/' }
+    //return { path: '/' }
   }
 
   if (from.path === '/create-room') {
