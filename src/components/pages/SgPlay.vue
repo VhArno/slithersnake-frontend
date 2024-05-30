@@ -97,6 +97,10 @@ socket.on('evacuateOthers', (roomId: string) => {
 
 socket.on('duelId', (duel: number) => {
   duelId.value = duel
+  console.log('-----------------')
+  console.log('duelId')
+  console.log(duelId.value)
+  console.log('-----------------')
 })
 
 const backToLobby = () => {
@@ -111,8 +115,8 @@ const backToLobby = () => {
 
 const postUserData = () => {
   if (useAuthStore().isAuthenticated) {
-    playStore.saveUserDuelData({ 
-      duel_id: duelId.value, 
+    playStore.saveUserDuelData({
+      duel_id: duelId.value,
       score: playStore.score,
       won: false,
       kills: playStore.kills

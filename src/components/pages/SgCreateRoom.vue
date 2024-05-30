@@ -109,6 +109,8 @@ socket.on('gameBusy', (gId) => {
 
 socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
+  sessionStorage.setItem('players', JSON.stringify(room.players))
+
   console.log('player joined room')
   if (params.id === room.id) {
     currentRoom.value = room
@@ -139,8 +141,7 @@ socket.on('players', (room: Room) => {
 if (!sessionStorage.getItem('creator')) {
   const params = useUrlSearchParams('history')
   if (!params.id) {
-    if (creator)
-    document.location.reload()
+    if (creator) document.location.reload()
   }
   console.log(params.id)
   socket.emit('joinRoom', params.id, player)
