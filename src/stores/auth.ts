@@ -72,7 +72,6 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await postRegister(payload)
       await login({ email: payload.email, password: payload.password })
-      router.push('/profile')
     } catch (err: any) {
       return err.response.data.message
     }
