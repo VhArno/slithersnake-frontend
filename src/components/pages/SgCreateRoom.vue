@@ -43,9 +43,9 @@ const players = ref<Player[]>([])
 const player = ref<Player>({
   id: 'player' + Math.floor(Math.random() * (10000 - 0 + 1)) + 0,
   // id: 'player' + 0,
-  username: 'test user',
+  username: 'guest' + Math.floor(Math.random() * (10000 - 0 + 1)) + 0,
   email: '',
-  level: Math.floor(Math.random() * (100 - 0 + 1)) + 0,
+  level: 0,
   highscore: 0,
   games_played: 0,
   games_won: 0,
@@ -85,8 +85,9 @@ socket.on('joinedRoom', (room: Room) => {
   sessionStorage.setItem('players', JSON.stringify(room.players))
   console.log('player joined room')
   if (params.id === room.id) {
-    players.value = room.players
-    console.log(players.value)
+    currentRoom.value = room
+    console.log(room)
+    players.value = currentRoom.value.players
     socket.emit('getPlayers', params.id)
   }
 })

@@ -46,8 +46,8 @@ export interface Player {
 
 export interface IngamePlayer {
     id: string
-    ghosted: false,
-    invisible: false,
+    ghosted: boolean,
+    invisible: boolean,
     data: Array<{ x: number; y: number }>
 }
 

@@ -100,6 +100,11 @@ router.beforeEach((to, from) => {
   if (to.path === '/create-room' && from.path === '/play') {
     return { path: '/' }
   }
+
+  if (from.path === '/create-room') {
+    sessionStorage.removeItem('creator')
+  }
 })
+
 
 export default router

@@ -32,7 +32,7 @@ export const usePlayStore = defineStore('play', () => {
   }
   const gamemodeStore = useGamemodesStore()
   const { selectedMode } = storeToRefs(gamemodeStore)
-    
+
   const mapStore = useMapsStore()
   const { selectedMap } = storeToRefs(mapStore)
 
@@ -62,14 +62,14 @@ export const usePlayStore = defineStore('play', () => {
   const enemyInvisible = ref<boolean>(false)
 
   //time if limited-time mode is selected
-  const remainingTime = ref<number>(0) 
-  //const PowerUp 
+  const remainingTime = ref<number>(0)
+  //const PowerUp
   const powerUp = ref<PowerUp>({ id: 1, name: 'speedboost', x: 0, y: 0 })
   //init game intervals
   let gameLoopInterval = setInterval(() => {})
   let socketInterval = setInterval(() => {})
   let powerUpTimeOut = setInterval(() => {})
-  let timerInterval = setInterval(() => {});
+  let timerInterval = setInterval(() => {})
 
   //kijkt of richting al veranderd is in interval
   const directionChanged = ref<boolean>(false)
@@ -104,6 +104,7 @@ export const usePlayStore = defineStore('play', () => {
     let startY = Math.floor(numRows / 2)
     
     //CHECKING IF SELECTED GAME MODE IS WALLS TO GENERATE WALLS
+
     if (selectedMap.value && selectedMap.value.name === 'walls') {
       console.log('generate walls')
       socket?.emit('generateWalls')
@@ -129,7 +130,10 @@ export const usePlayStore = defineStore('play', () => {
     } else if (players.value.length == 3) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
-          startX = Math.floor(numCols / (players.value.length + players.value.length * i) + (numCols / players.value.length) * i)
+          startX = Math.floor(
+            numCols / (players.value.length + players.value.length * i) +
+              (numCols / players.value.length) * i
+          )
           startY = Math.floor(numRows / 2)
         }
       }
@@ -159,7 +163,6 @@ export const usePlayStore = defineStore('play', () => {
       console.error('Something went wrong')
     })
 
-
     /*alert('game over!')
     restartGame()*/
   }
@@ -181,13 +184,13 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('generateFood', foodX, foodY)
   }
 
-  function generateWalls(){
-      // Add some obstacles
-      const numObstacles = Math.max(15, Math.floor(Math.random() * 6) + 1); // Random number of obstacles between 1 and 6, but at least 15
-      for (let i = 0; i < numObstacles; i++) {
-        const obstacleX = Math.floor(Math.random() * numCols);
-        const obstacleY = Math.floor(Math.random() * numRows);
-        addObstacle(obstacleX, obstacleY);
+  function generateWalls() {
+    // Add some obstacles
+    const numObstacles = Math.max(15, Math.floor(Math.random() * 6) + 1) // Random number of obstacles between 1 and 6, but at least 15
+    for (let i = 0; i < numObstacles; i++) {
+      const obstacleX = Math.floor(Math.random() * numCols)
+      const obstacleY = Math.floor(Math.random() * numRows)
+      addObstacle(obstacleX, obstacleY)
     }
   }
 
@@ -235,7 +238,7 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   //logica van de magnet powerup
-  const magnetApple = function() {
+  const magnetApple = function () {
     console.log('magnet apple')
 
     const isAppleNearby = () => {
@@ -255,19 +258,22 @@ export const usePlayStore = defineStore('play', () => {
       }
     }
 
-    const intervalId = setInterval(() => {
-      if (!gameOver.value) {
-        eatApple()
-      } else {
-        clearInterval(intervalId)
-        powerUpActive.value = false 
-      }
-    }, 2000 / (interval.value * 2))
+    const intervalId = setInterval(
+      () => {
+        if (!gameOver.value) {
+          eatApple()
+        } else {
+          clearInterval(intervalId)
+          powerUpActive.value = false
+        }
+      },
+      2000 / (interval.value * 2)
+    )
 
     // Stop the interval after 30 seconds
     setTimeout(() => {
       clearInterval(intervalId)
-      powerUpActive.value = false 
+      powerUpActive.value = false
     }, 10000)
   }
 
@@ -283,12 +289,12 @@ export const usePlayStore = defineStore('play', () => {
 
   //const invisibility = function () {}
   function generatePowerUp() {
-    socket?.emit('setPowerUpAvailability', true)  
+    socket?.emit('setPowerUpAvailability', true)
     // Random positie genereren
     do {
       powerUp.value.x = Math.floor(Math.random() * numCols)
       powerUp.value.y = Math.floor(Math.random() * numRows)
-    } while (gameGrid.value[powerUp.value.x][powerUp.value.y] !== 'empty')
+    } while (gameGrid.value[powerUp.value.y][powerUp.value.x] !== 'empty')
 
     // Random power up genereren
     // const random = Math.floor(Math.random() * 4) + 1 // Adjust if more power-ups are added
@@ -308,7 +314,7 @@ export const usePlayStore = defineStore('play', () => {
     // }
     socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
   }
-  
+
   function pickupPowerUp() {
     powerUpActive.value = true
     socket?.emit('setPowerUpAvailability', false)
@@ -330,19 +336,19 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   function moveEnemySnake() {
-    if(players.value.length > 1){
-    players.value.forEach((e) => {
-      if (e.id !== params.playerId) {
-        e.data.forEach((segment) => {
-          const { x, y } = segment
-          gameGrid.value[y][x] = 'enemy'
-          if (enemyGhosted.value) {
-            gameGrid.value[y][x] = 'ghostedEnemy'
-          }
-        })
-      }
-    })
-  }
+    if (players.value.length > 1) {
+      players.value.forEach((e) => {
+        if (e.id !== params.playerId) {
+          e.data.forEach((segment) => {
+            const { x, y } = segment
+            gameGrid.value[y][x] = 'enemy'
+            if (e.ghosted) {
+              gameGrid.value[y][x] = 'ghostedEnemy'
+            }
+          })
+        }
+      })
+    }
     // enemySnake.value.forEach((segment) => {
     //   const { x, y } = segment
     //   gameGrid.value[y][x] = 'enemy'
@@ -389,19 +395,20 @@ export const usePlayStore = defineStore('play', () => {
   function startGameLoop() {
     startInterval()
     //if the gamemode is limited-time
-    if(selectedMode.value && selectedMode.value.name === 'limited-time'){
-      remainingTime.value = 3*60;
+    if (selectedMode.value && selectedMode.value.name === 'limited-time') {
+      remainingTime.value = 3 * 60
       startTimer()
-    }
-    else {
+    } else {
       remainingTime.value = 0
     }
     // Genereer eerste voedsel
     generateFood()
     //genereer powerUp indien powerup mode is selected
-    if(selectedMode.value && selectedMode.value.name === 'power-ups'){
+    if (selectedMode.value && selectedMode.value.name === 'power-ups') {
       powerUpTimeOut = setTimeout(() => {
+        if(players.value[0].id === params.playerId){
         generatePowerUp()
+        }
       }, 5000)
     }
 
@@ -423,7 +430,7 @@ export const usePlayStore = defineStore('play', () => {
         case 4:
           powerUp.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
           break
-      }    
+      }
     })
 
     socket?.on('setPowerUpAvailability', (bool) => {
@@ -431,19 +438,24 @@ export const usePlayStore = defineStore('play', () => {
     })
 
     socket?.on('activateGhost', (id) => {
+      players.value.forEach((e) => {
+        if(e.id === id){
+          e.ghosted = true
+        }
+      })
       if (id === params.playerId) {
         ghosted.value = true
-      } else {
-        //enemy spelers worden ghosted
-        enemyGhosted.value = true
-      }
+      } 
     })
 
     socket?.on('deactivateGhost', (id) => {
+      players.value.forEach((e) => {
+        if(e.id === id){
+          e.ghosted = false
+        }
+      })
       if (id === params.playerId) {
         ghosted.value = false
-      } else {
-        enemyGhosted.value = false
       }
     })
 
@@ -531,7 +543,7 @@ export const usePlayStore = defineStore('play', () => {
         return
     }
 
-    if(selectedMap.value && selectedMap.value.name === 'teleports'){
+    if (selectedMap.value && selectedMap.value.name === 'teleports') {
       newHead.x = (newHead.x + numCols) % numCols
       newHead.y = (newHead.y + numRows) % numRows
     }
@@ -555,12 +567,11 @@ export const usePlayStore = defineStore('play', () => {
       pickupPowerUp()
       powerUpTimeOut = setTimeout(() => {
         generatePowerUp()
-
       }, 20000)
     }
   }
 
-  function FoodCollision(){
+  function FoodCollision() {
     score.value++
     // Play pick up sound
     pickupSound.value.currentTime = 0
@@ -574,22 +585,22 @@ export const usePlayStore = defineStore('play', () => {
     const head = snake.value[0]
 
     // Controleer botsingen met de randen van het speelveld en niet controleren als de map teleports is
-    if(!(selectedMap.value && selectedMap.value.name === 'teleports')){
+    if (!(selectedMap.value && selectedMap.value.name === 'teleports')) {
       if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
         gameOver.value = true
         return
       }
     }
 
-    //controleer op botsing met obstacles
-    obstacles.value.forEach((obstacle) => {
-      if (head.x === obstacle.x && head.y === obstacle.y) {
-        gameOver.value = true
-        return
-      }
-    })
-
     if (!ghosted.value) {
+      //controleer op botsing met obstacles
+      obstacles.value.forEach((obstacle) => {
+        if (head.x === obstacle.x && head.y === obstacle.y) {
+          gameOver.value = true
+          return
+        }
+      })
+
       // Controleer botsingen met zichzelf
       for (let i = 1; i < snake.value.length; i++) {
         if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
@@ -648,10 +659,10 @@ export const usePlayStore = defineStore('play', () => {
           gameGrid.value[powerUp.value.y][powerUp.value.x] = 'swiftness'
           break
         case 2:
-          gameGrid.value[powerUp.value.x][powerUp.value.x] = 'ghost'
+          gameGrid.value[powerUp.value.y][powerUp.value.x] = 'ghost'
           break
         case 3:
-          gameGrid.value[powerUp.value.x][powerUp.value.x] = 'invisibility'
+          gameGrid.value[powerUp.value.y][powerUp.value.x] = 'invisibility'
           break
         case 4: // Add this case
           gameGrid.value[powerUp.value.y][powerUp.value.x] = 'magnet'
@@ -698,17 +709,17 @@ export const usePlayStore = defineStore('play', () => {
     router.push('/')
   }
 
-    // Start the timer
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        if (remainingTime.value > 0) {
-          remainingTime.value -= 1
-        } else {
-          clearInterval(timerInterval)
-          endGame()
-        }
-      }, 1000) // Decrement every second
-    }
+  // Start the timer
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      if (remainingTime.value > 0) {
+        remainingTime.value -= 1
+      } else {
+        clearInterval(timerInterval)
+        endGame()
+      }
+    }, 1000) // Decrement every second
+  }
 
   return {
     setGameMusic,

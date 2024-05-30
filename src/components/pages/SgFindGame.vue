@@ -33,7 +33,17 @@ socket.on('newRoom', (r: Room[]) => {
 })
 
 const joinRoom = () => {
-  router.push('/create-room?id=' + selectedRoom.value?.id)
+  let roomId = null
+
+  if (roomUrl.value !== null) {
+    roomId = roomUrl.value.substring(roomUrl.value.indexOf('=')+1)
+  } else {
+    roomId = selectedRoom.value?.id
+  }
+  
+  if (roomId !== null) {
+    router.push('/create-room?id=' + roomId)
+  }
 }
 
 function disabledBtn(): boolean {
