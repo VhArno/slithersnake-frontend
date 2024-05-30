@@ -303,6 +303,8 @@ export const usePlayStore = defineStore('play', () => {
     //     powerUp.value = { id: 4, name: 'magnet', x: powerUp.value.x, y: powerUp.value.y }
     //     break
     // }
+
+
     socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
   }
 
@@ -387,29 +389,14 @@ export const usePlayStore = defineStore('play', () => {
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
+    //checking modes and maps and listening to server to run logic
+    socket?.emit('checkModeMap');
+
     //if the gamemode is limited-time
-    if (selectedMode.value && selectedMode.value.name === 'limited-time') {
+    socket?.on('setTimeLimit' , () => {
       remainingTime.value = 3 * 60
       startTimer()
-    } else {
-      remainingTime.value = 0
-    }
-    // Genereer eerste voedsel
-    generateFood()
-    //genereer powerUp indien powerup mode is selected
-    if (selectedMode.value && selectedMode.value.name === 'power-ups') {
-      powerUpTimeOut = setTimeout(() => {
-        if(players.value[0].id === params.playerId){
-        generatePowerUp()
-        }
-      }, 5000)
-    }
-
-    socket?.on('showFood', (foodX, foodY) => {
-      food.value = { x: foodX, y: foodY }
     })
-
-    socket?.emit('checkGameMode');
 
     // Listen for the walls event from the server
     socket?.on('wallsGenerated', (walls: any) => {
@@ -420,6 +407,41 @@ export const usePlayStore = defineStore('play', () => {
         addObstacle(wall.x, wall.y);
       });
     });
+    
+    socket?.on('generatePowerUps', () => {
+      powerUpTimeOut = setTimeout(() => {
+        if(players.value[0].id === params.playerId){
+        generatePowerUp()
+        }
+      }, 5000)
+     }) 
+
+    /*
+    if (selectedMode.value && selectedMode.value.name === 'limited-time') {
+      remainingTime.value = 3 * 60
+      startTimer()
+    } else {
+      remainingTime.value = 0
+    }
+    */
+
+    // Genereer eerste voedsel
+    generateFood()
+
+    /*
+    genereer powerUp indien powerup mode is selected
+    if (selectedMode.value && selectedMode.value.name === 'power-ups') {
+      powerUpTimeOut = setTimeout(() => {
+        if(players.value[0].id === params.playerId){
+        generatePowerUp()
+        }
+      }, 5000)
+    }
+    */
+
+    socket?.on('showFood', (foodX, foodY) => {
+      food.value = { x: foodX, y: foodY }
+    })
 
     socket?.on('showPowerUp', (powerX, powerY, random) => {
       switch (random) {
