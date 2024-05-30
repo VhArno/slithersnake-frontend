@@ -284,7 +284,7 @@ export const usePlayStore = defineStore('play', () => {
     setTimeout(() => {
       console.log('invisibility over')
       socket?.emit('deactivateInvis', params.playerId)
-    }, 10000)
+    }, 3000)
   }
 
   function generatePowerUp() {
