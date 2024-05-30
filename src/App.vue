@@ -37,9 +37,9 @@ settingsStore.$subscribe(() => {
 })
 
 //online server
-const socket: Socket = io('https://slithersnake-server.onrender.com/')
+// const socket: Socket = io('https://slithersnake-server.onrender.com/')
 //locale server
-// const socket: Socket = io(`${import.meta.env.VITE_SOCKET_URL}`)
+const socket: Socket = io(`${import.meta.env.VITE_SOCKET_URL}`)
 
 socket.on('connect', () => {
   console.log('Connected to server')
