@@ -103,10 +103,21 @@ export const usePlayStore = defineStore('play', () => {
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
     
-    if(selectedMap.value && selectedMap.value.name === 'walls'){
+    //CHECKING IF SELECTED GAME MODE IS WALLS TO GENERATE WALLS
+    if (selectedMap.value && selectedMap.value.name === 'walls') {
       console.log('generate walls')
-      generateWalls()
+      socket?.emit('generateWalls')
+      //generateWalls()
     }
+
+    // Listen for the walls event from the server
+    socket?.on('wallsGenerated', (walls: any) => {
+    console.log('Walls received from server:', walls);
+    // Place each wall received from the server using addObstacle
+    walls.forEach((wall: { x: number, y: number }) => {
+      addObstacle(wall.x, wall.y);
+    });
+});
 
     if (players.value.length == 2) {
       for (let i = 0; i < players.value.length; i++) {

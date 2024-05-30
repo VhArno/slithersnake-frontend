@@ -36,6 +36,9 @@ settingsStore.$subscribe(() => {
   settingsStore.saveData()
 })
 
+//online server
+//const socket: Socket = io('https://slithersnake-server.onrender.com/')
+//locale server
 const socket: Socket = io('http://localhost:3000')
 
 socket.on('connect', () => {
@@ -56,8 +59,7 @@ if (socket) {
     <RouterView />
   </main>
 
-  <footer>
-  </footer>
+  <footer></footer>
 </template>
 
 <style scoped lang="scss">

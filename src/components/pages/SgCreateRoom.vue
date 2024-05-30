@@ -14,16 +14,15 @@ import { useSettingsStore } from '@/stores/settings'
 import { Socket } from 'socket.io-client'
 import { watch } from 'fs'
 
-// pinia
-/* maps store */
-const mapsStore = useMapsStore()
-const { selectedMap, maps } = storeToRefs(mapsStore)
-selectedMap.value = maps.value[0]
-
 let creator = false
 watchEffect(() => {
   creator = sessionStorage.getItem('creator') === 'true'
 })
+
+/* maps store */
+const mapsStore = useMapsStore()
+const { selectedMap, maps } = storeToRefs(mapsStore)
+selectedMap.value = maps.value[0]
 
 /* modes store */
 const modesStore = useGamemodesStore()
@@ -37,7 +36,6 @@ const { volume } = storeToRefs(settingsStore)
 const currentRoom = ref<Room | null>(null)
 
 // router
-
 const socket: Socket = inject('socket') as Socket
 const router = useRouter()
 const players = ref<Player[]>([])
@@ -191,6 +189,7 @@ socket.on('gameStarted', (roomId: string) => {
 watchEffect(() => {
   selectedMap.value = maps.value[0]
   selectedMode.value = modes.value[0]
+  console.log('watchEffect ')
 })
 
 watchEffect(() => {
@@ -209,8 +208,10 @@ watchEffect(() => {
   }
 })
 
+//throttling error is hier
 socket.on('settingsChanged', (room: Room) => {
   if (room.id === currentRoom.value?.id) {
+    console.log('how many')
     selectedMap.value = room.map
     selectedMode.value = room.mode
   }
