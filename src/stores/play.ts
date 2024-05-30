@@ -104,22 +104,12 @@ export const usePlayStore = defineStore('play', () => {
     let startY = Math.floor(numRows / 2)
     
     //CHECKING IF SELECTED GAME MODE IS WALLS TO GENERATE WALLS
-
     if (selectedMap.value && selectedMap.value.name === 'walls') {
       console.log('generate walls')
       socket?.emit('generateWalls')
       //generateWalls()
     }
-
     // Listen for the walls event from the server
-    socket?.on('wallsGenerated', (walls: any) => {
-    console.log('Walls received from server:', walls);
-    // Place each wall received from the server using addObstacle
-    walls.forEach((wall: { x: number, y: number }) => {
-      addObstacle(wall.x, wall.y);
-    });
-});
-
     if (players.value.length == 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
@@ -144,7 +134,13 @@ export const usePlayStore = defineStore('play', () => {
       snake.value.push({ x: startX, y: startY + i })
     }
   }
-
+  socket?.on('wallsGenerated', (walls: any) => {
+    console.log('Walls received from server:', walls);
+    // Place each wall received from the server using addObstacle
+    walls.forEach((wall: { x: number, y: number }) => {
+      addObstacle(wall.x, wall.y);
+    });
+  });
   //eindigt de game
   const endGame = () => {
     console.log('game over')
