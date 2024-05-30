@@ -30,11 +30,6 @@ export const usePlayStore = defineStore('play', () => {
   function setEndGameSound(sound: HTMLAudioElement) {
     endGameSound.value = sound
   }
-  const gamemodeStore = useGamemodesStore()
-  const { selectedMode } = storeToRefs(gamemodeStore)
-
-  const mapStore = useMapsStore()
-  const { selectedMap } = storeToRefs(mapStore)
 
   // instellingen opslaan
   const settingsStore = useSettingsStore()
@@ -77,6 +72,7 @@ export const usePlayStore = defineStore('play', () => {
 
   //obstakels toevoegen
   const obstacles = ref<Array<{ x: number; y: number }>>([])
+  const teleports = ref<boolean>(false)
 
   function addObstacle(x: number, y: number) {
     obstacles.value.push({ x, y })
@@ -416,6 +412,9 @@ export const usePlayStore = defineStore('play', () => {
       }, 5000)
      }) 
 
+     socket?.on('teleportTrue', () => {
+      teleports.value = true
+     })
     /*
     if (selectedMode.value && selectedMode.value.name === 'limited-time') {
       remainingTime.value = 3 * 60
@@ -570,7 +569,8 @@ export const usePlayStore = defineStore('play', () => {
         return
     }
 
-    if (selectedMap.value && selectedMap.value.name === 'teleports') {
+
+    if (teleports.value) {
       newHead.x = (newHead.x + numCols) % numCols
       newHead.y = (newHead.y + numRows) % numRows
     }
@@ -612,7 +612,7 @@ export const usePlayStore = defineStore('play', () => {
     const head = snake.value[0]
 
     // Controleer botsingen met de randen van het speelveld en niet controleren als de map teleports is
-    if (!(selectedMap.value && selectedMap.value.name === 'teleports')) {
+    if (!(teleports.value)) {
       if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
         gameOver.value = true
         return
