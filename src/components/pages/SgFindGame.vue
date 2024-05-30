@@ -13,6 +13,7 @@ const socket: Socket = inject('socket') as Socket
 const roomUrl = ref<string | null>(null)
 const selectedRoom = ref<Room | null>(null)
 let rooms = ref<Room[] | null>(null)
+let ping = ref<number>(0)
 
 const toggleSelectRoom = (room: Room) => {
   if (selectedRoom.value === room) {
@@ -32,15 +33,37 @@ socket.on('newRoom', (r: Room[]) => {
   rooms.value = r
 })
 
+function calculateRTT() {
+  const startTime = Date.now()
+
+  // Emit a ping event to the server
+  socket.emit('ping')
+
+  // Listen for the pong event from the server
+  socket.once('pong', () => {
+    const endTime = Date.now()
+    const rtt = endTime - startTime
+
+    // Display RTT
+    ping.value = rtt
+
+    // Schedule the next RTT calculation
+    setTimeout(calculateRTT, 1000)
+  })
+}
+
+// Start the RTT calculation
+calculateRTT()
+
 const joinRoom = () => {
   let roomId = null
 
   if (roomUrl.value !== null) {
-    roomId = roomUrl.value.substring(roomUrl.value.indexOf('=')+1)
+    roomId = roomUrl.value.substring(roomUrl.value.indexOf('=') + 1)
   } else {
     roomId = selectedRoom.value?.id
   }
-  
+
   if (roomId !== null) {
     router.push('/create-room?id=' + roomId)
   }
@@ -78,7 +101,7 @@ function disabledBtn(): boolean {
           <td>{{ room.map.name }}</td>
           <td>{{ room.mode.name }}</td>
           <td>{{ room.players.length }}</td>
-          <td>{{ room.ping }}</td>
+          <td>{{ ping }}</td>
         </tr>
         <p class="not-found" v-if="rooms === null || rooms.length <= 0">No game rooms found!</p>
       </table>
@@ -87,7 +110,14 @@ function disabledBtn(): boolean {
       <form class="join-form">
         <div class="form-div">
           <label for="join">Join game</label>
-          <input placeholder="Add game url..." type="text" id="join" name="join" class="input" v-model="roomUrl"/>
+          <input
+            placeholder="Add game url..."
+            type="text"
+            id="join"
+            name="join"
+            class="input"
+            v-model="roomUrl"
+          />
         </div>
         <div class="form-button">
           <SgButton @click="joinRoom" :disabled="disabledBtn()">Join</SgButton>
