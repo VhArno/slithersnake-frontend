@@ -16,13 +16,17 @@ import router from '@/router'
 const gameMusic = ref()
 const pickupSound = ref()
 const endGameSound = ref()
-const gameStatus = ref()
+const gameStatus = ref<boolean>(false)
 
 const playStore = usePlayStore()
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
 
+//creeer timer van 3 seconden wanneer dit pagina is geladen
+const timer = ref(3)
+
 const socket: Socket = inject('socket') as Socket
+
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
   playStore.setGameMusic(gameMusic.value)
@@ -32,6 +36,20 @@ onMounted(() => {
   playStore.initializeGame()
   playStore.initializeSocket(socket)
 
+  const interval = setInterval(() => {
+    timer.value--
+    if (timer.value === 0) {
+      if (gameStatus.value === true) {
+        return
+      } else {
+        playStore.startGameLoop()
+        gameStatus.value = true
+        clearInterval(interval)
+      }
+    }
+  }, 1000)
+
+  /* got rid of click to play
   const grid = document.getElementById('grid')
   grid?.addEventListener('click', () => {
     if (gameStatus.value === 'started') {
@@ -39,7 +57,7 @@ onMounted(() => {
     }
     playStore.startGameLoop()
     gameStatus.value = 'started'
-  })
+  })*/
 })
 
 socket.on('evacuateRoom', (roomId: string) => {
@@ -55,6 +73,9 @@ socket.on('gameOver', () => {
 
 <template>
   <section class="main-sec">
+    <div class="countdown" v-if="timer > 0">
+      {{ timer }}
+    </div>
     <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
 
     <div class="scoreboard">
@@ -107,6 +128,19 @@ socket.on('gameOver', () => {
   position: relative;
   margin-top: 2rem;
   gap: 2rem;
+
+  .countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 3rem;
+    padding: 1rem 2rem;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
 
   .scoreboard {
     position: absolute;
