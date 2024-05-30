@@ -13,8 +13,12 @@ import SgSoundRange from '../atoms/SgSoundRange.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { Socket } from 'socket.io-client'
 import { watch } from 'fs'
+import { useAuthStore } from '@/stores/auth'
 
 // pinia
+/* auth store */
+const authStore = useAuthStore()
+
 /* maps store */
 const mapsStore = useMapsStore()
 const { selectedMap, maps } = storeToRefs(mapsStore)
@@ -37,24 +41,41 @@ const { volume } = storeToRefs(settingsStore)
 const currentRoom = ref<Room | null>(null)
 
 // router
-
 const socket: Socket = inject('socket') as Socket
 const router = useRouter()
 const players = ref<Player[]>([])
 
-const player = ref<Player>({
-  id: 'player' + Math.floor(Math.random() * (10000 - 0 + 1)) + 0,
-  // id: 'player' + 0,
-  username: 'guest' + Math.floor(Math.random() * (10000 - 0 + 1)) + 0,
-  email: '',
-  level: 0,
-  highscore: 0,
-  games_played: 0,
-  games_won: 0,
-  players_killed: 0,
-  skins: [],
-  role: ''
-})
+const player = ref<Player>()
+
+if(authStore.isAuthenticated && authStore.user) {
+  player.value = {
+    id: authStore.user.id,
+    username: authStore.user.username,
+    email: authStore.user.email,
+    level: authStore.user.level,
+    highscore: authStore.user.highscore,
+    games_played: authStore.user.games_played,
+    games_won: authStore.user.games_won,
+    players_killed: authStore.user.players_killed,
+    skins: authStore.user.skins,
+    role: authStore.user.role
+  }
+} else {
+  player.value = {
+    id: 'player' + Math.floor(Math.random() * (10000 - 0 + 1)) + 0,
+    // id: 'player' + 0,
+    username: 'guest' + Math.floor(Math.random() * (10000 - 0 + 1)) + 0,
+    email: '',
+    level: 0,
+    highscore: 0,
+    games_played: 0,
+    games_won: 0,
+    players_killed: 0,
+    skins: [],
+    role: ''
+  }
+}
+
 
 // function checkStatus () {
 //   socket.emit('checkStatus', useUrlSearchParams('history').id)
@@ -180,9 +201,9 @@ const startGame = () => {
 socket.on('gameStarted', (roomId: string) => {
   console.log(roomId)
   console.log('game started')
-  console.log(player.value.id)
+  //console.log(player.value.id)
   const params = useUrlSearchParams('history')
-  if (params.id && roomId) {
+  if (params.id && roomId && player.value) {
     if (roomId === params.id) {
       router.push('/play?id=' + roomId + '&playerId=' + player.value.id)
     }
@@ -354,6 +375,11 @@ const leaveGame = async () => {
       }
     }
   }
+
+  .sound-range {
+    width: 60%;
+  }
+
   .controls {
     display: flex;
     flex-flow: column;

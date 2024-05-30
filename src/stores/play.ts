@@ -3,13 +3,14 @@ import { inject, ref } from 'vue'
 import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
-import type { Character, PowerUp, IngamePlayer } from '@/types'
+import type { Character, PowerUp, IngamePlayer, PostUserDuelPayload } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
 import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
 import { useGamemodesStore } from './gamemodes'
 import { useMapsStore } from './maps'
+import { postUserDuel } from '@/services/dataService'
 
 let socket: Socket | null = null
 
@@ -709,6 +710,16 @@ export const usePlayStore = defineStore('play', () => {
     }, 1000) // Decrement every second
   }
 
+  const saveUserDuelData = async (payload: PostUserDuelPayload) => {
+    try {
+      if (gameOver.value) {
+        await postUserDuel(payload)
+      }
+    } catch(err) {
+      console.log(err)
+    }
+  }
+
   return {
     setGameMusic,
     setPickupSound,
@@ -730,6 +741,7 @@ export const usePlayStore = defineStore('play', () => {
     updateGameGrid,
     leaveGame,
     initializeSocket,
-    remainingTime
+    remainingTime,
+    saveUserDuelData
   }
 })
