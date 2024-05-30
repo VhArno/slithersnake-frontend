@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, inject } from 'vue'
-import { onKeyStroke } from '@vueuse/core'
+import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
 import SgGrid from '@/components/organisms/SgGrid.vue'
@@ -8,6 +8,7 @@ import { usePlayStore } from '@/stores/play'
 import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
 import { Socket } from 'socket.io-client'
+import router from '@/router'
 //import { watch } from 'fs'
 
 //audios
@@ -24,9 +25,10 @@ const { volume } = storeToRefs(settingsStore)
 //creeer timer van 3 seconden wanneer dit pagina is geladen
 const timer = ref(3)
 
+const socket: Socket = inject('socket') as Socket
+
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
-  const socket: Socket = inject('socket') as Socket
   playStore.setGameMusic(gameMusic.value)
   playStore.setPickupSound(pickupSound.value)
   playStore.setEndGameSound(endGameSound.value)
@@ -56,6 +58,16 @@ onMounted(() => {
     playStore.startGameLoop()
     gameStatus.value = 'started'
   })*/
+})
+
+socket.on('evacuateRoom', (roomId: string) => {
+  if (roomId === useUrlSearchParams('history').id) {
+    router.push('/')
+  }
+})
+
+socket.on('gameOver', () => {
+  router.push('/')
 })
 </script>
 
