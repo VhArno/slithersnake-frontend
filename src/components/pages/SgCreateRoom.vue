@@ -29,6 +29,11 @@ watchEffect(() => {
   creator = sessionStorage.getItem('creator') === 'true'
 })
 
+/* maps store */
+const mapsStore = useMapsStore()
+const { selectedMap, maps } = storeToRefs(mapsStore)
+selectedMap.value = maps.value[0]
+
 /* modes store */
 const modesStore = useGamemodesStore()
 const { selectedMode, modes } = storeToRefs(modesStore)
@@ -213,6 +218,7 @@ socket.on('gameStarted', (roomId: string) => {
 watchEffect(() => {
   selectedMap.value = maps.value[0]
   selectedMode.value = modes.value[0]
+  console.log('watchEffect ')
 })
 
 watchEffect(() => {
@@ -231,8 +237,10 @@ watchEffect(() => {
   }
 })
 
+//throttling error is hier
 socket.on('settingsChanged', (room: Room) => {
   if (room.id === currentRoom.value?.id) {
+    console.log('how many')
     selectedMap.value = room.map
     selectedMode.value = room.mode
   }

@@ -31,11 +31,6 @@ export const usePlayStore = defineStore('play', () => {
   function setEndGameSound(sound: HTMLAudioElement) {
     endGameSound.value = sound
   }
-  const gamemodeStore = useGamemodesStore()
-  const { selectedMode } = storeToRefs(gamemodeStore)
-
-  const mapStore = useMapsStore()
-  const { selectedMap } = storeToRefs(mapStore)
 
   // instellingen opslaan
   const settingsStore = useSettingsStore()
@@ -75,6 +70,7 @@ export const usePlayStore = defineStore('play', () => {
 
   //obstakels toevoegen
   const obstacles = ref<Array<{ x: number; y: number }>>([])
+  const teleports = ref<boolean>(false)
 
   function addObstacle(x: number, y: number) {
     obstacles.value.push({ x, y })
@@ -102,11 +98,14 @@ export const usePlayStore = defineStore('play', () => {
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
-
+    
+    //CHECKING IF SELECTED GAME MODE IS WALLS TO GENERATE WALLS
+    /*
     if (selectedMap.value && selectedMap.value.name === 'walls') {
       console.log('generate walls')
-      generateWalls()
-    }
+      socket?.emit('generateWalls')
+      //generateWalls()
+    }*/
 
     if (players.value.length == 2) {
       for (let i = 0; i < players.value.length; i++) {
@@ -311,6 +310,8 @@ export const usePlayStore = defineStore('play', () => {
     //     powerUp.value = { id: 4, name: 'magnet', x: powerUp.value.x, y: powerUp.value.y }
     //     break
     // }
+
+
     socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
   }
 
@@ -391,6 +392,8 @@ export const usePlayStore = defineStore('play', () => {
       }
     })
 
+
+
     // socket?.on('sendData', () => {
     //   console.log('player data sent')
     // })
@@ -399,16 +402,50 @@ export const usePlayStore = defineStore('play', () => {
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
+    //checking modes and maps and listening to server to run logic
+    socket?.emit('checkModeMap');
+
     //if the gamemode is limited-time
+    socket?.on('setTimeLimit' , () => {
+      remainingTime.value = 3 * 60
+      startTimer()
+    })
+
+    // Listen for the walls event from the server
+    socket?.on('wallsGenerated', (walls: any) => {
+    console.log('Walls received from server:', walls);
+
+    // Place each wall received from the server using addObstacle
+    walls.forEach((wall: { x: number, y: number }) => {
+        addObstacle(wall.x, wall.y);
+      });
+    });
+    
+    socket?.on('generatePowerUps', () => {
+      powerUpTimeOut = setTimeout(() => {
+        if(players.value[0].id === params.playerId){
+        generatePowerUp()
+        }
+      }, 5000)
+     }) 
+
+     socket?.on('teleportTrue', () => {
+      teleports.value = true
+     })
+    /*
     if (selectedMode.value && selectedMode.value.name === 'limited-time') {
       remainingTime.value = 3 * 60
       startTimer()
     } else {
       remainingTime.value = 0
     }
+    */
+
     // Genereer eerste voedsel
     generateFood()
-    //genereer powerUp indien powerup mode is selected
+
+    /*
+    genereer powerUp indien powerup mode is selected
     if (selectedMode.value && selectedMode.value.name === 'power-ups') {
       powerUpTimeOut = setTimeout(() => {
         if (players.value[0].id === params.playerId) {
@@ -416,6 +453,7 @@ export const usePlayStore = defineStore('play', () => {
         }
       }, 5000)
     }
+    */
 
     socket?.on('showFood', (foodX, foodY) => {
       food.value = { x: foodX, y: foodY }
@@ -570,7 +608,8 @@ export const usePlayStore = defineStore('play', () => {
         return
     }
 
-    if (selectedMap.value && selectedMap.value.name === 'teleports') {
+
+    if (teleports.value) {
       newHead.x = (newHead.x + numCols) % numCols
       newHead.y = (newHead.y + numRows) % numRows
     }
@@ -612,7 +651,7 @@ export const usePlayStore = defineStore('play', () => {
     const head = snake.value[0]
 
     // Controleer botsingen met de randen van het speelveld en niet controleren als de map teleports is
-    if (!(selectedMap.value && selectedMap.value.name === 'teleports')) {
+    if (!(teleports.value)) {
       if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
         gameOver.value = true
         return
