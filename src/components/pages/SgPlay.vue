@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, inject } from 'vue'
+import { ref, onMounted, inject, watchEffect } from 'vue'
 import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
@@ -9,6 +9,8 @@ import SgSoundRange from '../atoms/SgSoundRange.vue'
 import SgButton from '../atoms/SgButton.vue'
 import { Socket } from 'socket.io-client'
 import router from '@/router'
+import { v4 as uuidv4 } from 'uuid'
+import { useAuthStore } from '@/stores/auth'
 //import { watch } from 'fs'
 
 //audios
@@ -24,10 +26,10 @@ const { volume } = storeToRefs(settingsStore)
 
 //creeer timer van 3 seconden wanneer dit pagina is geladen
 const timer = ref(3)
-
 const gameOver = ref<boolean>(false)
 
 const socket: Socket = inject('socket') as Socket
+const duelId = ref<number>(0)
 
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
@@ -72,9 +74,26 @@ socket.on('gameOver', () => {
   //router.push('/')
 })
 
+socket.on('duelId', (duel: number) => {
+  duelId.value = duel
+})
+
 const backToLobby = () => {
-  router.push('/')
+  const id: string = uuidv4()
+  router.push('/create-room?id='+id)
 }
+
+const postUserData = () => {
+  if (useAuthStore().isAuthenticated) {
+    playStore.saveUserDuelData({duel_id: duelId.value, score: playStore.score})
+  }
+}
+
+watchEffect(() => {
+  if (playStore.gameOver) {
+    postUserData()
+  }
+})
 </script>
 
 <template>
@@ -96,7 +115,7 @@ const backToLobby = () => {
         <h3>Scorebord</h3>
 
         <div class="player-1">
-          <p>Jij (lvl. 11)</p>
+          <p>Jij (lvl. {{ useAuthStore().user?.level }})</p>
           <span>{{ playStore.score }}</span>
         </div>
         <!-- Andere spelerscores -->

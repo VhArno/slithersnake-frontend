@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import SgButton from '../atoms/SgButton.vue'
+import { usePlayStore } from '@/stores/play';
 
 const router = useRouter()
+const play = usePlayStore()
 
 const goToPlay = () => {
   router.push('/play')
