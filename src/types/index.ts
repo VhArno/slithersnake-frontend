@@ -41,6 +41,14 @@ export interface Player {
   players_killed: number
   skins: Skin[]
   role: string
+  duels?: Duel[]
+}
+
+export interface Duel {
+  id: number
+  start_time: Date
+  gamemode: GameMode
+  map: Map
 }
 
 export interface IngamePlayer {

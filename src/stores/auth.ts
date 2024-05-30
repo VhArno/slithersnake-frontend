@@ -32,7 +32,21 @@ export const useAuthStore = defineStore('auth', () => {
     if (user.value) return user.value
 
     try {
-      const {data: user} = await getUser<Player>()
+      const user = await getUser<{data: Player}>().then((res) => {
+        return {
+          id: res.data.data.id,
+          username: res.data.data.username,
+          email: res.data.data.email,
+          level: res.data.data.level,
+          highscore: res.data.data.highscore,
+          games_played: res.data.data.games_played,
+          games_won: res.data.data.games_won,
+          players_killed: res.data.data.players_killed,
+          skins: [],
+          role: '',
+          duels: res.data.data.duels,
+        }
+      })
       return user
     } catch (e) {
       console.error(e)
