@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import SgButton from '../atoms/SgButton.vue'
+import { inject } from 'vue'
+import { Socket } from 'socket.io-client'
+import type { socketPlayer } from '@/types/'
 import { usePlayStore } from '@/stores/play';
 
 const router = useRouter()
+const socket: Socket = inject('socket') as Socket
 const play = usePlayStore()
 
 const goToPlay = () => {
@@ -13,7 +17,7 @@ const goFindGame = () => {
   router.push('/find-game')
 }
 const goCreateRoom = () => {
-  sessionStorage.setItem('creator', "true")
+  sessionStorage.setItem('creator', 'true')
   router.push('/create-room')
 }
 const goSkins = () => {
@@ -22,16 +26,38 @@ const goSkins = () => {
 const goSettings = () => {
   router.push('/settings')
 }
+
+socket.on('prepNewRoom', (playerSocketId: string) => {
+  console.log('didnt get this far')
+  if (socket.id === playerSocketId) {
+    socket.emit('checkIfRoomExists', sessionStorage.getItem('newRoom'))
+  }
+})
+
+socket.on('roomExists', (roomId: string) => {
+  // alert('Sending you to the room now!')
+  setTimeout(() => {
+    sessionStorage.removeItem('creator')
+    router.push('/create-room?id=' + roomId)
+  }, 3000)
+})
+
+socket.on('roomDoesNotExist', (roomId) => {
+  sessionStorage.setItem('creator', 'true')
+  router.push('/create-room?id=' + roomId)
+})
 </script>
 
 <template>
   <section class="main-window">
-      <div class="main-menu">
-        <SgButton @click="goFindGame"><RouterLink to="/find-game">Play</RouterLink></SgButton>
-        <SgButton @click="goCreateRoom"><RouterLink to="/create-room">Create room</RouterLink></SgButton>
-        <SgButton @click="goSkins"><RouterLink to="/skins">Skins</RouterLink></SgButton>
-        <SgButton @click="goSettings"><RouterLink to="/settings">Settings</RouterLink></SgButton>
-      </div>
+    <div class="main-menu">
+      <SgButton @click="goFindGame"><RouterLink to="/find-game">Play</RouterLink></SgButton>
+      <SgButton @click="goCreateRoom"
+        ><RouterLink to="/create-room">Create room</RouterLink></SgButton
+      >
+      <SgButton @click="goSkins"><RouterLink to="/skins">Skins</RouterLink></SgButton>
+      <SgButton @click="goSettings"><RouterLink to="/settings">Settings</RouterLink></SgButton>
+    </div>
   </section>
 </template>
 
@@ -59,7 +85,7 @@ const goSettings = () => {
       background-color: var(--dark-gray);
 
       a {
-        text-decoration: none;      
+        text-decoration: none;
         color: var(--default-text-dark);
       }
 

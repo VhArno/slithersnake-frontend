@@ -84,7 +84,12 @@ if (authStore.isAuthenticated && authStore.user) {
 if (sessionStorage.getItem('creator')) {
   const randomGuid: string = uuidv4()
   const params = useUrlSearchParams('history')
-  params.id = randomGuid
+  if (sessionStorage.getItem('newRoom')) {
+    params.id = sessionStorage.getItem('newRoom') + ''
+  } else {
+    params.id = randomGuid
+  }
+  sessionStorage.removeItem('newRoom')
   setTimeout(() => {
     socket.emit('createRoom', currentRoom.value, player, params.id)
   }, 1000)
@@ -204,6 +209,9 @@ socket.on('gameStarted', (roomId: string) => {
   const params = useUrlSearchParams('history')
   if (params.id && roomId && player.value) {
     if (roomId === params.id) {
+      if (creator) {
+        sessionStorage.setItem('crt', 'true')
+      }
       router.push('/play?id=' + roomId + '&playerId=' + player.value.id)
     }
   }

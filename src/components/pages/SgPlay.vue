@@ -19,6 +19,7 @@ const gameMusic = ref()
 const pickupSound = ref()
 const endGameSound = ref()
 const gameStatus = ref<boolean>(false)
+const gameStatus = ref<boolean>(false)
 
 const playStore = usePlayStore()
 const settingsStore = useSettingsStore()
@@ -30,6 +31,16 @@ const gameOver = ref<boolean>(false)
 
 const socket: Socket = inject('socket') as Socket
 const duelId = ref<number>(0)
+
+
+const isCreator = sessionStorage.getItem('crt')
+sessionStorage.removeItem('crt')
+console.log(isCreator)
+if (isCreator) {
+  const randomGuid: string = uuidv4()
+  socket.emit('nextGameUrl', useUrlSearchParams('history').id, randomGuid)
+}
+// sessionStorage.removeItem('creator')
 
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
@@ -53,6 +64,16 @@ onMounted(() => {
     }
   }, 1000)
 
+  socket.on('nextGameUrl', (roomId: string, newRoomId: string) => {
+    console.log(roomId)
+    console.log(useUrlSearchParams('history').id)
+    console.log(newRoomId)
+
+    if (roomId === useUrlSearchParams('history').id) {
+      sessionStorage.setItem('newRoom', newRoomId)
+    }
+  })
+
   /* got rid of click to play
   const grid = document.getElementById('grid')
   grid?.addEventListener('click', () => {
@@ -62,6 +83,7 @@ onMounted(() => {
     playStore.startGameLoop()
     gameStatus.value = 'started'
   })*/
+  })*/
 })
 
 socket.on('evacuateRoom', (roomId: string) => {
@@ -70,9 +92,12 @@ socket.on('evacuateRoom', (roomId: string) => {
   }
 })
 
-socket.on('gameOver', () => {
-  //router.push('/')
+socket.on('evacuateOthers', (roomId: string) => {
+  if (roomId === useUrlSearchParams('history').id) {
+    router.push('/')
+  }
 })
+
 
 socket.on('duelId', (duel: number) => {
   duelId.value = duel
@@ -93,7 +118,15 @@ watchEffect(() => {
   if (playStore.gameOver) {
     postUserData()
   }
-})
+  sessionStorage.setItem('creator', 'true')
+  socket.emit(
+    'prepNewRoom',
+    useUrlSearchParams('history').id,
+    socket.id,
+    sessionStorage.getItem('newRoom')
+  )
+  socket.emit('evacuateOthers', useUrlSearchParams('history').id)
+}
 </script>
 
 <template>
@@ -104,7 +137,7 @@ watchEffect(() => {
 
     <div class="game-over countdown" v-if="playStore.gameOver">
       <p>Game over!</p>
-      <SgButton @click="backToLobby()">Go back to lobby</SgButton>
+      <SgButton v-if="isCreator" @click="backToLobby()">Go back to lobby</SgButton>
     </div>
 
     <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
@@ -122,6 +155,7 @@ watchEffect(() => {
       </div>
 
       <div class="score-settings">
+        <SgSoundRange class="sound-range" v-model:modelValue="playStore.volume"></SgSoundRange>
         <SgSoundRange class="sound-range" v-model:modelValue="playStore.volume"></SgSoundRange>
         <SgButton class="leave-btn" @click="playStore.leaveGame">Verlaten</SgButton>
       </div>
@@ -154,12 +188,30 @@ watchEffect(() => {
 <style scoped lang="scss">
 .main-sec {
   position: relative;
+  position: relative;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
   position: relative;
   margin-top: 2rem;
   gap: 2rem;
+
+  .countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 3rem;
+    padding: 1rem 2rem;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+    button {
+      font-size: 0.5em;
+    }
+  }
 
   .countdown {
     position: absolute;
@@ -186,6 +238,7 @@ watchEffect(() => {
     display: flex;
     flex-flow: column;
     justify-content: space-between;
+    gap: 1rem;
     gap: 1rem;
     padding: 1rem;
     border-radius: 10px;
@@ -217,6 +270,12 @@ watchEffect(() => {
     position: static !important;
     height: auto !important;
     width: 60%;
+
+    .score-settings {
+      .sound-range {
+        width: 60%;
+      }
+    }
 
     .score-settings {
       .sound-range {
