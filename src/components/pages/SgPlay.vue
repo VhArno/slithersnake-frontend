@@ -19,7 +19,6 @@ const gameMusic = ref()
 const pickupSound = ref()
 const endGameSound = ref()
 const gameStatus = ref<boolean>(false)
-const gameStatus = ref<boolean>(false)
 
 const playStore = usePlayStore()
 const settingsStore = useSettingsStore()
@@ -31,7 +30,6 @@ const gameOver = ref<boolean>(false)
 
 const socket: Socket = inject('socket') as Socket
 const duelId = ref<number>(0)
-
 
 const isCreator = sessionStorage.getItem('crt')
 sessionStorage.removeItem('crt')
@@ -83,34 +81,39 @@ onMounted(() => {
     playStore.startGameLoop()
     gameStatus.value = 'started'
   })*/
-  })*/
 })
 
 socket.on('evacuateRoom', (roomId: string) => {
   if (roomId === useUrlSearchParams('history').id) {
+    console.log('evacuating')
     router.push('/')
   }
 })
 
 socket.on('evacuateOthers', (roomId: string) => {
   if (roomId === useUrlSearchParams('history').id) {
+    console.log('evacuating ohters')
     router.push('/')
   }
 })
-
 
 socket.on('duelId', (duel: number) => {
   duelId.value = duel
 })
 
 const backToLobby = () => {
-  const id: string = uuidv4()
-  router.push('/create-room?id='+id)
+  console.log('back to lobby')
+  sessionStorage.setItem('creator', 'true')
+  console.log('---Play Session Storage---')
+  console.log(sessionStorage.getItem('newRoom'))
+  socket.emit('evacuateOthers', useUrlSearchParams('history').id)
+  socket.emit('prepNewRoom', useUrlSearchParams('history').id, socket.id)
+  router.push('/')
 }
 
 const postUserData = () => {
   if (useAuthStore().isAuthenticated) {
-    playStore.saveUserDuelData({duel_id: duelId.value, score: playStore.score})
+    playStore.saveUserDuelData({ duel_id: duelId.value, score: playStore.score })
   }
 }
 
@@ -118,15 +121,7 @@ watchEffect(() => {
   if (playStore.gameOver) {
     postUserData()
   }
-  sessionStorage.setItem('creator', 'true')
-  socket.emit(
-    'prepNewRoom',
-    useUrlSearchParams('history').id,
-    socket.id,
-    sessionStorage.getItem('newRoom')
-  )
-  socket.emit('evacuateOthers', useUrlSearchParams('history').id)
-}
+})
 </script>
 
 <template>
