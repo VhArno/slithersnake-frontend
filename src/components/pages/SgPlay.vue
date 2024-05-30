@@ -25,6 +25,8 @@ const { volume } = storeToRefs(settingsStore)
 //creeer timer van 3 seconden wanneer dit pagina is geladen
 const timer = ref(3)
 
+const gameOver = ref<boolean>(false)
+
 const socket: Socket = inject('socket') as Socket
 
 // Initialiseer het spel wanneer het component is gemount
@@ -67,8 +69,12 @@ socket.on('evacuateRoom', (roomId: string) => {
 })
 
 socket.on('gameOver', () => {
-  router.push('/')
+  //router.push('/')
 })
+
+const backToLobby = () => {
+  router.push('/')
+}
 </script>
 
 <template>
@@ -76,6 +82,12 @@ socket.on('gameOver', () => {
     <div class="countdown" v-if="timer > 0">
       {{ timer }}
     </div>
+
+    <div class="game-over countdown" v-if="playStore.gameOver">
+      <p>Game over!</p>
+      <SgButton @click="backToLobby()">Go back to lobby</SgButton>
+    </div>
+
     <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
 
     <div class="scoreboard">
@@ -91,7 +103,7 @@ socket.on('gameOver', () => {
       </div>
 
       <div class="score-settings">
-        <SgSoundRange v-model:modelValue="playStore.volume"></SgSoundRange>
+        <SgSoundRange class="sound-range" v-model:modelValue="playStore.volume"></SgSoundRange>
         <SgButton class="leave-btn" @click="playStore.leaveGame">Verlaten</SgButton>
       </div>
     </div>
@@ -122,6 +134,7 @@ socket.on('gameOver', () => {
 
 <style scoped lang="scss">
 .main-sec {
+  position: relative;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
@@ -140,6 +153,10 @@ socket.on('gameOver', () => {
     padding: 1rem 2rem;
 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+    button {
+      font-size: 0.5em;
+    }
   }
 
   .scoreboard {
@@ -150,6 +167,7 @@ socket.on('gameOver', () => {
     display: flex;
     flex-flow: column;
     justify-content: space-between;
+    gap: 1rem;
     padding: 1rem;
     border-radius: 10px;
     color: var(--default-text-dark);
@@ -180,6 +198,12 @@ socket.on('gameOver', () => {
     position: static !important;
     height: auto !important;
     width: 60%;
+
+    .score-settings {
+      .sound-range {
+        width: 60%;
+      }
+    }
   }
 }
 </style>
