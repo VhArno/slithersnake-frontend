@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios'
 import { authAxios, myAxios } from '../instances/myAxios'
-import type { RegisterPayload } from '@/types'
+import type { PostUserDuelPayload, RegisterPayload } from '@/types'
 
 // maps
 const getMap = async <T>(id: number): Promise<AxiosResponse<T>> => {
@@ -55,4 +55,9 @@ const patchUser = async <T>(username: string): Promise<AxiosResponse<T>> => {
     })
 }
 
-export { getMap, getMaps, getGamemode, getGamemodes, getSkins, getCsrfCookie, postLogin, postLogout, postRegister, getUser, patchUser }
+// Duels
+const postUserDuel = async <T>(payload: PostUserDuelPayload): Promise<AxiosResponse<T>> => {
+    return authAxios.post<T>(`/user/duel`, payload)
+}
+
+export { getMap, getMaps, getGamemode, getGamemodes, getSkins, getCsrfCookie, postLogin, postLogout, postRegister, getUser, patchUser, postUserDuel }
