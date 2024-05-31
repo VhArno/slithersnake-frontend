@@ -87,7 +87,7 @@ function logout() {
 
     <div class="games">
       <h2>Game history</h2>
-      <table class="games-table">
+      <table class="games-table" v-if="user?.duels?.length">
         <thead>
           <tr class="table-head">
             <th>id</th>
@@ -105,6 +105,9 @@ function logout() {
           </tr>
         </tbody>
       </table>
+      <div class="no-games">
+        <p v-if="!user?.duels?.length">No games played yet!</p>
+      </div>
     </div>
   </section>
 </template>
@@ -135,6 +138,14 @@ function logout() {
       td {
         text-align: center;
       }
+    }
+  }
+
+  .no-games {
+    width: 100%;
+
+    p {
+      text-align: center;
     }
   }
 
