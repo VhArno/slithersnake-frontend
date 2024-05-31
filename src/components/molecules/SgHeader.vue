@@ -14,8 +14,9 @@ import { useAuthStore } from '@/stores/auth';
         <h1>Slithersnake</h1>
     </RouterLink>
     <ul class="menu-list">
-        <li><RouterLink v-if="useAuthStore().isAuthenticated" :to="{ name: 'profile'}">profile <i class="fa-solid fa-user"></i></RouterLink></li>
-        <li><RouterLink v-if="!useAuthStore().isAuthenticated" :to="{ name: 'login'}">Login<i class="fa-solid fa-right-to-bracket"></i></RouterLink></li>
+        <li><RouterLink :to="{ name: 'leaderboard'}">Leaderboard <i class="fa-solid fa-trophy"></i></RouterLink></li>
+        <li v-if="useAuthStore().isAuthenticated"><RouterLink :to="{ name: 'profile'}">Profile <i class="fa-solid fa-user"></i></RouterLink></li>
+        <li v-if="!useAuthStore().isAuthenticated"><RouterLink :to="{ name: 'login'}">Login<i class="fa-solid fa-right-to-bracket"></i></RouterLink></li>
         <li><RouterLink :to="{ name: 'settings'}">Settings <i class="fa-solid fa-gear"></i></RouterLink></li>
     </ul>
     </nav>
@@ -32,7 +33,7 @@ nav {
         list-style-type: none;
         display: flex;
         flex-flow: row;
-        gap: 1rem;
+        gap: 1.5rem;
         padding: 0;
 
         li a {
