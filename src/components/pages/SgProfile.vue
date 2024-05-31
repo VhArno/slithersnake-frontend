@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Player } from '@/types'
 import SgButton from '@/components/atoms/SgButton.vue'
 import SgPrompt from '@/components/molecules/SgPrompt.vue'
 import { computed, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
+import { useDateFormatter } from '@/composables/dateFormatter';
 
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
@@ -86,11 +86,27 @@ function logout() {
     </div>
 
     <div class="games">
-      <div class="game" v-for="game in user?.duels" :key="game.id">
-        <span>{{ game.id }}</span>
-        <span>{{ game.start_time }}</span>
-        <span>{{ game.gamemode.name }}</span>
-        <span>{{ game.map.name }}</span>
+      <h2>Game history</h2>
+      <table class="games-table" v-if="user?.duels?.length">
+        <thead>
+          <tr class="table-head">
+            <th>id</th>
+            <th>start_time</th>
+            <th>gamemode</th>
+            <th>map</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="game" v-for="game in user?.duels" :key="game.id">
+            <td>{{ game.id }}</td>
+            <td>{{ useDateFormatter(game.start_time).newDate }}</td>
+            <td>{{ game.gamemode.name }}</td>
+            <td>{{ game.map.name }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="no-games">
+        <p v-if="!user?.duels?.length">No games played yet!</p>
       </div>
     </div>
   </section>
@@ -107,39 +123,59 @@ function logout() {
   margin-left: auto;
   margin-right: auto;
 
-  .game {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-between;
+  .games-table {
+    width: 100%;
+
+    .table-head {
+      th {
+        padding: 1rem 0rem;
+      }
+      
+    }
+
+    .game {
+      width: 100%;
+      td {
+        text-align: center;
+      }
+    }
+  }
+
+  .no-games {
+    width: 100%;
+
+    p {
+      text-align: center;
+    }
   }
 
   .user-profile {
-      display: flex;
-      flex-flow: column;
-      align-items: first baseline;
-      justify-content: space-between;
-      gap: 1rem;
+    display: flex;
+    flex-flow: column;
+    align-items: first baseline;
+    justify-content: space-between;
+    gap: 1rem;
 
-      .user-info {
-          display: flex;
-          gap: 0.5rem;
+    .user-info {
+        display: flex;
+        gap: 0.5rem;
 
-          .user-name {
-              order: 1;
-          }
+        .user-name {
+            order: 1;
+        }
 
-          > img {
-              width: 5rem;
-          }
-      }
+        > img {
+            width: 5rem;
+        }
+    }
 
-      button {
-          background-color: var(--accent);
-          color: var(--default-text-dark);
-          border: none;
-          border-radius: 10px;
-          padding: 0.4rem 2rem;
-      }
+    button {
+        background-color: var(--accent);
+        color: var(--default-text-dark);
+        border: none;
+        border-radius: 10px;
+        padding: 0.4rem 2rem;
+    }
   }
 
   .user-stats {
