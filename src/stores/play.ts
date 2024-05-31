@@ -433,6 +433,11 @@ export const usePlayStore = defineStore('play', () => {
      socket?.on('teleportTrue', () => {
       teleports.value = true
      })
+
+     socket?.on('teleportFalse', () => {
+      teleports.value = false
+     })
+
     /*
     if (selectedMode.value && selectedMode.value.name === 'limited-time') {
       remainingTime.value = 3 * 60
