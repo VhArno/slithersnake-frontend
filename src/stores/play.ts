@@ -96,6 +96,9 @@ export const usePlayStore = defineStore('play', () => {
       Array.from({ length: numCols }, () => 'empty')
     )
 
+    // make obstacles ref empty
+    obstacles.value = []
+
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
@@ -132,7 +135,15 @@ export const usePlayStore = defineStore('play', () => {
       snake.value.push({ x: startX, y: startY + i })
     }
 
-
+    //do a check for each X Y on the grid if the gamegrid.value is ibstacle make it empty
+    for (let i = 0; i < numRows; i++) {
+      for (let j = 0; j < numCols; j++) {
+        if (gameGrid.value[i][j] === 'obstacles') {
+          console.log('calling delete obstacle')
+          deleteObstacle(i,j);
+        }
+      }
+    }
   }
 
   //eindigt de game
@@ -174,6 +185,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('generateFood', foodX, foodY)
   }
 
+  /*
   function generateWalls() {
     // Add some obstacles
     const numObstacles = Math.max(15, Math.floor(Math.random() * 6) + 1) // Random number of obstacles between 1 and 6, but at least 15
@@ -182,7 +194,7 @@ export const usePlayStore = defineStore('play', () => {
       const obstacleY = Math.floor(Math.random() * numRows)
       addObstacle(obstacleX, obstacleY)
     }
-  }
+  }*/
 
   //logica van speedboost powerUp
   const speedBoost = function () {
@@ -403,22 +415,23 @@ export const usePlayStore = defineStore('play', () => {
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
+    //deleting all walls incase they were placed last round
     //checking modes and maps and listening to server to run logic
-    socket?.emit('checkModeMap');
+    socket?.emit('checkModeMap',  params.id);
 
     //if the gamemode is limited-time
     socket?.on('setTimeLimit' , () => {
       remainingTime.value = 3 * 60
       startTimer()
     })
-
+    
     // Listen for the walls event from the server
-    socket?.on('wallsGenerated', (walls: any) => {
-    console.log('Walls received from server:', walls);
+    socket?.on('wallsGenerated', (obstacles: Array<{ x: number; y: number }>) => {
+    console.log('Walls received from server:', obstacles);
 
     // Place each wall received from the server using addObstacle
-    walls.forEach((wall: { x: number, y: number }) => {
-        addObstacle(wall.x, wall.y);
+    obstacles.forEach((obstacle: { x: number, y: number }) => {
+        addObstacle(obstacle.x, obstacle.y);
       });
     });
     
@@ -767,6 +780,16 @@ export const usePlayStore = defineStore('play', () => {
     const { x, y } = food.value
     gameGrid.value[y][x] = 'food'
 
+    //do a check for each X Y on the grid if the gamegrid.value is ibstacle make it empty
+    /*
+    for (let i = 0; i < numRows; i++) {
+      for (let j = 0; j < numCols; j++) {
+        if (gameGrid.value[i][j] === 'obstacles') {
+          deleteObstacle(i,j);
+        }
+      }
+    }*/
+
     //Zet obstakels op het speelveld indien nodig
     obstacles.value.forEach((obstacle) => {
       const { x, y } = obstacle
@@ -801,6 +824,12 @@ export const usePlayStore = defineStore('play', () => {
     } catch(err) {
       console.log(err)
     }
+  }
+
+  function deleteObstacle(x: number, y: number) {
+    //get rid of all obstacles placed in grid
+    console.log('wallDeleted')
+    gameGrid.value[x][y] == 'empty';
   }
 
   return {
