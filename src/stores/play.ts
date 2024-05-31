@@ -73,9 +73,12 @@ export const usePlayStore = defineStore('play', () => {
   const obstacles = ref<Array<{ x: number; y: number }>>([])
   const teleports = ref<boolean>(false)
 
+  /*
   function addObstacle(x: number, y: number) {
     obstacles.value.push({ x, y })
   }
+  */
+ 
   function initializeSocket(s: Socket) {
     socket = s
   }
@@ -424,15 +427,18 @@ export const usePlayStore = defineStore('play', () => {
       remainingTime.value = 3 * 60
       startTimer()
     })
-    
+
     // Listen for the walls event from the server
-    socket?.on('wallsGenerated', (obstacles: Array<{ x: number; y: number }>) => {
+    socket?.on('wallsGenerated', (walls: Array<{ x: number; y: number }>) => {
     console.log('Walls received from server:', obstacles);
+    obstacles.value = walls
 
     // Place each wall received from the server using addObstacle
+    /*
     obstacles.forEach((obstacle: { x: number, y: number }) => {
         addObstacle(obstacle.x, obstacle.y);
       });
+    */
     });
     
     socket?.on('generatePowerUps', () => {
