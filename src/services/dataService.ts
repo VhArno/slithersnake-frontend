@@ -60,4 +60,10 @@ const postUserDuel = async <T>(payload: PostUserDuelPayload): Promise<AxiosRespo
     return authAxios.post<T>(`/user/duel`, payload)
 }
 
-export { getMap, getMaps, getGamemode, getGamemodes, getSkins, getCsrfCookie, postLogin, postLogout, postRegister, getUser, patchUser, postUserDuel }
+// Leaderboard
+const getLeaderboard = async <T>(sort: string): Promise<AxiosResponse<T>> => {
+    return authAxios.get<T>(`/leaderboard?sort=${sort}`)
+}
+
+
+export { getMap, getMaps, getGamemode, getGamemodes, getSkins, getCsrfCookie, postLogin, postLogout, postRegister, getUser, patchUser, postUserDuel, getLeaderboard }

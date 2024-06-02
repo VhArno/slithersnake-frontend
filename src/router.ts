@@ -6,6 +6,7 @@ import PlayView from './components/pages/SgPlay.vue'
 import FindGame from './components/pages/SgFindGame.vue'
 import CreateRoomView from './components/pages/SgCreateRoom.vue'
 import SkinsView from './components/pages/SgSkins.vue'
+import LeaderboardView from './components/pages/SgLeaderboard.vue'
 import SettingsView from './components/pages/SgSettings.vue'
 import ProfileView from './components/pages/SgProfile.vue'
 import LoginView from './components/pages/SgLogin.vue'
@@ -47,6 +48,10 @@ const router = createRouter({
       path: '/skins',
       name: 'skins',
       component: SkinsView
+    },{
+      path: '/leaderboard',
+      name: 'leaderboard',
+      component: LeaderboardView
     },
     {
       path: '/settings',
