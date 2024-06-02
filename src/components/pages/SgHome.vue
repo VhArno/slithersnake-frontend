@@ -83,8 +83,9 @@ socket.on('roomDoesNotExist', (roomId) => {
 .main-window {
   background-image: url('/src/assets/img/SgBackground.jpg');
   background-size: cover;
-  height: 76vh;
+  height: 74vh;
   padding-top: 10rem;
+  overflow: hidden;
 
   .redirecting {
     position: fixed; /* Stay in place */
@@ -140,7 +141,7 @@ socket.on('roomDoesNotExist', (roomId) => {
   .main-window {
     padding: 5rem 0rem;
     background-size: cover;
-    height: 76vh;
+    overflow: hidden;
 
     .main-menu {
       width: 30%;
