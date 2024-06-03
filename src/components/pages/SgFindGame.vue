@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import SgButton from '../atoms/SgButton.vue'
 import type { Room } from '@/types/'
 import { useRouter } from 'vue-router'
@@ -30,7 +30,7 @@ function getRooms() {
   }
   socket.emit('getRooms')
 
-  setTimeout(getRooms, 10000)
+  setTimeout(getRooms, 5000)
 }
 
 getRooms()
@@ -76,7 +76,7 @@ const joinRoom = () => {
   }
 
   if (roomId !== null) {
-    router.push('/create-room?id=' + roomId)
+    router.push(`/create-room?id=${roomId}`)  
   }
 }
 
@@ -87,6 +87,14 @@ function disabledBtn(): boolean {
 
   return true
 }
+
+onBeforeUnmount(() => {
+  socket.off('rooms')
+  socket.off('newRoom')
+  socket.off('ping')
+  socket.off('pong')
+  socket.off('getRooms')
+})
 </script>
 
 <template>
@@ -111,7 +119,7 @@ function disabledBtn(): boolean {
           <td>{{ room.name }}</td>
           <td>{{ room.map.name }}</td>
           <td>{{ room.mode.name }}</td>
-          <td>{{ room.players.length }}</td>
+          <td>{{ room.players.length }}/4</td>
           <td>{{ ping }}</td>
         </tr>
         <tr v-if="rooms === null || rooms.length <= 0">

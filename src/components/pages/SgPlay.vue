@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, inject, watchEffect } from 'vue'
+import { ref, onMounted, inject, watchEffect, onBeforeUnmount} from 'vue'
 import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
@@ -128,6 +128,13 @@ watchEffect(() => {
   if (playStore.gameOver) {
     postUserData()
   }
+})
+
+onBeforeUnmount(() => {
+  socket.off('nextGameUrl')
+  socket.off('evacuateRoom')
+  socket.off('evacuateOthers')
+  socket.off('duelId')
 })
 </script>
 
