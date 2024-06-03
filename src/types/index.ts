@@ -56,6 +56,7 @@ export interface IngamePlayer {
   ghosted: boolean
   invisible: boolean
   data: Array<{ x: number; y: number }>
+  alive: boolean
 }
 
 export interface Keybinds {

@@ -212,6 +212,7 @@ export const usePlayStore = defineStore('play', () => {
     restartGame()*/
   }
 
+  /*
   socket?.on('someoneDied', (id) => {
     console.log('inside player died from socket')
     players.value.forEach((e) => {
@@ -226,7 +227,7 @@ export const usePlayStore = defineStore('play', () => {
       console.log('own snake died')
       snake.value = []
     }
-  })
+  })*/
 
   socket?.on('gameOver', (winningPlayerId: string) => {
     endGlobal()
@@ -239,7 +240,7 @@ export const usePlayStore = defineStore('play', () => {
     console.log('inside removeplayer')
     if(playerAlive.value){
       endGame()
-    console.log('player died')
+      console.log('player died')
 
     //snake.value = [] // Assign an empty array to snake.value
     //socket?.emit('sendPlayerData', snake.value, params.playerId)
@@ -490,17 +491,26 @@ export const usePlayStore = defineStore('play', () => {
       }
     })
 
-    socket?.on('SomeoneDied', (snake) => {
-      console.log('someone died')
-      
-      if (params.playerId !== snake.id) {
-      // console.log('enemy snake moved!')
-      // console.log(snake)
-      // enemySnake.value = snake.data
-
+    socket?.on('someoneDied', (id) => {
+      console.log('inside player died from socket')
       players.value.forEach((e) => {
-        if (e.id === snake.id) {
-        e.data = [] // make the snake empty
+      console.log(players.value)
+      if (e.id === id) {
+        //e.invisible = true
+        e.alive = false
+        e.data = []
+        console.log('other player died')
+      }
+      })
+      if (id === params.playerId) {
+      //invisible.value = true
+      console.log('own snake died')
+      snake.value = []
+      playerAlive.value = false
+      //put yourself as alive false in players by checking id
+      players.value.forEach((e) => {
+        if (e.id === params.playerId) {
+          e.alive = false
         }
       })
       }
@@ -514,6 +524,10 @@ export const usePlayStore = defineStore('play', () => {
     //checking modes and maps and listening to server to run logic
     socket?.emit('checkModeMap',  params.id);
 
+    //reset all players alive in the server aswell in case they are still in the same lobby
+    socket?.emit('resetPlayersAlive', params.id)
+    
+    playerAlive.value = true
     //if the gamemode is limited-time
     socket?.on('setTimeLimit' , () => {
       remainingTime.value = 3 * 60
@@ -792,10 +806,11 @@ export const usePlayStore = defineStore('play', () => {
       //   }
       // }
 
-      // Controleer botsingen met andere snake head
+      // Controleer botsingen met andere snake head 
+      //alleen controleren op spelers die nog leven
 
       players.value.forEach((e) => {
-        if (e.id !== params.playerId) {
+        if (e.id !== params.playerId && e.alive) {
           if (head.x == e.data[0].x && head.y == e.data[0].y && !e.ghosted) {
             //gameOver.value = true
         removePlayer()
