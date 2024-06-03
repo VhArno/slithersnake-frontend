@@ -29,7 +29,7 @@ export const useSkinsStore = defineStore('skins', () => {
           id: 1,
           name: 'Skin 1',
           imgHead: skins.value[0].imgHead,
-          imgBody: skins.value[1].imgBody
+          imgBody: skins.value[0].imgBody
         }
       })
       .catch((error) => console.error(error))
