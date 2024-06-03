@@ -150,39 +150,50 @@ export const usePlayStore = defineStore('play', () => {
     }*/
   }
 
-  //eindigt de game ALLEEN VOOR DE GEBRUIKER
+  //eindigt de game ALLEEN VOOR DE GEBRUIKER en wordt spectator
   const endGame = () => {
-    console.log('game over')
+    if(playerAlive.value){
+      console.log('game over')
+    playerAlive.value = false
     //clearInterval(gameLoopInterval)
     //clearInterval(socketInterval)
     //clearInterval(timerInterval)
-
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
-    //gameMusic.value.pause()
-
-
-    socket?.emit('gameOver', params.id)
-
+    gameMusic.value.pause()
+    //send player id and game id
+    //socket?.emit('playerDied', params.playerId, params.gameId)
+    console.log('emitting player died' + params.playerId + " " + params.id)
+    socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
     // Play end game sound
     endGameSound.value.currentTime = 0
     endGameSound.value.play().catch(() => {
       console.error('Something went wrong')
     })
 
+    //removePlayer()
+
     /*alert('game over!')
     restartGame()*/
+    } else {
+      console.log('player already dead')
+    }
   }
 
   //
   //end game for everyone
   //
-  socket?.on('endGame', () => {
+  /*
+  socket?.on('endGame', (winnerId, gameId) => {
+    console.log('game ended')
+    if(gameId === params.id)
     endGlobal()
-    socket?.emit('gameOver', params.playerId)
-  })
+    //socket?.emit('gameOver', params.playerId)
+    console.log(`Game Over! Player ${winnerId} wins!`)
+  })*/
 
   const endGlobal = () => {
+    console.log('inside endglobal')
     gameOver.value = true
     clearInterval(gameLoopInterval)
     clearInterval(socketInterval)
@@ -197,17 +208,24 @@ export const usePlayStore = defineStore('play', () => {
       console.error('Something went wrong')
     })
 
-
     /*alert('game over!')
     restartGame()*/
   }
 
-  socket?.on('playerRemoved', (playerId: string) => {
-      const playerIndex = players.value.findIndex(p => p.id === playerId)
-      if (playerIndex !== -1) {
-        players.value.splice(playerIndex, 1)
+  socket?.on('someoneDied', (id) => {
+    console.log('inside player died from socket')
+    players.value.forEach((e) => {
+      console.log(players.value)
+      if (e.id === id) {
+        //e.invisible = true
+        e.data = []
       }
-
+    })
+    if (id === params.playerId) {
+      //invisible.value = true
+      console.log('own snake died')
+      snake.value = []
+    }
   })
 
   socket?.on('gameOver', (winningPlayerId: string) => {
@@ -217,15 +235,18 @@ export const usePlayStore = defineStore('play', () => {
 
 
   function removePlayer() {
-    playerAlive.value = false
-    //endGame()
+    //playerAlive.value = false
+    console.log('inside removeplayer')
+    if(playerAlive.value){
+      endGame()
     console.log('player died')
 
-    snake.value.forEach(segment => {
-      gameGrid.value[segment.y][segment.x] = 'empty'
-    })
+    //snake.value = [] // Assign an empty array to snake.value
+    //socket?.emit('sendPlayerData', snake.value, params.playerId)
 
-    socket?.emit('playerDied', params.playerId, params.gameId)
+    //socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
+    }
+    
   }
 
   //herstart de game
@@ -272,7 +293,6 @@ export const usePlayStore = defineStore('play', () => {
           }
         } else {
           endGame()
-          endGlobal()
         }
       },
       1000 / (interval.value * 2)
@@ -443,7 +463,7 @@ export const usePlayStore = defineStore('play', () => {
 
     // console.log(socket)
     socketInterval = setInterval(() => {
-      if(playerAlive.value === true){
+      if(playerAlive.value){
         socket?.emit('sendPlayerData', snake.value, params.playerId)
       }
       socket?.emit('getPlayerData')
@@ -456,6 +476,7 @@ export const usePlayStore = defineStore('play', () => {
     }, 50)
 
     socket?.on('getData', (snake) => {
+      
       if (params.playerId !== snake.id) {
         // console.log('enemy snake moved!')
         // console.log(snake)
@@ -469,23 +490,21 @@ export const usePlayStore = defineStore('play', () => {
       }
     })
 
-    socket?.on('SomeoneDied', (id) => {
+    socket?.on('SomeoneDied', (snake) => {
       console.log('someone died')
       
-      //delete the snake that died from the grid
+      if (params.playerId !== snake.id) {
+      // console.log('enemy snake moved!')
+      // console.log(snake)
+      // enemySnake.value = snake.data
+
       players.value.forEach((e) => {
-        if (e.id === id) {
-          e.data.forEach(segment => {
-            gameGrid.value[segment.y][segment.x] = 'empty'
-          })
+        if (e.id === snake.id) {
+        e.data = [] // make the snake empty
         }
       })
+      }
     })
-
-
-    // socket?.on('sendData', () => {
-    //   console.log('player data sent')
-    // })
   }
 
   // Start de game loop om de spelstatus bij te werken
@@ -505,13 +524,6 @@ export const usePlayStore = defineStore('play', () => {
     socket?.on('wallsGenerated', (walls: Array<{ x: number; y: number }>) => {
     console.log('Walls received from server:', obstacles);
     obstacles.value = walls
-
-    // Place each wall received from the server using addObstacle
-    /*
-    obstacles.forEach((obstacle: { x: number, y: number }) => {
-        addObstacle(obstacle.x, obstacle.y);
-      });
-    */
     });
     
     socket?.on('generatePowerUps', () => {
@@ -530,28 +542,8 @@ export const usePlayStore = defineStore('play', () => {
       teleports.value = false
      })
 
-    /*
-    if (selectedMode.value && selectedMode.value.name === 'limited-time') {
-      remainingTime.value = 3 * 60
-      startTimer()
-    } else {
-      remainingTime.value = 0
-    }
-    */
-
     // Genereer eerste voedsel
     generateFood()
-
-    /*
-    genereer powerUp indien powerup mode is selected
-    if (selectedMode.value && selectedMode.value.name === 'power-ups') {
-      powerUpTimeOut = setTimeout(() => {
-        if (players.value[0].id === params.playerId) {
-          generatePowerUp()
-        }
-      }, 5000)
-    }
-    */
 
     socket?.on('showFood', (foodX, foodY) => {
       food.value = { x: foodX, y: foodY }
@@ -629,12 +621,15 @@ export const usePlayStore = defineStore('play', () => {
           checkCollisions()
           moveSnake()
           checkCollisions()
-          if (!gameOver.value) {
-            updateGameGrid()
-          }
-        } else {
-          endGame()
+        } 
+        if (!gameOver.value) {
+          updateGameGrid()
         }
+        
+        /*else {
+          console.log('calling endgame from inside interval constantly')
+          endGame()
+        }*/
       },
       2000 / (interval.value * 2)
     ) // Pas de snelheid aan door de intervaltijd te veranderen
@@ -841,22 +836,26 @@ export const usePlayStore = defineStore('play', () => {
       gameGrid.value[powerUp.value.y][powerUp.value.x] = 'empty'
     }
 
+    //hier is de error na dood
     // Plaats de slangen op het speelveld
-    snake.value.forEach((segment) => {
-      if (segment === snake.value[0]) {
-        const { x, y } = segment
-        gameGrid.value[y][x] = 'snake-head'
-        if (ghosted.value) {
-          gameGrid.value[y][x] = 'ghostedSnakeHead'
+
+    if(playerAlive.value){
+      snake.value.forEach((segment) => {
+        if (segment === snake.value[0]) {
+          const { x, y } = segment
+          gameGrid.value[y][x] = 'snake-head'
+          if (ghosted.value) {
+            gameGrid.value[y][x] = 'ghostedSnakeHead'
+          }
+        } else {
+          const { x, y } = segment
+          gameGrid.value[y][x] = 'snake'
+          if (ghosted.value) {
+            gameGrid.value[y][x] = 'ghostedSnake'
+          }
         }
-      } else {
-        const { x, y } = segment
-        gameGrid.value[y][x] = 'snake'
-        if (ghosted.value) {
-          gameGrid.value[y][x] = 'ghostedSnake'
-        }
-      }
-    })
+      })
+    }
 
     moveEnemySnake()
 
@@ -878,6 +877,14 @@ export const usePlayStore = defineStore('play', () => {
     obstacles.value.forEach((obstacle) => {
       const { x, y } = obstacle
       gameGrid.value[y][x] = 'obstacles'
+    })
+
+    socket?.on('endGame', (winnerId, gameId) => {
+      console.log('game ended')
+      if(gameId === params.id)
+      endGlobal()
+      //socket?.emit('gameOver', params.playerId)
+      console.log(`Game Over! Player ${winnerId} wins!`)
     })
   }
 
