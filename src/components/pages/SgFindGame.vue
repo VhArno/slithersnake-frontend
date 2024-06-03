@@ -24,6 +24,10 @@ const toggleSelectRoom = (room: Room) => {
 }
 
 function getRooms() {
+  // emit only if the user is on this page
+  if (router.currentRoute.value.path !== '/find-game') {
+    return
+  }
   socket.emit('getRooms')
 
   setTimeout(getRooms, 10000)

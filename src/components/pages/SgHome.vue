@@ -42,8 +42,6 @@ socket.on('prepNewRoom', (playerSocketId: string) => {
 socket.on('roomExists', (roomId: string) => {
   // alert('Sending you to the room now!')
   redirecting.value = true
-  console.log('room exists')
-  console.log(roomId)
   setTimeout(() => {
     redirecting.value = false
     sessionStorage.removeItem('creator')
