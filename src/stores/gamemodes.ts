@@ -13,7 +13,7 @@ export const useGamemodesStore = defineStore('gamemodes', () => {
             return {
               id: record.id,
               name: record.name,
-              image: record.image
+              image: import.meta.env.VITE_BASE_URL + record.image
             }
           })
           modes.value?.push(...loadedMaps)
