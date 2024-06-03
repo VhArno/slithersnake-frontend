@@ -6,15 +6,14 @@ import { storeToRefs } from 'pinia'
 
 // skins store
 const skinStore = useSkinsStore()
-
-const { skins } = storeToRefs(skinStore)
+const { skins, selectedSkin } = storeToRefs(skinStore)
 
 const handleClick = (skin: Skin) => {
-    skinStore.selectedSkin = skin
+    selectedSkin.value = skin
 }
 
 const isSelected = (skin: Skin) => {
-    if (skinStore.selectedSkin === skin) {
+    if (selectedSkin.value === skin) {
         return true
     }
     return false

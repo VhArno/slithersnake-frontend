@@ -8,11 +8,12 @@ export const useSkinsStore = defineStore('skins', () => {
     const selectedSkin = ref<Skin>({
       id: 1,
       name: 'Skin 1',
-      imgHead: skins.value[0].imgHead,
-      imgBody: skins.value[1].imgBody
+      imgHead: '',
+      imgBody: ''
     })
 
     const loadSkins = () => {
+      console.log('loading skins')
       getSkins<ApiResponse>().then((response) => {
         const loadedMaps: Skin[] = response.data.data.map((record: any) => {
           return {
@@ -23,6 +24,13 @@ export const useSkinsStore = defineStore('skins', () => {
           }
         })
         skins.value?.push(...loadedMaps)
+        
+        selectedSkin.value = {
+          id: 1,
+          name: 'Skin 1',
+          imgHead: skins.value[0].imgHead,
+          imgBody: skins.value[1].imgBody
+        }
       })
       .catch((error) => console.error(error))
     }
