@@ -153,13 +153,14 @@ export const usePlayStore = defineStore('play', () => {
   //eindigt de game ALLEEN VOOR DE GEBRUIKER
   const endGame = () => {
     console.log('game over')
-    clearInterval(gameLoopInterval)
+    //clearInterval(gameLoopInterval)
     //clearInterval(socketInterval)
     //clearInterval(timerInterval)
 
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
     //gameMusic.value.pause()
+
 
     socket?.emit('gameOver', params.id)
 
@@ -182,6 +183,7 @@ export const usePlayStore = defineStore('play', () => {
   })
 
   const endGlobal = () => {
+    gameOver.value = true
     clearInterval(gameLoopInterval)
     clearInterval(socketInterval)
     clearInterval(timerInterval)
@@ -194,6 +196,7 @@ export const usePlayStore = defineStore('play', () => {
     endGameSound.value.play().catch(() => {
       console.error('Something went wrong')
     })
+
 
     /*alert('game over!')
     restartGame()*/
@@ -208,22 +211,21 @@ export const usePlayStore = defineStore('play', () => {
   })
 
   socket?.on('gameOver', (winningPlayerId: string) => {
-    gameOver.value = true
+    endGlobal()
     console.log(`Game Over! Player ${winningPlayerId} wins!`)
   })
 
 
   function removePlayer() {
     playerAlive.value = false
+    //endGame()
     console.log('player died')
+
     snake.value.forEach(segment => {
       gameGrid.value[segment.y][segment.x] = 'empty'
     })
-    playerCount.value -= 1
+
     socket?.emit('playerDied', params.playerId, params.gameId)
-    if (playerCount.value <= 1) {
-      endGlobal()
-    }
   }
 
   //herstart de game
@@ -439,18 +441,11 @@ export const usePlayStore = defineStore('play', () => {
       e.data = [{x:0, y:0}]
     })
 
-    socket?.on('SomeoneDied', (id) => {
-
-      players.value.forEach((e) => {
-        if (e.id === id) {
-          e.data = [{x:0, y:0}]
-        }
-      })
-      
-    })
     // console.log(socket)
     socketInterval = setInterval(() => {
-      socket?.emit('sendPlayerData', snake.value, params.playerId)
+      if(playerAlive.value === true){
+        socket?.emit('sendPlayerData', snake.value, params.playerId)
+      }
       socket?.emit('getPlayerData')
 
       if (!gameOver.value) {
@@ -474,6 +469,18 @@ export const usePlayStore = defineStore('play', () => {
       }
     })
 
+    socket?.on('SomeoneDied', (id) => {
+      console.log('someone died')
+      
+      //delete the snake that died from the grid
+      players.value.forEach((e) => {
+        if (e.id === id) {
+          e.data.forEach(segment => {
+            gameGrid.value[segment.y][segment.x] = 'empty'
+          })
+        }
+      })
+    })
 
 
     // socket?.on('sendData', () => {
@@ -617,7 +624,7 @@ export const usePlayStore = defineStore('play', () => {
 
     gameLoopInterval = setInterval(
       () => {
-        if (!gameOver.value) {
+        if (playerAlive.value) {
           directionChanged.value = false
           checkCollisions()
           moveSnake()
@@ -902,10 +909,6 @@ export const usePlayStore = defineStore('play', () => {
       console.log(err)
     }
   }
-
-  
-
-
 
   return {
     setGameMusic,
