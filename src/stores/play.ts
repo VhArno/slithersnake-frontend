@@ -6,10 +6,7 @@ import { storeToRefs } from 'pinia'
 import type { Character, PowerUp, IngamePlayer, PostUserDuelPayload } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
-import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
-import { useGamemodesStore } from './gamemodes'
-import { useMapsStore } from './maps'
 import { postUserDuel } from '@/services/dataService'
 
 let socket: Socket | null = null
@@ -41,6 +38,7 @@ export const usePlayStore = defineStore('play', () => {
   const numRows = 20 // Aantal rijen
   const numCols = 20 // Aantal kolommen
   const players = ref<IngamePlayer[]>([])
+  const playerCount = ref<number>(0)
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
@@ -48,6 +46,7 @@ export const usePlayStore = defineStore('play', () => {
   const score = ref(0)
   const kills = ref(0)
   const gameOver = ref(false)
+  const playerAlive = ref<boolean>(true)
   const powerUpAvailable = ref<boolean>(false)
   const powerUpActive = ref<boolean>(false)
   const interval = ref<number>(10)
@@ -87,6 +86,7 @@ export const usePlayStore = defineStore('play', () => {
   function initializeGame() {
     params = useUrlSearchParams('history')
     players.value = JSON.parse(sessionStorage.getItem('players')!)
+    playerCount.value = players.value.length
     console.log(params.playerId)
     console.log(players.value)
     //Sla de geselecteerde character op
@@ -139,6 +139,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     //do a check for each X Y on the grid if the gamegrid.value is ibstacle make it empty
+    /*
     for (let i = 0; i < numRows; i++) {
       for (let j = 0; j < numCols; j++) {
         if (gameGrid.value[i][j] === 'obstacles') {
@@ -146,18 +147,19 @@ export const usePlayStore = defineStore('play', () => {
           deleteObstacle(i,j);
         }
       }
-    }
+    }*/
   }
 
-  //eindigt de game
+  //eindigt de game ALLEEN VOOR DE GEBRUIKER
   const endGame = () => {
     console.log('game over')
     clearInterval(gameLoopInterval)
-    clearInterval(socketInterval)
-    clearInterval(timerInterval)
+    //clearInterval(socketInterval)
+    //clearInterval(timerInterval)
+
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
-    gameMusic.value.pause()
+    //gameMusic.value.pause()
 
     socket?.emit('gameOver', params.id)
 
@@ -169,6 +171,59 @@ export const usePlayStore = defineStore('play', () => {
 
     /*alert('game over!')
     restartGame()*/
+  }
+
+  //
+  //end game for everyone
+  //
+  socket?.on('endGame', () => {
+    endGlobal()
+    socket?.emit('gameOver', params.playerId)
+  })
+
+  const endGlobal = () => {
+    clearInterval(gameLoopInterval)
+    clearInterval(socketInterval)
+    clearInterval(timerInterval)
+    // Toon een game over bericht of handel het einde van het spel af
+    // Pause game music
+    gameMusic.value.pause()
+
+    // Play end game sound
+    endGameSound.value.currentTime = 0
+    endGameSound.value.play().catch(() => {
+      console.error('Something went wrong')
+    })
+
+    /*alert('game over!')
+    restartGame()*/
+  }
+
+  socket?.on('playerRemoved', (playerId: string) => {
+      const playerIndex = players.value.findIndex(p => p.id === playerId)
+      if (playerIndex !== -1) {
+        players.value.splice(playerIndex, 1)
+      }
+
+  })
+
+  socket?.on('gameOver', (winningPlayerId: string) => {
+    gameOver.value = true
+    console.log(`Game Over! Player ${winningPlayerId} wins!`)
+  })
+
+
+  function removePlayer() {
+    playerAlive.value = false
+    console.log('player died')
+    snake.value.forEach(segment => {
+      gameGrid.value[segment.y][segment.x] = 'empty'
+    })
+    playerCount.value -= 1
+    socket?.emit('playerDied', params.playerId, params.gameId)
+    if (playerCount.value <= 1) {
+      endGlobal()
+    }
   }
 
   //herstart de game
@@ -215,6 +270,7 @@ export const usePlayStore = defineStore('play', () => {
           }
         } else {
           endGame()
+          endGlobal()
         }
       },
       1000 / (interval.value * 2)
@@ -381,6 +437,16 @@ export const usePlayStore = defineStore('play', () => {
   const startInterval = () => {
     players.value.forEach((e) => {
       e.data = [{x:0, y:0}]
+    })
+
+    socket?.on('SomeoneDied', (id) => {
+
+      players.value.forEach((e) => {
+        if (e.id === id) {
+          e.data = [{x:0, y:0}]
+        }
+      })
+      
     })
     // console.log(socket)
     socketInterval = setInterval(() => {
@@ -678,7 +744,8 @@ export const usePlayStore = defineStore('play', () => {
     // Controleer botsingen met de randen van het speelveld en niet controleren als de map teleports is
     if (!(teleports.value)) {
       if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
-        gameOver.value = true
+        //gameOver.value = true
+        removePlayer()
         return
       }
     }
@@ -687,7 +754,8 @@ export const usePlayStore = defineStore('play', () => {
       //controleer op botsing met obstacles
       obstacles.value.forEach((obstacle) => {
         if (head.x === obstacle.x && head.y === obstacle.y) {
-          gameOver.value = true
+          //gameOver.value = true
+        removePlayer()
           return
         }
       })
@@ -695,7 +763,8 @@ export const usePlayStore = defineStore('play', () => {
       // Controleer botsingen met zichzelf
       for (let i = 1; i < snake.value.length; i++) {
         if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
-          gameOver.value = true
+          //gameOver.value = true
+        removePlayer()
           return
         }
       }
@@ -706,7 +775,8 @@ export const usePlayStore = defineStore('play', () => {
         if (e.id !== params.playerId) {
           for (let i = 1; i < e.data.length; i++) {
             if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
-              gameOver.value = true
+              //gameOver.value = true
+              removePlayer()
               return
             }
           }
@@ -725,7 +795,8 @@ export const usePlayStore = defineStore('play', () => {
       players.value.forEach((e) => {
         if (e.id !== params.playerId) {
           if (head.x == e.data[0].x && head.y == e.data[0].y && !e.ghosted) {
-            gameOver.value = true
+            //gameOver.value = true
+        removePlayer()
             return
           }
         }
@@ -832,11 +903,9 @@ export const usePlayStore = defineStore('play', () => {
     }
   }
 
-  function deleteObstacle(x: number, y: number) {
-    //get rid of all obstacles placed in grid
-    console.log('wallDeleted')
-    gameGrid.value[x][y] == 'empty';
-  }
+  
+
+
 
   return {
     setGameMusic,
@@ -862,6 +931,7 @@ export const usePlayStore = defineStore('play', () => {
     leaveGame,
     initializeSocket,
     remainingTime,
-    saveUserDuelData
+    saveUserDuelData,
+    playerAlive
   }
 })

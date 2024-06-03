@@ -142,6 +142,8 @@ watchEffect(() => {
       <SgButton v-if="isCreator" @click="backToLobby()">Go back to lobby</SgButton>
     </div>
 
+    <div class="Spectate" v-if="playStore.playerAlive"></div>
+
     <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
 
     <div class="scoreboard">
