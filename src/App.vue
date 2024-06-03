@@ -66,6 +66,6 @@ if (socket) {
 main {
   flex: 1;
   position: relative;
-  max-height: 100vh;
+  max-height: 90vh;
 }
 </style>

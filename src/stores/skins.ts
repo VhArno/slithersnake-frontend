@@ -8,8 +8,8 @@ export const useSkinsStore = defineStore('skins', () => {
     const selectedSkin = ref<Skin>({
       id: 1,
       name: 'Skin 1',
-      imgHead: 'http://localhost:8080/storage/skin1_head.svg',
-      imgBody: 'http://localhost:8080/storage/skin1_body.svg'
+      imgHead: skins.value[0].imgHead,
+      imgBody: skins.value[1].imgBody
     })
 
     const loadSkins = () => {

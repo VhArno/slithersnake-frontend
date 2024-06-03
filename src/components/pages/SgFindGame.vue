@@ -103,7 +103,9 @@ function disabledBtn(): boolean {
           <td>{{ room.players.length }}</td>
           <td>{{ ping }}</td>
         </tr>
-        <p class="not-found" v-if="rooms === null || rooms.length <= 0">No game rooms found!</p>
+        <tr v-if="rooms === null || rooms.length <= 0">
+          <td colspan="6" class="not-found">No game rooms found!</td>
+        </tr>
       </table>
     </div>
     <div class="join-custom">

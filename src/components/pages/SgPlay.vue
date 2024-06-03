@@ -134,7 +134,7 @@ watchEffect(() => {
 <template>
   <section class="main-sec">
     <div class="countdown" v-if="timer > 0">
-      {{ timer }}
+      <p>{{ timer }}</p>
     </div>
 
     <div class="game-over countdown" v-if="playStore.gameOver">
@@ -191,11 +191,9 @@ watchEffect(() => {
 <style scoped lang="scss">
 .main-sec {
   position: relative;
-  position: relative;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
-  position: relative;
   margin-top: 2rem;
   gap: 2rem;
 
@@ -208,8 +206,13 @@ watchEffect(() => {
     color: white;
     font-size: 3rem;
     padding: 1rem 2rem;
-
+    text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+    p {
+      margin: 0.5rem;
+      text-align: center;
+    }
 
     button {
       font-size: 0.5em;
