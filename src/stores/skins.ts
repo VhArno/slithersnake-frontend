@@ -19,12 +19,12 @@ export const useSkinsStore = defineStore('skins', () => {
           return {
             id: record.id,
             name: record.name,
-            imgHead: record.image_head,
-            imgBody: record.image_body,
+            imgHead: import.meta.env.VITE_BASE_URL + record.image_head,
+            imgBody: import.meta.env.VITE_BASE_URL + record.image_body,
           }
         })
         skins.value?.push(...loadedMaps)
-        
+
         selectedSkin.value = {
           id: 1,
           name: 'Skin 1',
