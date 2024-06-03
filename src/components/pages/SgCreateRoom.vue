@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUrlSearchParams, useClipboard } from '@vueuse/core'
 import SgButton from '../atoms/SgButton.vue'
-import { computed, inject, ref, watchEffect } from 'vue'
+import { computed, inject, ref, watchEffect, onBeforeUnmount } from 'vue'
 import type { Room, Map, GameMode, Player } from '@/types/'
 import SgToast from '../atoms/SgToast.vue'
 import { v4 as uuidv4 } from 'uuid'
@@ -256,6 +256,19 @@ const leaveGame = async () => {
   await socket.emit('leaveRoom', socket.id)
   router.push('/')
 }
+
+// before leaving the page even if the user closes the tab or goes to previous page run socket.emit('leaveRoom')
+
+
+onBeforeUnmount(() => {
+  socket.off('evacuateRoom')
+  socket.off('gameBusy')
+  socket.off('joinedRoom')
+  socket.off('newCreator')
+  socket.off('playerLeft')
+  socket.off('players')
+  socket.off('settingsChanged')
+})
 </script>
 
 <template>

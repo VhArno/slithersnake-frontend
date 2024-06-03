@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, inject, watchEffect } from 'vue'
+import { ref, onMounted, inject, watchEffect, onBeforeUnmount} from 'vue'
 import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
@@ -129,6 +129,13 @@ watchEffect(() => {
     postUserData()
   }
 })
+
+onBeforeUnmount(() => {
+  socket.off('nextGameUrl')
+  socket.off('evacuateRoom')
+  socket.off('evacuateOthers')
+  socket.off('duelId')
+})
 </script>
 
 <template>
@@ -142,7 +149,7 @@ watchEffect(() => {
       <SgButton v-if="isCreator" @click="backToLobby()">Go back to lobby</SgButton>
     </div>
 
-    <SgGrid id="grid" :gameGrid="playStore.gameGrid"></SgGrid>
+    <SgGrid id="grid" :gameOver="playStore.gameOver" :countdown="timer > 0" :gameGrid="playStore.gameGrid"></SgGrid>
 
     <div class="scoreboard">
       <div v-if="playStore.remainingTime != 0">Time left: {{ playStore.remainingTime }}</div>
@@ -203,8 +210,8 @@ watchEffect(() => {
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
-    font-size: 3rem;
-    padding: 1rem 2rem;
+    font-size: 2rem;
+    padding: 1rem 1.5rem;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 
@@ -212,23 +219,6 @@ watchEffect(() => {
       margin: 0.5rem;
       text-align: center;
     }
-
-    button {
-      font-size: 0.5em;
-    }
-  }
-
-  .countdown {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    font-size: 3rem;
-    padding: 1rem 2rem;
-
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 
     button {
       font-size: 0.5em;

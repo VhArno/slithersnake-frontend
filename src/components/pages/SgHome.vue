@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import SgButton from '../atoms/SgButton.vue'
-import { inject, ref } from 'vue'
+import { inject, ref, onBeforeUnmount } from 'vue'
 import { Socket } from 'socket.io-client'
 import type { socketPlayer } from '@/types/'
 import { usePlayStore } from '@/stores/play'
@@ -42,8 +42,6 @@ socket.on('prepNewRoom', (playerSocketId: string) => {
 socket.on('roomExists', (roomId: string) => {
   // alert('Sending you to the room now!')
   redirecting.value = true
-  console.log('room exists')
-  console.log(roomId)
   setTimeout(() => {
     redirecting.value = false
     sessionStorage.removeItem('creator')
@@ -56,6 +54,12 @@ socket.on('roomDoesNotExist', (roomId) => {
   console.log(roomId)
   sessionStorage.setItem('creator', 'true')
   router.push('/create-room?id=' + roomId)
+})
+
+onBeforeUnmount(() => {
+  socket.off('prepNewRoom')
+  socket.off('roomExists')
+  socket.off('roomDoesNotExist')
 })
 </script>
 
