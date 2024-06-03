@@ -342,7 +342,13 @@ export const usePlayStore = defineStore('play', () => {
         if (e.id !== params.playerId) {
           e.data.forEach((segment) => {
             const { x, y } = segment
-            gameGrid.value[y][x] = 'enemy'
+
+            if(segment === e.data[0]) {
+              gameGrid.value[y][x] = 'enemy-head'
+            } else {
+              gameGrid.value[y][x] = 'enemy'
+            }
+            
             if (e.ghosted) {
               gameGrid.value[y][x] = 'ghostedEnemy'
             }
@@ -545,6 +551,19 @@ export const usePlayStore = defineStore('play', () => {
 
   // Lees toetsenbordinvoer
   onKeyStroke(keybinds.value.down, () => {
+    moveSnakeUp()
+  })
+  onKeyStroke(keybinds.value.up, () => {
+    moveSnakeDown()
+  })
+  onKeyStroke(keybinds.value.left, () => {
+    moveSnakeLeft()
+  })
+  onKeyStroke(keybinds.value.right, () => {
+    moveSnakeRight()
+  })
+
+  const moveSnakeUp = () => {
     //zorgt ervoor dat je niet kan verwisselen naar de tegenovergestelde richting
     if (!directionChanged.value) {
       if (direction.value === 'up') {
@@ -554,8 +573,9 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
-  onKeyStroke(keybinds.value.up, () => {
+  }
+
+  const moveSnakeDown = () => {
     if (!directionChanged.value) {
       if (direction.value === 'down') {
         return
@@ -564,8 +584,9 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
-  onKeyStroke(keybinds.value.left, () => {
+  }
+
+  const moveSnakeLeft = () => {
     if (!directionChanged.value) {
       if (direction.value === 'right') {
         return
@@ -574,8 +595,9 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
-  onKeyStroke(keybinds.value.right, () => {
+  }
+
+  const moveSnakeRight = () => {
     if (!directionChanged.value) {
       if (direction.value === 'left') {
         return
@@ -584,7 +606,7 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
+  }
 
   // Beweeg de slang
   function moveSnake() {
@@ -822,6 +844,10 @@ export const usePlayStore = defineStore('play', () => {
     leaveGame,
     initializeSocket,
     remainingTime,
-    saveUserDuelData
+    saveUserDuelData,
+    moveSnakeUp,
+    moveSnakeDown,
+    moveSnakeRight,
+    moveSnakeLeft
   }
 })

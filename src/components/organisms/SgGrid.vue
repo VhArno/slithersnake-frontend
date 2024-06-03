@@ -1,14 +1,19 @@
 <script setup lang="ts">
+import { usePlayStore } from '@/stores/play';
 import { useSkinsStore } from '@/stores/skins'
 import { storeToRefs } from 'pinia'
 import { defineProps } from 'vue'
 
 defineProps<{
+  gameOver: boolean
+  countdown: boolean
   gameGrid: string[][]
 }>()
 
 const skinStore = useSkinsStore()
 const { selectedSkin } = storeToRefs(skinStore)
+
+const playStore = usePlayStore()
 
 const handleKeyDown = (event: KeyboardEvent) => {
   if (
@@ -20,6 +25,23 @@ const handleKeyDown = (event: KeyboardEvent) => {
   ) {
     event.preventDefault()
   }
+}
+
+// mobile buttons
+const mobileRight = () => {
+  playStore.moveSnakeRight()
+}
+
+const mobileLeft = () => {
+  playStore.moveSnakeLeft()
+}
+
+const mobileUp = () => {
+  playStore.moveSnakeUp()
+}
+
+const mobileDown = () => {
+  playStore.moveSnakeDown()
 }
 </script>
 
@@ -49,6 +71,15 @@ const handleKeyDown = (event: KeyboardEvent) => {
         ]"
       ></div>
     </div>
+
+    <div class="mobile-btns" v-show="!gameOver && !countdown">
+      <button class="up" @click="mobileDown"><i class="fa-solid fa-up-long"></i></button>
+      <div>
+        <button class="left" @click="mobileLeft"><i class="fa-solid fa-left-long"></i></button>
+        <button class="down" @click="mobileUp"><i class="fa-solid fa-down-long"></i></button>
+        <button class="right" @click="mobileRight"><i class="fa-solid fa-right-long"></i></button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -77,10 +108,20 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background-repeat: no-repeat;
   background-size: cover;
   border: 10px solid green;
+  width: 100%;
+  max-width: max-content;
+}
+
+.enemy-head {
+  background-image: url('/src/assets/img/skinEnemy_head.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .enemy {
-  background-color: orange;
+  background-image: url('/src/assets/img/skinEnemy_body.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .ghostedSnakeHead {
@@ -140,8 +181,54 @@ p {
 }
 
 .cell {
-  width: 30px; /* Adjust based on desired cell size */
-  height: 30px; /* Adjust based on desired cell size */
+  width: 1rem; /* Adjust based on desired cell size */
+  height: 1rem; /* Adjust based on desired cell size */
   border: 1px solid #ffffff3b;
+}
+
+.mobile-btns {
+  display: flex;
+  flex-flow: column;
+  gap: 0.5rem;
+  position: absolute; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  justify-content: center;
+  align-items: center;
+  width: max-content;
+
+  > div {
+    display: flex;
+    flex-flow: row;
+    gap: 0.5rem;
+  }
+
+  button {
+    width: fit-content;
+    background-color: rgba(0, 0, 0, 0.568);
+    color: white;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: none;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+@media (min-width: 45em) {
+  .cell {
+    width: 30px; /* Adjust based on desired cell size */
+    height: 30px; /* Adjust based on desired cell size */
+    border: 1px solid #ffffff3b;
+  }
+
+  .mobile-btns {
+    display: none;
+  }
 }
 </style>
