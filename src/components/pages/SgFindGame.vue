@@ -23,7 +23,14 @@ const toggleSelectRoom = (room: Room) => {
   }
 }
 
-socket.emit('getRooms')
+function getRooms() {
+  socket.emit('getRooms')
+
+  setTimeout(getRooms, 10000)
+}
+
+getRooms()
+
 socket.on('rooms', (r: Room[]) => {
   console.log(r)
   rooms.value = r
