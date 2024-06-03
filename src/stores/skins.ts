@@ -25,12 +25,7 @@ export const useSkinsStore = defineStore('skins', () => {
         })
         skins.value?.push(...loadedMaps)
 
-        selectedSkin.value = {
-          id: 1,
-          name: 'Skin 1',
-          imgHead: skins.value[0].imgHead,
-          imgBody: skins.value[0].imgBody
-        }
+        selectedSkin.value = skins.value[0]
       })
       .catch((error) => console.error(error))
     }
