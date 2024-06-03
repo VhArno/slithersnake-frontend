@@ -153,6 +153,7 @@ onBeforeUnmount(() => {
 
     <div class="scoreboard">
       <div v-if="playStore.remainingTime != 0">Time left: {{ playStore.remainingTime }}</div>
+      <div class="Spectate" v-if="!playStore.playerAlive">Spectating</div>
       <div class="players">
         <h3>Scorebord</h3>
 
@@ -255,6 +256,10 @@ onBeforeUnmount(() => {
       display: flex;
       flex-flow: column;
       gap: 1rem;
+    }
+    .spectate {
+      font-size: 1.5rem;
+      text-align: right;
     }
   }
 }
