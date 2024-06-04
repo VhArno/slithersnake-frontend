@@ -8,6 +8,7 @@ import { useDateFormatter } from '@/composables/dateFormatter';
 
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
+authStore.tryAutoLogin()
 
 const winPerc = computed(() => {
   const gamesWon = user.value?.games_won ?? 0;
