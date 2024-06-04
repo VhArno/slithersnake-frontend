@@ -120,7 +120,7 @@ const postUserData = () => {
     playStore.saveUserDuelData({
       duel_id: duelId.value,
       score: playStore.score,
-      won: false,
+      won: winnerName.value === useAuthStore().user?.username ? true : false,
       kills: playStore.kills
     })
   }
