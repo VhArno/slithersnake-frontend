@@ -54,6 +54,7 @@ export const usePlayStore = defineStore('play', () => {
   const ghosted = ref<boolean>(false)
   const invisible = ref<boolean>(false)
 
+  const winnerName = ref<string>('')
   //time if limited-time mode is selected
   const remainingTime = ref<number>(0)
   //const PowerUp
@@ -207,6 +208,14 @@ export const usePlayStore = defineStore('play', () => {
     clearInterval(gameLoopInterval)
     clearInterval(socketInterval)
     clearInterval(timerInterval)
+
+    //check which player is still alive to give back winner
+    players.value.forEach((e) => {
+      if (e.alive) {
+        console.log('winner is ' + e.id)
+        winnerName.value = e.id
+      }
+    })
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
     gameMusic.value.pause()
@@ -220,23 +229,6 @@ export const usePlayStore = defineStore('play', () => {
     /*alert('game over!')
     restartGame()*/
   }
-
-  /*
-  socket?.on('someoneDied', (id) => {
-    console.log('inside player died from socket')
-    players.value.forEach((e) => {
-      console.log(players.value)
-      if (e.id === id) {
-        //e.invisible = true
-        e.data = []
-      }
-    })
-    if (id === params.playerId) {
-      //invisible.value = true
-      console.log('own snake died')
-      snake.value = []
-    }
-  })*/
 
   socket?.on('gameOver', (winningPlayerId: string) => {
     endGlobal()
@@ -937,6 +929,7 @@ export const usePlayStore = defineStore('play', () => {
       console.log('game ended')
       if(gameId === params.id)
       endGlobal()
+      
       //socket?.emit('gameOver', params.playerId)
       console.log(`Game Over! Player ${winnerId} wins!`)
     })
@@ -1002,6 +995,7 @@ export const usePlayStore = defineStore('play', () => {
     moveSnakeRight,
     moveSnakeLeft,
     playerAlive,
-    players
+    players,
+    winnerName
   }
 })

@@ -20,6 +20,7 @@ const gameStatus = ref<boolean>(false)
 
 const playStore = usePlayStore()
 const { players } = storeToRefs(playStore)
+const { winnerName } = storeToRefs(playStore)
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
 
@@ -147,6 +148,7 @@ onBeforeUnmount(() => {
 
     <div class="game-over countdown" v-if="playStore.gameOver">
       <p>Game over!</p>
+      <p>Winner is: {{ winnerName }}</p>
       <SgButton v-if="isCreator" @click="backToLobby()">Go back to lobby</SgButton>
     </div>
 
