@@ -259,6 +259,23 @@ const leaveGame = async () => {
 
 // before leaving the page even if the user closes the tab or goes to previous page run socket.emit('leaveRoom')
 
+// Chat functionality
+const messages = ref<{ playerId: string; message: string }[]>([])
+const chatMessage = ref('')
+
+// Listen for incoming chat messages
+socket.on('receiveMessage', (message: string, playerId: string) => {
+  messages.value.push({ playerId, message })
+})
+
+// Send a chat message
+const sendMessage = () => {
+  const params = useUrlSearchParams('history')
+  if (chatMessage.value.trim() !== '' && player.value && params.id) {
+    socket.emit('sendMessage', chatMessage.value, params.id, player.value.id)
+    chatMessage.value = ''
+  }
+}
 
 onBeforeUnmount(() => {
   socket.off('evacuateRoom')
@@ -341,16 +358,15 @@ onBeforeUnmount(() => {
     <div class="chatroom">
       <div class="chat-container">
         <div class="chat">
-          <p>Send a message...</p>       
+          <p v-for="(message, index) in messages" :key="index">{{ message }}</p>
         </div>
       </div>
-      <form class="chat-form">
+      <form class="chat-form" @submit.prevent="sendMessage">
         <div class="form-div">
           <label for="chat">Send chat message</label>
-          <input type="text" id="chat" name="chat">
+          <input type="text" id="chat" v-model="chatMessage" />
         </div>
-
-        <SgButton>Send chat</SgButton>
+        <SgButton type="submit">Send chat</SgButton>
       </form>
     </div>
   </section>
