@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, inject, watchEffect, onBeforeUnmount} from 'vue'
+import { ref, onMounted, inject, watchEffect, onBeforeUnmount } from 'vue'
 import { onKeyStroke, useUrlSearchParams } from '@vueuse/core'
 import { useSettingsStore } from '@/stores/settings'
 import { storeToRefs } from 'pinia'
@@ -19,6 +19,7 @@ const endGameSound = ref()
 const gameStatus = ref<boolean>(false)
 
 const playStore = usePlayStore()
+const { players } = storeToRefs(playStore)
 const settingsStore = useSettingsStore()
 const { volume } = storeToRefs(settingsStore)
 
@@ -149,19 +150,24 @@ onBeforeUnmount(() => {
       <SgButton v-if="isCreator" @click="backToLobby()">Go back to lobby</SgButton>
     </div>
 
-    <SgGrid id="grid" :gameOver="playStore.gameOver" :countdown="timer > 0" :gameGrid="playStore.gameGrid"></SgGrid>
+    <SgGrid
+      id="grid"
+      :gameOver="playStore.gameOver"
+      :countdown="timer > 0"
+      :gameGrid="playStore.gameGrid"
+    ></SgGrid>
 
     <div class="scoreboard">
       <div v-if="playStore.remainingTime != 0">Time left: {{ playStore.remainingTime }}</div>
       <div class="Spectate" v-if="!playStore.playerAlive">Spectating</div>
       <div class="players">
         <h3>Scorebord</h3>
-
-        <div class="player-1">
-          <p>Jij (lvl. {{ useAuthStore().user?.level }})</p>
-          <span>{{ playStore.score }}</span>
-        </div>
-        <!-- Andere spelerscores -->
+        <!-- <p>Jij (lvl. {{ useAuthStore().user?.level }})</p> -->
+        <!--<span>{{ playStore.score }}</span>-->
+        <li v-for="player in players" :key="player.id">
+          {{ player.username }} (lvl. <span>{{ player.level }}</span
+          >)
+        </li>
       </div>
 
       <div class="score-settings">

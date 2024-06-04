@@ -983,6 +983,7 @@ export const usePlayStore = defineStore('play', () => {
     moveSnakeDown,
     moveSnakeRight,
     moveSnakeLeft,
-    playerAlive
+    playerAlive,
+    players
   }
 })
