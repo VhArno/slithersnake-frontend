@@ -272,74 +272,97 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="create">
-    <div>
-      <SgToast v-if="showToast" :content="'Game link copied!'" :duration="5000"></SgToast>
-    </div>
-
-    <div class="settings">
-      <div class="bg-gray players">
-        <h2>Players</h2>
-        <ul class="player-list">
-          <li v-for="player in players" :key="player.id">
-            {{ player.username }} (lvl. <span>{{ player.level }}</span
-            >)
-          </li>
-        </ul>
-        <div>
-          <SgButton @click="invite">Invite</SgButton>
-        </div>
+  <section class="create-room">
+    <div class="create">
+      <div>
+        <SgToast v-if="showToast" :content="'Game link copied!'" :duration="5000"></SgToast>
       </div>
 
-      <div class="bg-gray options">
-        <h2>Game options</h2>
-        <div class="game-options">
+      <div class="settings">
+        <div class="bg-gray players">
+          <h2>Players</h2>
+          <ul class="player-list">
+            <li v-for="player in players" :key="player.id">
+              {{ player.username }} (lvl. <span>{{ player.level }}</span
+              >)
+            </li>
+          </ul>
           <div>
-            <h3>Map</h3>
-            <div class="map-select">
-              <SgButton v-if="creator" @click="prevMap" class="select-btn"
-                ><i class="fa-solid fa-chevron-left"></i
-              ></SgButton>
-              <div class="maps">
-                <div>
-                  <p>{{ selectedMap?.name }}</p>
-                  <img :src="selectedMap?.image" alt="map image" />
-                </div>
-              </div>
-              <SgButton v-if="creator" @click="nextMap" class="select-btn"
-                ><i class="fa-solid fa-chevron-right"></i
-              ></SgButton>
-            </div>
+            <SgButton @click="invite">Invite</SgButton>
           </div>
-          <div>
-            <h3>Gamemode</h3>
-            <div class="gamemode-select">
-              <SgButton v-if="creator" @click="prevMode" class="select-btn"
-                ><i class="fa-solid fa-chevron-left"></i
-              ></SgButton>
-              <div class="gamemodes">
-                <div>
-                  <p>{{ selectedMode?.name }}</p>
-                  <img :src="selectedMode?.image" alt="mode image" />
+        </div>
+
+        <div class="bg-gray options">
+          <h2>Game options</h2>
+          <div class="game-options">
+            <div>
+              <h3>Map</h3>
+              <div class="map-select">
+                <SgButton v-if="creator" @click="prevMap" class="select-btn"
+                  ><i class="fa-solid fa-chevron-left"></i
+                ></SgButton>
+                <div class="maps">
+                  <div>
+                    <p>{{ selectedMap?.name }}</p>
+                    <img :src="selectedMap?.image" alt="map image" />
+                  </div>
                 </div>
+                <SgButton v-if="creator" @click="nextMap" class="select-btn"
+                  ><i class="fa-solid fa-chevron-right"></i
+                ></SgButton>
               </div>
-              <SgButton v-if="creator" @click="nextMode" class="select-btn"
-                ><i class="fa-solid fa-chevron-right"></i
-              ></SgButton>
+            </div>
+            <div>
+              <h3>Gamemode</h3>
+              <div class="gamemode-select">
+                <SgButton v-if="creator" @click="prevMode" class="select-btn"
+                  ><i class="fa-solid fa-chevron-left"></i
+                ></SgButton>
+                <div class="gamemodes">
+                  <div>
+                    <p>{{ selectedMode?.name }}</p>
+                    <img :src="selectedMode?.image" alt="mode image" />
+                  </div>
+                </div>
+                <SgButton v-if="creator" @click="nextMode" class="select-btn"
+                  ><i class="fa-solid fa-chevron-right"></i
+                ></SgButton>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="controls">
+        <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
+        <SgButton v-if="creator" @click="startGame">Start game</SgButton>
+        <SgButton @click="leaveGame">Leave game</SgButton>
+      </div>
     </div>
-    <div class="controls">
-      <SgSoundRange class="sound-range" v-model:modelValue="volume"></SgSoundRange>
-      <SgButton v-if="creator" @click="startGame">Start game</SgButton>
-      <SgButton @click="leaveGame">Leave game</SgButton>
+    <div class="chatroom">
+      <div class="chat-container">
+        <div class="chat">
+          <p>Send a message...</p>       
+        </div>
+      </div>
+      <form class="chat-form">
+        <div class="form-div">
+          <label for="chat">Send chat message</label>
+          <input type="text" id="chat" name="chat">
+        </div>
+
+        <SgButton>Send chat</SgButton>
+      </form>
     </div>
   </section>
 </template>
 
 <style scoped lang="scss">
+.create-room {
+  display: flex;
+  flex-flow: column;
+  gap: 1rem;
+}
+
 .create {
   display: flex;
   flex-flow: column;
@@ -414,10 +437,62 @@ onBeforeUnmount(() => {
   }
 }
 
+.chatroom {
+  display: flex;
+  flex-flow: column;
+  gap: 1rem;
+  width: 80%;
+  margin: 1rem auto;
+  padding: 1rem;
+  border-radius: 10px;
+  color: var(--default-text-dark);
+  background-color: var(--bg2-dark);
+
+  .chat-container {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: var(--dark-gray);
+    min-height: 5rem;
+    max-height: 15rem;
+    border-radius: 10px;
+
+    .chat {
+      padding: 0.5rem;
+      width: 100%;
+      max-width: max-content;
+    }
+  }
+
+  .chat-form {
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+
+    .form-div {
+      display: flex;
+      flex-flow: column;
+
+      input[type='text'] {
+        padding: 0.5rem;
+        border-radius: 10px;
+        border: none;
+      }
+    }
+  }
+}
+
 /* BREAKPOINTS */
 @media (width >=65em) {
+  .create-room {
+    display: flex;
+    flex-flow: row;
+    gap: 2rem;
+    width: 90%;
+    margin: auto;
+  }
+
   .create {
-    width: 60%;
     margin: 2rem auto;
 
     .settings {
@@ -437,6 +512,19 @@ onBeforeUnmount(() => {
 
     .sound-range {
       width: 30%;
+    }
+  }
+
+  .chatroom {
+    display: flex;
+    flex-flow: column;
+    max-width: 15rem;
+    margin: 2rem auto;
+    justify-content: space-between;
+
+    .chat-container {
+      height: 100%;
+      max-height: 100%;
     }
   }
 }
