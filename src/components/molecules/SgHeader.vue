@@ -1,103 +1,179 @@
 <script setup lang="ts">
+import router from '@/router'
 import { useAuthStore } from '@/stores/auth';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
+const openMenu = ref(false)
+const windowWidth = ref(window.innerWidth)
 
+const thresholdWidthEm = 45
+
+function goToLogin() {
+  router.push({ name: 'login' })
+}
+
+function goToProfile() {
+  router.push({ name: 'profile' })
+}
+
+function toggleMenu() {
+  openMenu.value = !openMenu.value
+}
+
+function handleResize() {
+  windowWidth.value = window.innerWidth
+  if (window.innerWidth / 16 > thresholdWidthEm) {
+    openMenu.value = true
+  } else {
+    openMenu.value = false
+  }
+}
+
+onMounted(() => {
+  openMenu.value = window.innerWidth >= 45 ? true : false
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+})
+
+watch(windowWidth, (newValue) => {
+  if (newValue / 16 > thresholdWidthEm) {
+    openMenu.value = true
+  } else {
+    openMenu.value = false
+  }
+})
 </script>
 <template>
     <nav>
-    <button aria-expanded="false" class="toggle hamburger hidden" id="menu">
-        <span aria-hidden="true" class="icon">
-        <span></span><span></span><span></span>
-        </span>
-    </button>
-    <RouterLink to="/" id="logo" href="/" aria-label="logo" tabindex="0">
-        <h1>Slithersnake</h1>
-    </RouterLink>
-    <ul class="menu-list">
-        <li><RouterLink v-if="useAuthStore().isAuthenticated" :to="{ name: 'profile'}">profile <i class="fa-solid fa-user"></i></RouterLink></li>
-        <li><RouterLink v-if="!useAuthStore().isAuthenticated" :to="{ name: 'login'}">Login<i class="fa-solid fa-right-to-bracket"></i></RouterLink></li>
-        <li><RouterLink :to="{ name: 'settings'}">Settings <i class="fa-solid fa-gear"></i></RouterLink></li>
-    </ul>
+        <button @click="toggleMenu" aria-expanded="false" class="toggle hamburger" id="menu">
+            <span aria-hidden="true" class="icon">
+            <span></span><span></span><span></span>
+            </span>
+        </button>
+
+        <RouterLink to="/" id="logo" href="/" aria-label="logo" tabindex="0">
+            <h1>Slithersnake</h1>
+        </RouterLink>
+
+        <div v-show="openMenu" class="menu-items">
+            <ul class="menu-list">
+                <li>
+                    <RouterLink :to="{ name: 'leaderboard'}">Leaderboard <i class="fa-solid fa-trophy"></i></RouterLink>
+                </li>
+                <li v-if="useAuthStore().isAuthenticated">
+                    <RouterLink :to="{ name: 'profile'}">Profile <i class="fa-solid fa-user"></i></RouterLink>
+                </li>
+                <li v-if="!useAuthStore().isAuthenticated">
+                    <RouterLink :to="{ name: 'login'}">Login<i class="fa-solid fa-right-to-bracket"></i></RouterLink>
+                </li>
+                <li>
+                    <RouterLink :to="{ name: 'settings'}">Settings <i class="fa-solid fa-gear"></i></RouterLink>
+                </li>
+            </ul>
+        </div>
     </nav>
 </template>
 
 <style scoped lang="scss">
 nav {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+
+  #logo {
+    order: -1;
+  }
+
+  .menu-items {
+    width: 100%;
+    padding-left: 2rem;
     display: flex;
-    flex-flow: row;
-    justify-content: space-between;
-    align-items: center;
+    flex-flow: column;
 
     .menu-list {
-        list-style-type: none;
+      display: flex;
+      flex-flow: column;
+      gap: 0.5rem;
+      list-style-type: none;
+      padding: 0;
+
+      li {
         display: flex;
         flex-flow: row;
-        gap: 1rem;
-        padding: 0;
+        align-items: center;
 
-        li a {
-            display: flex;
-            flex-flow: row;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5em;
-            text-decoration: none;
+        i {
+          margin-left: 0.2rem;
+          font-size: 1em;
+        }
+
+        a {
+            font-size: 1.2em;
             color: var(--default-text-dark);
+            text-decoration: none;
 
             &:hover {
                 text-decoration: underline;
+                color: var(--accent-light);
             }
         }
-        
-        i {
-            color: var(--default-text-dark);
-            font-size: 24px;
-        }
+      }
     }
+
+    .menu-btn {
+      margin-top: 0.5rem;
+    }
+  }
+
+  .hamburger {
+    background-color: transparent;
+    border: none;
+
+    .icon {
+      display: flex;
+      flex-flow: column;
+      cursor: pointer;
+
+      span {
+        display: block;
+        width: 20px;
+        border: 2px solid var(--default-text-dark);
+        margin: 3px auto;
+      }
+    }
+  }
 }
 
-/* Hamburger */
-.hamburger {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
-    transition: all;
-    border: none;
-    background-color: transparent;
-    color: var(--main);
-    font-weight: bold;
-    cursor: pointer;
-}
-  
-.icon {
-    display: inline-block;
-    cursor: pointer;
-}
-  
-.icon span {
-    display: block;
-    width: 25px;
-    height: 3px;
-    margin: 5px auto;
-    transition: all 0.5s;
-    background-color: var(--accent);
-}
-  
-.visible {
-    animation: show-menu 0.4s ease-in-out forwards;
-}
-  
-.hamburger[aria-expanded="true"] .icon span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-}
-  
-.hamburger[aria-expanded="true"] .icon span:nth-child(2) {
-    opacity: 0;
-}
-  
-.hamburger[aria-expanded="true"] .icon span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-    background-color: var(--accent);
+@media (min-width: 45em) {
+  nav {
+    flex-flow: row nowrap;
+    gap: 3rem;
+
+    .menu-items {
+        flex-flow: row;
+        justify-content: end;
+        align-items: center;
+        width: 100%;
+
+        .menu-list {
+            flex-flow: row;
+            gap: 3rem;
+        }
+
+        .menu-btn {
+            display: block;
+            margin: 0;
+        }
+    }
+
+    .hamburger {
+      display: none;
+    }
+  }
 }
 </style>

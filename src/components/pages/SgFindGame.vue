@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import SgButton from '../atoms/SgButton.vue'
 import type { Room } from '@/types/'
 import { useRouter } from 'vue-router'
@@ -23,7 +23,18 @@ const toggleSelectRoom = (room: Room) => {
   }
 }
 
-socket.emit('getRooms')
+function getRooms() {
+  // emit only if the user is on this page
+  if (router.currentRoute.value.path !== '/find-game') {
+    return
+  }
+  socket.emit('getRooms')
+
+  setTimeout(getRooms, 5000)
+}
+
+getRooms()
+
 socket.on('rooms', (r: Room[]) => {
   console.log(r)
   rooms.value = r
@@ -65,7 +76,7 @@ const joinRoom = () => {
   }
 
   if (roomId !== null) {
-    router.push('/create-room?id=' + roomId)
+    router.push(`/create-room?id=${roomId}`)  
   }
 }
 
@@ -76,6 +87,14 @@ function disabledBtn(): boolean {
 
   return true
 }
+
+onBeforeUnmount(() => {
+  socket.off('rooms')
+  socket.off('newRoom')
+  socket.off('ping')
+  socket.off('pong')
+  socket.off('getRooms')
+})
 </script>
 
 <template>
@@ -100,10 +119,12 @@ function disabledBtn(): boolean {
           <td>{{ room.name }}</td>
           <td>{{ room.map.name }}</td>
           <td>{{ room.mode.name }}</td>
-          <td>{{ room.players.length }}</td>
+          <td>{{ room.players.length }}/4</td>
           <td>{{ ping }}</td>
         </tr>
-        <p class="not-found" v-if="rooms === null || rooms.length <= 0">No game rooms found!</p>
+        <tr v-if="rooms === null || rooms.length <= 0">
+          <td colspan="6" class="not-found">No game rooms found!</td>
+        </tr>
       </table>
     </div>
     <div class="join-custom">

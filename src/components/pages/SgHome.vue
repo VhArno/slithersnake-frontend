@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import SgButton from '../atoms/SgButton.vue'
-import { inject, ref } from 'vue'
+import { inject, ref, onBeforeUnmount } from 'vue'
 import { Socket } from 'socket.io-client'
 import type { socketPlayer } from '@/types/'
 import { usePlayStore } from '@/stores/play'
@@ -42,8 +42,6 @@ socket.on('prepNewRoom', (playerSocketId: string) => {
 socket.on('roomExists', (roomId: string) => {
   // alert('Sending you to the room now!')
   redirecting.value = true
-  console.log('room exists')
-  console.log(roomId)
   setTimeout(() => {
     redirecting.value = false
     sessionStorage.removeItem('creator')
@@ -56,6 +54,12 @@ socket.on('roomDoesNotExist', (roomId) => {
   console.log(roomId)
   sessionStorage.setItem('creator', 'true')
   router.push('/create-room?id=' + roomId)
+})
+
+onBeforeUnmount(() => {
+  socket.off('prepNewRoom')
+  socket.off('roomExists')
+  socket.off('roomDoesNotExist')
 })
 </script>
 
@@ -83,8 +87,9 @@ socket.on('roomDoesNotExist', (roomId) => {
 .main-window {
   background-image: url('/src/assets/img/SgBackground.jpg');
   background-size: cover;
-  height: 76vh;
+  height: 74vh;
   padding-top: 10rem;
+  overflow: hidden;
 
   .redirecting {
     position: fixed; /* Stay in place */
@@ -140,7 +145,7 @@ socket.on('roomDoesNotExist', (roomId) => {
   .main-window {
     padding: 5rem 0rem;
     background-size: cover;
-    height: 76vh;
+    overflow: hidden;
 
     .main-menu {
       width: 30%;

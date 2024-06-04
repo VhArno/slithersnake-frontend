@@ -8,21 +8,24 @@ export const useSkinsStore = defineStore('skins', () => {
     const selectedSkin = ref<Skin>({
       id: 1,
       name: 'Skin 1',
-      imgHead: 'http://localhost:8080/storage/skin1_head.svg',
-      imgBody: 'http://localhost:8080/storage/skin1_body.svg'
+      imgHead: '',
+      imgBody: ''
     })
 
     const loadSkins = () => {
+      console.log('loading skins')
       getSkins<ApiResponse>().then((response) => {
         const loadedMaps: Skin[] = response.data.data.map((record: any) => {
           return {
             id: record.id,
             name: record.name,
-            imgHead: record.image_head,
-            imgBody: record.image_body,
+            imgHead: import.meta.env.VITE_BASE_URL + record.image_head,
+            imgBody: import.meta.env.VITE_BASE_URL + record.image_body,
           }
         })
         skins.value?.push(...loadedMaps)
+
+        selectedSkin.value = skins.value[0]
       })
       .catch((error) => console.error(error))
     }

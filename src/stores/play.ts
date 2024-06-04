@@ -6,10 +6,7 @@ import { storeToRefs } from 'pinia'
 import type { Character, PowerUp, IngamePlayer, PostUserDuelPayload } from '@/types'
 import { useCharStore } from './char'
 import { useRouter } from 'vue-router'
-import { usePowerUpStore } from './powerups'
 import { io, Socket } from 'socket.io-client'
-import { useGamemodesStore } from './gamemodes'
-import { useMapsStore } from './maps'
 import { postUserDuel } from '@/services/dataService'
 
 let socket: Socket | null = null
@@ -41,6 +38,7 @@ export const usePlayStore = defineStore('play', () => {
   const numRows = 20 // Aantal rijen
   const numCols = 20 // Aantal kolommen
   const players = ref<IngamePlayer[]>([])
+  const playerCount = ref<number>(0)
   const gameGrid = ref<Array<Array<string>>>([]) // Speelveld data
   const snake = ref<Array<{ x: number; y: number }>>([]) // Lichaam van de slang
   const food = ref<{ x: number; y: number }>({ x: 10, y: 10 })
@@ -48,6 +46,7 @@ export const usePlayStore = defineStore('play', () => {
   const score = ref(0)
   const kills = ref(0)
   const gameOver = ref(false)
+  const playerAlive = ref<boolean>(true)
   const powerUpAvailable = ref<boolean>(false)
   const powerUpActive = ref<boolean>(false)
   const interval = ref<number>(10)
@@ -73,9 +72,12 @@ export const usePlayStore = defineStore('play', () => {
   const obstacles = ref<Array<{ x: number; y: number }>>([])
   const teleports = ref<boolean>(false)
 
+  /*
   function addObstacle(x: number, y: number) {
     obstacles.value.push({ x, y })
   }
+  */
+ 
   function initializeSocket(s: Socket) {
     socket = s
   }
@@ -84,6 +86,7 @@ export const usePlayStore = defineStore('play', () => {
   function initializeGame() {
     params = useUrlSearchParams('history')
     players.value = JSON.parse(sessionStorage.getItem('players')!)
+    playerCount.value = players.value.length
     console.log(params.playerId)
     console.log(players.value)
     //Sla de geselecteerde character op
@@ -95,6 +98,9 @@ export const usePlayStore = defineStore('play', () => {
     gameGrid.value = Array.from({ length: numRows }, () =>
       Array.from({ length: numCols }, () => 'empty')
     )
+
+    // make obstacles ref empty
+    obstacles.value = []
 
     // spawn slang
     let startX = Math.floor(numCols / 2)
@@ -108,6 +114,7 @@ export const usePlayStore = defineStore('play', () => {
       //generateWalls()
     }*/
 
+    // Spawn players on edges of the grid
     for (let i = 0; i < players.value.length; i++) {
       if (players.value[0].id === params.playerId) {
         // startX = Math.floor(numCols / (2 + players.value.length * i))
@@ -152,17 +159,57 @@ export const usePlayStore = defineStore('play', () => {
     }
   }
 
-  //eindigt de game
+  //eindigt de game ALLEEN VOOR DE GEBRUIKER en wordt spectator
   const endGame = () => {
-    console.log('game over')
+    if(playerAlive.value){
+      console.log('game over')
+    playerAlive.value = false
+    //clearInterval(gameLoopInterval)
+    //clearInterval(socketInterval)
+    //clearInterval(timerInterval)
+    // Toon een game over bericht of handel het einde van het spel af
+    // Pause game music
+    gameMusic.value.pause()
+    //send player id and game id
+    //socket?.emit('playerDied', params.playerId, params.gameId)
+    console.log('emitting player died' + params.playerId + " " + params.id)
+    socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
+    // Play end game sound
+    endGameSound.value.currentTime = 0
+    endGameSound.value.play().catch(() => {
+      console.error('Something went wrong')
+    })
+
+    //removePlayer()
+
+    /*alert('game over!')
+    restartGame()*/
+    } else {
+      console.log('player already dead')
+    }
+  }
+
+  //
+  //end game for everyone
+  //
+  /*
+  socket?.on('endGame', (winnerId, gameId) => {
+    console.log('game ended')
+    if(gameId === params.id)
+    endGlobal()
+    //socket?.emit('gameOver', params.playerId)
+    console.log(`Game Over! Player ${winnerId} wins!`)
+  })*/
+
+  const endGlobal = () => {
+    console.log('inside endglobal')
+    gameOver.value = true
     clearInterval(gameLoopInterval)
     clearInterval(socketInterval)
     clearInterval(timerInterval)
     // Toon een game over bericht of handel het einde van het spel af
     // Pause game music
     gameMusic.value.pause()
-
-    socket?.emit('gameOver', params.id)
 
     // Play end game sound
     endGameSound.value.currentTime = 0
@@ -172,6 +219,44 @@ export const usePlayStore = defineStore('play', () => {
 
     /*alert('game over!')
     restartGame()*/
+  }
+
+  /*
+  socket?.on('someoneDied', (id) => {
+    console.log('inside player died from socket')
+    players.value.forEach((e) => {
+      console.log(players.value)
+      if (e.id === id) {
+        //e.invisible = true
+        e.data = []
+      }
+    })
+    if (id === params.playerId) {
+      //invisible.value = true
+      console.log('own snake died')
+      snake.value = []
+    }
+  })*/
+
+  socket?.on('gameOver', (winningPlayerId: string) => {
+    endGlobal()
+    console.log(`Game Over! Player ${winningPlayerId} wins!`)
+  })
+
+
+  function removePlayer() {
+    //playerAlive.value = false
+    console.log('inside removeplayer')
+    if(playerAlive.value){
+      endGame()
+      console.log('player died')
+
+    //snake.value = [] // Assign an empty array to snake.value
+    //socket?.emit('sendPlayerData', snake.value, params.playerId)
+
+    //socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
+    }
+    
   }
 
   //herstart de game
@@ -191,6 +276,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('generateFood', foodX, foodY)
   }
 
+  /*
   function generateWalls() {
     // Add some obstacles
     const numObstacles = Math.max(15, Math.floor(Math.random() * 6) + 1) // Random number of obstacles between 1 and 6, but at least 15
@@ -199,7 +285,7 @@ export const usePlayStore = defineStore('play', () => {
       const obstacleY = Math.floor(Math.random() * numRows)
       addObstacle(obstacleX, obstacleY)
     }
-  }
+  }*/
 
   //logica van speedboost powerUp
   const speedBoost = function () {
@@ -358,7 +444,13 @@ export const usePlayStore = defineStore('play', () => {
         if (e.id !== params.playerId) {
           e.data.forEach((segment) => {
             const { x, y } = segment
-            gameGrid.value[y][x] = 'enemy'
+
+            if(segment === e.data[0]) {
+              gameGrid.value[y][x] = 'enemy-head'
+            } else {
+              gameGrid.value[y][x] = 'enemy'
+            }
+            
             if (e.ghosted) {
               gameGrid.value[y][x] = 'ghostedEnemy'
             }
@@ -385,7 +477,9 @@ export const usePlayStore = defineStore('play', () => {
     // })
     // console.log(socket)
     socketInterval = setInterval(() => {
-      socket?.emit('sendPlayerData', snake.value, params.playerId)
+      if(playerAlive.value){
+        socket?.emit('sendPlayerData', snake.value, params.playerId)
+      }
       socket?.emit('getPlayerData')
 
       if (!gameOver.value) {
@@ -396,6 +490,7 @@ export const usePlayStore = defineStore('play', () => {
     }, 50)
 
     socket?.on('getData', (snake) => {
+      
       if (params.playerId !== snake.id) {
         // console.log('enemy snake moved!')
         // console.log(snake)
@@ -412,14 +507,43 @@ export const usePlayStore = defineStore('play', () => {
     // socket?.on('sendData', () => {
     //   console.log('player data sent')
     // })
+    socket?.on('someoneDied', (id) => {
+      console.log('inside player died from socket')
+      players.value.forEach((e) => {
+      console.log(players.value)
+      if (e.id === id) {
+        //e.invisible = true
+        e.alive = false
+        e.data = []
+        console.log('other player died')
+      }
+      })
+      if (id === params.playerId) {
+      //invisible.value = true
+      console.log('own snake died')
+      snake.value = []
+      playerAlive.value = false
+      //put yourself as alive false in players by checking id
+      players.value.forEach((e) => {
+        if (e.id === params.playerId) {
+          e.alive = false
+        }
+      })
+      }
+    })
   }
 
   // Start de game loop om de spelstatus bij te werken
   function startGameLoop() {
     startInterval()
+    //deleting all walls incase they were placed last round
     //checking modes and maps and listening to server to run logic
-    socket?.emit('checkModeMap')
+    socket?.emit('checkModeMap',  params.id)
 
+    //reset all players alive in the server aswell in case they are still in the same lobby
+    socket?.emit('resetPlayersAlive', params.id)
+    
+    playerAlive.value = true
     //if the gamemode is limited-time
     socket?.on('setTimeLimit', () => {
       remainingTime.value = 3 * 60
@@ -427,15 +551,11 @@ export const usePlayStore = defineStore('play', () => {
     })
 
     // Listen for the walls event from the server
-    socket?.on('wallsGenerated', (walls: any) => {
-      console.log('Walls received from server:', walls)
-
-      // Place each wall received from the server using addObstacle
-      walls.forEach((wall: { x: number; y: number }) => {
-        addObstacle(wall.x, wall.y)
-      })
-    })
-
+    socket?.on('wallsGenerated', (walls: Array<{ x: number; y: number }>) => {
+    console.log('Walls received from server:', obstacles);
+    obstacles.value = walls
+    });
+    
     socket?.on('generatePowerUps', () => {
       powerUpTimeOut = setTimeout(() => {
         if (players.value[0].id === params.playerId) {
@@ -456,19 +576,12 @@ export const usePlayStore = defineStore('play', () => {
     }
     */
 
+     socket?.on('teleportFalse', () => {
+      teleports.value = false
+     })
+
     // Genereer eerste voedsel
     generateFood()
-
-    /*
-    genereer powerUp indien powerup mode is selected
-    if (selectedMode.value && selectedMode.value.name === 'power-ups') {
-      powerUpTimeOut = setTimeout(() => {
-        if (players.value[0].id === params.playerId) {
-          generatePowerUp()
-        }
-      }, 5000)
-    }
-    */
 
     socket?.on('showFood', (foodX, foodY) => {
       food.value = { x: foodX, y: foodY }
@@ -541,17 +654,20 @@ export const usePlayStore = defineStore('play', () => {
 
     gameLoopInterval = setInterval(
       () => {
-        if (!gameOver.value) {
+        if (playerAlive.value) {
           directionChanged.value = false
           checkCollisions()
           moveSnake()
           checkCollisions()
-          if (!gameOver.value) {
-            updateGameGrid()
-          }
-        } else {
-          endGame()
+        } 
+        if (!gameOver.value) {
+          updateGameGrid()
         }
+        
+        /*else {
+          console.log('calling endgame from inside interval constantly')
+          endGame()
+        }*/
       },
       2000 / (interval.value * 2)
     ) // Pas de snelheid aan door de intervaltijd te veranderen
@@ -559,6 +675,19 @@ export const usePlayStore = defineStore('play', () => {
 
   // Lees toetsenbordinvoer
   onKeyStroke(keybinds.value.down, () => {
+    moveSnakeUp()
+  })
+  onKeyStroke(keybinds.value.up, () => {
+    moveSnakeDown()
+  })
+  onKeyStroke(keybinds.value.left, () => {
+    moveSnakeLeft()
+  })
+  onKeyStroke(keybinds.value.right, () => {
+    moveSnakeRight()
+  })
+
+  const moveSnakeUp = () => {
     //zorgt ervoor dat je niet kan verwisselen naar de tegenovergestelde richting
     if (!directionChanged.value) {
       if (direction.value === 'up') {
@@ -568,8 +697,9 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
-  onKeyStroke(keybinds.value.up, () => {
+  }
+
+  const moveSnakeDown = () => {
     if (!directionChanged.value) {
       if (direction.value === 'down') {
         return
@@ -578,8 +708,9 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
-  onKeyStroke(keybinds.value.left, () => {
+  }
+
+  const moveSnakeLeft = () => {
     if (!directionChanged.value) {
       if (direction.value === 'right') {
         return
@@ -588,8 +719,9 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
-  onKeyStroke(keybinds.value.right, () => {
+  }
+
+  const moveSnakeRight = () => {
     if (!directionChanged.value) {
       if (direction.value === 'left') {
         return
@@ -598,7 +730,7 @@ export const usePlayStore = defineStore('play', () => {
         directionChanged.value = true
       }
     }
-  })
+  }
 
   // Beweeg de slang
   function moveSnake() {
@@ -667,7 +799,8 @@ export const usePlayStore = defineStore('play', () => {
     // Controleer botsingen met de randen van het speelveld en niet controleren als de map teleports is
     if (!teleports.value) {
       if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
-        gameOver.value = true
+        //gameOver.value = true
+        removePlayer()
         return
       }
     }
@@ -676,7 +809,8 @@ export const usePlayStore = defineStore('play', () => {
       //controleer op botsing met obstacles
       obstacles.value.forEach((obstacle) => {
         if (head.x === obstacle.x && head.y === obstacle.y) {
-          gameOver.value = true
+          //gameOver.value = true
+        removePlayer()
           return
         }
       })
@@ -684,7 +818,8 @@ export const usePlayStore = defineStore('play', () => {
       // Controleer botsingen met zichzelf
       for (let i = 1; i < snake.value.length; i++) {
         if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
-          gameOver.value = true
+          //gameOver.value = true
+        removePlayer()
           return
         }
       }
@@ -695,7 +830,8 @@ export const usePlayStore = defineStore('play', () => {
         if (e.id !== params.playerId) {
           for (let i = 1; i < e.data.length; i++) {
             if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
-              gameOver.value = true
+              //gameOver.value = true
+              removePlayer()
               return
             }
           }
@@ -709,12 +845,14 @@ export const usePlayStore = defineStore('play', () => {
       //   }
       // }
 
-      // Controleer botsingen met andere snake head
+      // Controleer botsingen met andere snake head 
+      //alleen controleren op spelers die nog leven
 
       players.value.forEach((e) => {
-        if (e.id !== params.playerId) {
+        if (e.id !== params.playerId && e.alive) {
           if (head.x == e.data[0].x && head.y == e.data[0].y && !e.ghosted) {
-            gameOver.value = true
+            //gameOver.value = true
+        removePlayer()
             return
           }
         }
@@ -752,22 +890,26 @@ export const usePlayStore = defineStore('play', () => {
       gameGrid.value[powerUp.value.y][powerUp.value.x] = 'empty'
     }
 
+    //hier is de error na dood
     // Plaats de slangen op het speelveld
-    snake.value.forEach((segment) => {
-      if (segment === snake.value[0]) {
-        const { x, y } = segment
-        gameGrid.value[y][x] = 'snake-head'
-        if (ghosted.value) {
-          gameGrid.value[y][x] = 'ghostedSnakeHead'
+
+    if(playerAlive.value){
+      snake.value.forEach((segment) => {
+        if (segment === snake.value[0]) {
+          const { x, y } = segment
+          gameGrid.value[y][x] = 'snake-head'
+          if (ghosted.value) {
+            gameGrid.value[y][x] = 'ghostedSnakeHead'
+          }
+        } else {
+          const { x, y } = segment
+          gameGrid.value[y][x] = 'snake'
+          if (ghosted.value) {
+            gameGrid.value[y][x] = 'ghostedSnake'
+          }
         }
-      } else {
-        const { x, y } = segment
-        gameGrid.value[y][x] = 'snake'
-        if (ghosted.value) {
-          gameGrid.value[y][x] = 'ghostedSnake'
-        }
-      }
-    })
+      })
+    }
 
     moveEnemySnake()
 
@@ -775,10 +917,28 @@ export const usePlayStore = defineStore('play', () => {
     const { x, y } = food.value
     gameGrid.value[y][x] = 'food'
 
+    //do a check for each X Y on the grid if the gamegrid.value is ibstacle make it empty
+    /*
+    for (let i = 0; i < numRows; i++) {
+      for (let j = 0; j < numCols; j++) {
+        if (gameGrid.value[i][j] === 'obstacles') {
+          deleteObstacle(i,j);
+        }
+      }
+    }*/
+
     //Zet obstakels op het speelveld indien nodig
     obstacles.value.forEach((obstacle) => {
       const { x, y } = obstacle
       gameGrid.value[y][x] = 'obstacles'
+    })
+
+    socket?.on('endGame', (winnerId, gameId) => {
+      console.log('game ended')
+      if(gameId === params.id)
+      endGlobal()
+      //socket?.emit('gameOver', params.playerId)
+      console.log(`Game Over! Player ${winnerId} wins!`)
     })
   }
 
@@ -788,6 +948,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('leaveGameInProgress', params.id)
     router.push('/')
   }
+  
 
   // Start the timer
   function startTimer() {
@@ -835,6 +996,12 @@ export const usePlayStore = defineStore('play', () => {
     leaveGame,
     initializeSocket,
     remainingTime,
-    saveUserDuelData
+    saveUserDuelData,
+    moveSnakeUp,
+    moveSnakeDown,
+    moveSnakeRight,
+    moveSnakeLeft,
+    playerAlive,
+    players
   }
 })

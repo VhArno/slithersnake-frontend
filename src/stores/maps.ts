@@ -13,7 +13,7 @@ export const useMapsStore = defineStore('maps', () => {
         return {
           id: record.id,
           name: record.name,
-          image: record.image
+          image: import.meta.env.VITE_BASE_URL + record.image,
         }
       })
       maps.value?.push(...loadedMaps)
