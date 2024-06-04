@@ -114,6 +114,7 @@ export const usePlayStore = defineStore('play', () => {
       //generateWalls()
     }*/
 
+    /*
     if (players.value.length == 2) {
       for (let i = 0; i < players.value.length; i++) {
         if (players.value[i].id === params.playerId) {
@@ -131,23 +132,101 @@ export const usePlayStore = defineStore('play', () => {
           startY = Math.floor(numRows / 2)
         }
       }
-    }
+    }*/
 
-    snake.value = [{ x: startX, y: startY }]
-    for (let i = 1; i < character.value.attributes.startLength; i++) {
-      snake.value.push({ x: startX, y: startY + i })
-    }
 
-    //do a check for each X Y on the grid if the gamegrid.value is ibstacle make it empty
-    /*
-    for (let i = 0; i < numRows; i++) {
-      for (let j = 0; j < numCols; j++) {
-        if (gameGrid.value[i][j] === 'obstacles') {
-          console.log('calling delete obstacle')
-          deleteObstacle(i,j);
+    // Spawn players on edges of the grid
+    if (players.value.length == 2) {
+      for (let i = 0; i < players.value.length; i++) {
+        if (players.value[i].id === params.playerId) {
+          if (i === 0) {
+            startX = 0;
+            startY = Math.floor(numRows / 2);
+            snake.value = [{ x: startX, y: startY }];
+            for (let j = 1; j < character.value.attributes.startLength; j++) {
+              snake.value.push({ x: startX, y: startY + j }); // spawn vertically down
+            }
+            direction.value = 'up';
+          } else {
+            startX = numCols - 1;
+            startY = Math.floor(numRows / 2);
+            snake.value = [{ x: startX, y: startY }];
+            for (let j = 1; j < character.value.attributes.startLength; j++) {
+              snake.value.push({ x: startX, y: startY - j }); // spawn vertically up
+            }
+            direction.value = 'down';
+          }
         }
       }
-    }*/
+      } else if (players.value.length == 3) {
+        for (let i = 0; i < players.value.length; i++) {
+          if (players.value[i].id === params.playerId) {
+            if (i === 0) {
+              startX = 0;
+              startY = Math.floor(numRows / 2);
+              snake.value = [{ x: startX, y: startY }];
+              for (let j = 1; j < character.value.attributes.startLength; j++) {
+                snake.value.push({ x: startX, y: startY + j }); // spawn vertically down
+              }
+              direction.value = 'up';
+            } else if (i === 1) {
+              startX = numCols - 1;
+              startY = Math.floor(numRows / 2);
+              snake.value = [{ x: startX, y: startY }];
+              for (let j = 1; j < character.value.attributes.startLength; j++) {
+                snake.value.push({ x: startX, y: startY - j }); // spawn vertically up
+              }
+              direction.value = 'down';
+            } else {
+              startX = Math.floor(numCols / 2);
+              startY = 0;
+              snake.value = [{ x: startX, y: startY }];
+              for (let j = 1; j < character.value.attributes.startLength; j++) {
+                snake.value.push({ x: startX - j, y: startY }); // spawn horizontally left
+              }
+              direction.value = 'right';
+            }
+          }
+        }
+      } else if (players.value.length == 4) {
+      for (let i = 0; i < players.value.length; i++) {
+        if (players.value[i].id === params.playerId) {
+          if (i === 0) {
+            startX = 0;
+            startY = Math.floor(numRows / 2);
+            snake.value = [{ x: startX, y: startY }];
+            for (let j = 1; j < character.value.attributes.startLength; j++) {
+              snake.value.push({ x: startX, y: startY + j }); // spawn vertically down
+            }
+            direction.value = 'up';
+          } else if (i === 1) {
+            startX = numCols - 1;
+            startY = Math.floor(numRows / 2);
+            snake.value = [{ x: startX, y: startY }];
+            for (let j = 1; j < character.value.attributes.startLength; j++) {
+              snake.value.push({ x: startX, y: startY - j }); // spawn vertically up
+            }
+            direction.value = 'down';
+          } else if (i=== 2) {
+            startX = Math.floor(numCols / 2);
+            startY = 0;
+            snake.value = [{ x: startX, y: startY }];
+            for (let j = 1; j < character.value.attributes.startLength; j++) {
+              snake.value.push({ x: startX - j, y: startY }); // spawn horizontally left
+            }
+            direction.value = 'right';
+          } else {
+            startX = Math.floor(numCols / 2);
+            startY = numRows - 1;
+            snake.value = [{ x: startX, y: startY }];
+            for (let j = 1; j < character.value.attributes.startLength; j++) {
+              snake.value.push({ x: startX + j, y: startY }); // spawn horizontally right
+            }
+            direction.value = 'left';
+          }
+        }
+      }
+    }
   }
 
   //eindigt de game ALLEEN VOOR DE GEBRUIKER en wordt spectator
@@ -931,6 +1010,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('leaveGameInProgress', params.id)
     router.push('/')
   }
+  
 
   // Start the timer
   function startTimer() {
