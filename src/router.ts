@@ -15,6 +15,9 @@ import NotFoundView from './components/pages/SgNotFound.vue'
 import { useAuthStore } from './stores/auth'
 import { authGuard } from './guards/authGuard'
 import { loginGuard } from './guards/loginGuard'
+import { ref } from 'vue'
+
+const autoLoggedIn = ref<boolean>(false)
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -91,7 +94,12 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
+  if (!autoLoggedIn.value) {
+    await useAuthStore().tryAutoLogin()
+    autoLoggedIn.value = true
+  }
+
   if (to.meta.requiresAuth && !useAuthStore().isAuthenticated) {
     return { path: '/login' }
   }
