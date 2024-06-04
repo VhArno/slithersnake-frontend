@@ -358,7 +358,9 @@ onBeforeUnmount(() => {
     <div class="chatroom">
       <div class="chat-container">
         <div class="chat">
-          <p v-for="(message, index) in messages" :key="index">{{ message }}</p>
+          <p v-for="(message, index) in messages" :key="index">
+            {{ message.playerId }}: {{ message.message }}
+          </p>
         </div>
       </div>
       <form class="chat-form" @submit.prevent="sendMessage">
