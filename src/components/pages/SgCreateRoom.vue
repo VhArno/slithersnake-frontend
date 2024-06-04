@@ -264,8 +264,11 @@ const messages = ref<{ playerId: string; message: string }[]>([])
 const chatMessage = ref('')
 
 // Listen for incoming chat messages
-socket.on('receiveMessage', (message: string, playerId: string) => {
-  messages.value.push({ playerId, message })
+socket.on('receiveMessage', (message: string, playerId: string, lobbyId: string) => {
+  //if the player is in the lobby
+  if (lobbyId === currentRoom.value?.id) {
+    messages.value.push({ playerId, message })
+  }
 })
 
 // Send a chat message
