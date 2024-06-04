@@ -99,7 +99,7 @@ export const usePlayStore = defineStore('play', () => {
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
-    
+
     //CHECKING IF SELECTED GAME MODE IS WALLS TO GENERATE WALLS
     /*
     if (selectedMap.value && selectedMap.value.name === 'walls') {
@@ -108,31 +108,48 @@ export const usePlayStore = defineStore('play', () => {
       //generateWalls()
     }*/
 
-    if (players.value.length == 2) {
-      for (let i = 0; i < players.value.length; i++) {
-        if (players.value[i].id === params.playerId) {
-          startX = Math.floor(numCols / (2 + players.value.length * i))
-          startY = Math.floor(numRows / 2)
-        }
-      }
-    } else if (players.value.length == 3) {
-      for (let i = 0; i < players.value.length; i++) {
-        if (players.value[i].id === params.playerId) {
-          startX = Math.floor(
-            numCols / (players.value.length + players.value.length * i) +
-              (numCols / players.value.length) * i
-          )
-          startY = Math.floor(numRows / 2)
-        }
+    for (let i = 0; i < players.value.length; i++) {
+      if (players.value[0].id === params.playerId) {
+        // startX = Math.floor(numCols / (2 + players.value.length * i))
+
+        startX = Math.floor(0)
+        startY = Math.floor((numRows / 2) - 1)
+        direction.value = 'up'
+      } else if (players.value[1].id === params.playerId) {
+        startX = Math.floor(numCols - 1)
+        startY = Math.floor(numRows / 2)
+        direction.value = 'down'
+      } else if (players.value[2].id === params.playerId) {
+        startX = Math.floor(numCols / 2)
+        startY = Math.floor(0)
+        direction.value = 'right'
+      } else if (players.value[3].id === params.playerId) {
+        startX = Math.floor(numCols / 2 - 1)
+        startY = Math.floor(numRows - 1)
+        direction.value = 'left'
       }
     }
 
     snake.value = [{ x: startX, y: startY }]
     for (let i = 1; i < character.value.attributes.startLength; i++) {
-      snake.value.push({ x: startX, y: startY + i })
+      switch (direction.value) {
+        case 'up':
+          snake.value.push({ x: startX, y: startY + i })
+          break
+
+        case 'down':
+          snake.value.push({ x: startX, y: startY - i })
+          break
+
+        case 'left':
+          snake.value.push({ x: startX + i, y: startY })
+          break
+
+        case 'right':
+          snake.value.push({ x: startX - i, y: startY })
+          break
+      }
     }
-
-
   }
 
   //eindigt de game
@@ -312,7 +329,6 @@ export const usePlayStore = defineStore('play', () => {
     //     break
     // }
 
-
     socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
   }
 
@@ -364,9 +380,9 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   const startInterval = () => {
-    players.value.forEach((e) => {
-      e.data = [{x:0, y:0}]
-    })
+    // players.value.forEach((e) => {
+    //   e.data = [{x:0, y:0}]
+    // })
     // console.log(socket)
     socketInterval = setInterval(() => {
       socket?.emit('sendPlayerData', snake.value, params.playerId)
@@ -393,8 +409,6 @@ export const usePlayStore = defineStore('play', () => {
       }
     })
 
-
-
     // socket?.on('sendData', () => {
     //   console.log('player data sent')
     // })
@@ -404,35 +418,35 @@ export const usePlayStore = defineStore('play', () => {
   function startGameLoop() {
     startInterval()
     //checking modes and maps and listening to server to run logic
-    socket?.emit('checkModeMap');
+    socket?.emit('checkModeMap')
 
     //if the gamemode is limited-time
-    socket?.on('setTimeLimit' , () => {
+    socket?.on('setTimeLimit', () => {
       remainingTime.value = 3 * 60
       startTimer()
     })
 
     // Listen for the walls event from the server
     socket?.on('wallsGenerated', (walls: any) => {
-    console.log('Walls received from server:', walls);
+      console.log('Walls received from server:', walls)
 
-    // Place each wall received from the server using addObstacle
-    walls.forEach((wall: { x: number, y: number }) => {
-        addObstacle(wall.x, wall.y);
-      });
-    });
-    
+      // Place each wall received from the server using addObstacle
+      walls.forEach((wall: { x: number; y: number }) => {
+        addObstacle(wall.x, wall.y)
+      })
+    })
+
     socket?.on('generatePowerUps', () => {
       powerUpTimeOut = setTimeout(() => {
-        if(players.value[0].id === params.playerId){
-        generatePowerUp()
+        if (players.value[0].id === params.playerId) {
+          generatePowerUp()
         }
       }, 5000)
-     }) 
+    })
 
-     socket?.on('teleportTrue', () => {
+    socket?.on('teleportTrue', () => {
       teleports.value = true
-     })
+    })
     /*
     if (selectedMode.value && selectedMode.value.name === 'limited-time') {
       remainingTime.value = 3 * 60
@@ -609,7 +623,6 @@ export const usePlayStore = defineStore('play', () => {
         return
     }
 
-
     if (teleports.value) {
       newHead.x = (newHead.x + numCols) % numCols
       newHead.y = (newHead.y + numRows) % numRows
@@ -652,7 +665,7 @@ export const usePlayStore = defineStore('play', () => {
     const head = snake.value[0]
 
     // Controleer botsingen met de randen van het speelveld en niet controleren als de map teleports is
-    if (!(teleports.value)) {
+    if (!teleports.value) {
       if (head.x < 0 || head.x >= numCols || head.y < 0 || head.y >= numRows) {
         gameOver.value = true
         return
@@ -793,7 +806,7 @@ export const usePlayStore = defineStore('play', () => {
       if (gameOver.value) {
         await postUserDuel(payload)
       }
-    } catch(err) {
+    } catch (err) {
       console.log(err)
     }
   }
