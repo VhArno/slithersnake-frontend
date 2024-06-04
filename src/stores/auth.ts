@@ -10,9 +10,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false)
   const isAdmin = ref<boolean>(false)
 
-  const readUserDetails = async () => {
+  const tryAutoLogin = async () => {
     try {
-      if (user.value !== null) {
+      if (user.value !== null || user.value !== undefined) {
         await initUser().catch(() => {
           user.value = null
           isAuthenticated.value = false
@@ -24,41 +24,40 @@ export const useAuthStore = defineStore('auth', () => {
         isAdmin.value = false
       }
     } catch (err) {
-      console.log(err)
+      //console.log(err)
     }
   }
 
   const getUserDetails = async () => {
-    if (user.value) return user.value
-
-    try {
-      const user = await getUser<{data: Player}>().then((res) => {
-        return {
-          id: res.data.data.id,
-          username: res.data.data.username,
-          email: res.data.data.email,
-          level: res.data.data.level,
-          highscore: res.data.data.highscore,
-          games_played: res.data.data.games_played,
-          games_won: res.data.data.games_won,
-          players_killed: res.data.data.players_killed,
-          skins: [],
-          role: '',
-          duels: res.data.data.duels,
-        }
-      })
-      return user
-    } catch (e) {
-      console.error(e)
-      logout()
-      return null
-    }
+    const user = await getUser<{data: Player}>().then((res) => {
+      return {
+        id: res.data.data.id,
+        username: res.data.data.username,
+        email: res.data.data.email,
+        level: res.data.data.level,
+        highscore: res.data.data.highscore,
+        games_played: res.data.data.games_played,
+        games_won: res.data.data.games_won,
+        players_killed: res.data.data.players_killed,
+        skins: [],
+        role: '',
+        duels: res.data.data.duels,
+      }
+    })
+    return user
   }
   
   const initUser = async () => {
     user.value = await getUserDetails().catch()
-    isAuthenticated.value = true
-    if (user.value?.role == 'admin') isAdmin.value = true
+
+    if (user.value !== null) {
+      isAuthenticated.value = true
+      if (user.value?.role == 'admin') isAdmin.value = true
+    } else {
+      user.value = null
+      isAuthenticated.value = false
+      isAdmin.value = false
+    }
   }
   
   const login = async (payload: { email: string; password: string }) => {
@@ -79,6 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     isAuthenticated.value = false
     isAdmin.value = false
+    
     router.push({ name: 'login' })
   }
   
@@ -100,7 +100,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   
-  return { user, isAuthenticated, isAdmin, readUserDetails, getUserDetails, login, logout, register, patch }
+  return { user, isAuthenticated, isAdmin, tryAutoLogin, getUserDetails, login, logout, register, patch }
 }, 
 { persist: {
   storage: localStorage,

@@ -24,8 +24,6 @@ const { darkMode } = storeToRefs(settingsStore)
 const isDark = useDark()
 darkMode.value = isDark.value
 
-useAuthStore().readUserDetails()
-
 onMounted(() => {
   settingsStore.loadData()
   modesStore.loadModes()
