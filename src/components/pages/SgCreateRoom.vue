@@ -44,12 +44,13 @@ const currentRoom = ref<Room | null>(null)
 const socket: Socket = inject('socket') as Socket
 const router = useRouter()
 const players = ref<Player[]>([])
+const oldPlayers = ref<String[]>([])
 
 const player = ref<Player>()
 
 if (authStore.isAuthenticated && authStore.user) {
   player.value = {
-    id: 'player' + authStore.user.id,
+    id: authStore.user.id,
     username: authStore.user.username,
     email: authStore.user.email,
     level: authStore.user.level,
@@ -110,13 +111,21 @@ socket.on('gameBusy', (gId) => {
 socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
   sessionStorage.setItem('players', JSON.stringify(room.players))
-
   console.log('player joined room')
   if (params.id === room.id) {
     currentRoom.value = room
     console.log(room)
     players.value = currentRoom.value.players
-    socket.emit('getPlayers', params.id)
+    //push each players username to oldusers with a foreach
+    room.players.forEach((player) => {
+      oldPlayers.value?.push(player.username)
+    })
+
+    //get the id of the player that last joined this room and push it intho the messages array to display in chat
+    messages.value.push({
+      playerId: room.players[room.players.length - 1].username,
+      message: 'joined the room'
+    })
   }
 })
 
@@ -129,6 +138,18 @@ socket.on('newCreator', (plId) => {
 })
 
 socket.on('playerLeft', (room: Room) => {
+  //get the id of the player that left and push a message in the messages array
+  console.log('above oldplayers')
+  console.log(oldPlayers.value)
+  if (oldPlayers.value) {
+    console.log('inside oldplayers')
+    messages.value.push({
+      playerId: oldPlayers.value[room.players.length - 1] as string,
+      message: 'left the room'
+    })
+  }
+  //get rid of last name in oldplayers
+  oldPlayers.value?.pop()
   players.value = room.players
 })
 
@@ -253,7 +274,7 @@ socket.on('settingsChanged', (room: Room) => {
 })
 
 const leaveGame = async () => {
-  await socket.emit('leaveRoom', socket.id)
+  await socket.emit('leaveRoom', socket.id, params.id)
   router.push('/')
 }
 
@@ -264,9 +285,9 @@ const messages = ref<{ playerId: string; message: string }[]>([])
 const chatMessage = ref('')
 
 // Listen for incoming chat messages
-socket.on('receiveMessage', (message: string, playerId: string, lobbyId: string) => {
+socket.on('receiveMessage', (message: string, playerId: string, roomId: string) => {
   //if the player is in the lobby
-  if (lobbyId === currentRoom.value?.id) {
+  if (roomId === currentRoom.value?.id) {
     messages.value.push({ playerId, message })
   }
 })
