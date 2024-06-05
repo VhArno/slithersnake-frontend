@@ -117,21 +117,24 @@ export const usePlayStore = defineStore('play', () => {
 
     // Spawn players on edges of the grid
     for (let i = 0; i < players.value.length; i++) {
+      console.log(players.value[i].id)
+      console.log(params.playerId)
+
       if (players.value[0].id === params.playerId) {
         // startX = Math.floor(numCols / (2 + players.value.length * i))
 
         startX = Math.floor(0)
         startY = Math.floor((numRows / 2) - 1)
         direction.value = 'up'
-      } else if (players.value[1].id === params.playerId) {
+      } else if (players.value[1] && players.value[1].id === params.playerId) {
         startX = Math.floor(numCols - 1)
         startY = Math.floor(numRows / 2)
         direction.value = 'down'
-      } else if (players.value[2].id === params.playerId) {
+      } else if (players.value[2] && players.value[2].id === params.playerId) {
         startX = Math.floor(numCols / 2)
         startY = Math.floor(0)
         direction.value = 'right'
-      } else if (players.value[3].id === params.playerId) {
+      } else if (players.value[3] && players.value[3].id === params.playerId) {
         startX = Math.floor(numCols / 2 - 1)
         startY = Math.floor(numRows - 1)
         direction.value = 'left'
@@ -819,7 +822,7 @@ export const usePlayStore = defineStore('play', () => {
       // Controleer botsingen met andere snake
 
       players.value.forEach((e) => {
-        if (e.id !== params.playerId) {
+        if (e.id !== params.playerId) { // && players.value.length > 1
           for (let i = 1; i < e.data.length; i++) {
             if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
               //gameOver.value = true
@@ -844,7 +847,7 @@ export const usePlayStore = defineStore('play', () => {
         if (e.id !== params.playerId && e.alive) {
           if (head.x == e.data[0].x && head.y == e.data[0].y && !e.ghosted) {
             //gameOver.value = true
-        removePlayer()
+            removePlayer()
             return
           }
         }

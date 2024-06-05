@@ -34,6 +34,7 @@ const duelId = ref<number>(0)
 const isCreator = sessionStorage.getItem('crt')
 sessionStorage.removeItem('crt')
 console.log(isCreator)
+
 if (isCreator) {
   const randomGuid: string = uuidv4()
   socket.emit('nextGameUrl', useUrlSearchParams('history').id, randomGuid)
@@ -42,12 +43,21 @@ if (isCreator) {
 
 // Initialiseer het spel wanneer het component is gemount
 onMounted(() => {
-  playStore.setGameMusic(gameMusic.value)
-  playStore.setPickupSound(pickupSound.value)
-  playStore.setEndGameSound(endGameSound.value)
+  try {
+    playStore.setGameMusic(gameMusic.value)
+    playStore.setPickupSound(pickupSound.value)
+    playStore.setEndGameSound(endGameSound.value)
+  } catch(err) {
+    console.log('error settings game music: ' + err)
+  }
 
-  playStore.initializeGame()
-  playStore.initializeSocket(socket)
+  try {
+    playStore.initializeGame()
+    playStore.initializeSocket(socket)
+  } catch(err) {
+    console.log('error initializing game: ' + err)
+  }
+
 
   const interval = setInterval(() => {
     timer.value--
