@@ -24,6 +24,30 @@ watchEffect(() => {
   creator = sessionStorage.getItem('creator') === 'true'
 })
 
+setTimeout(() => {
+  checkIfRoomInitated()
+  console.log('checking')
+}, 1000)
+
+function checkIfRoomInitated() {
+  setTimeout(() => {
+    const params = useUrlSearchParams('history')
+    if (!params.id) {
+      sessionStorage.setItem('creator', 'true')
+    }
+
+    const randomGuid: string = uuidv4()
+    if (sessionStorage.getItem('newRoom')) {
+      params.id = sessionStorage.getItem('newRoom') + ''
+    } else {
+      params.id = randomGuid
+    }
+    sessionStorage.removeItem('newRoom')
+    setTimeout(() => {
+      socket.emit('createRoom', currentRoom.value, player, params.id)
+    }, 1000)
+  }, 1000)
+}
 /* maps store */
 const mapsStore = useMapsStore()
 const { selectedMap, maps } = storeToRefs(mapsStore)
