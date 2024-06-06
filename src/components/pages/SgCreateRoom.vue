@@ -248,6 +248,7 @@ const nextMode = () => {
 const startGame = () => {
   // router.push('/character-select')
   // router.push('/play')
+  sessionStorage.setItem('players', JSON.stringify(players.value))
   const params = useUrlSearchParams('history')
   if (params.id) {
     socket.emit('startGame', currentRoom.value)
