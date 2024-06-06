@@ -32,10 +32,13 @@ setTimeout(() => {
 function checkIfRoomInitated() {
   setTimeout(() => {
     const params = useUrlSearchParams('history')
+    console.log(params.id)
     if (!params.id) {
       sessionStorage.setItem('creator', 'true')
     }
-
+    if (params.id) {
+      return
+    }
     const randomGuid: string = uuidv4()
     if (sessionStorage.getItem('newRoom')) {
       params.id = sessionStorage.getItem('newRoom') + ''
@@ -106,20 +109,6 @@ if (authStore.isAuthenticated && authStore.user) {
 //   console.log('checking status')
 // }
 
-if (creator) {
-  const randomGuid: string = uuidv4()
-  const params = useUrlSearchParams('history')
-  if (sessionStorage.getItem('newRoom')) {
-    params.id = sessionStorage.getItem('newRoom') + ''
-  } else {
-    params.id = randomGuid
-  }
-  sessionStorage.removeItem('newRoom')
-  setTimeout(() => {
-    socket.emit('createRoom', currentRoom.value, player, params.id)
-  }, 1000)
-}
-
 socket.on('evacuateRoom', (roomId: string) => {
   if (roomId === useUrlSearchParams('history').id) {
     router.push('/')
@@ -134,6 +123,7 @@ socket.on('gameBusy', (gId) => {
 
 socket.on('joinedRoom', (room: Room) => {
   const params = useUrlSearchParams('history')
+
   sessionStorage.setItem('players', JSON.stringify(room.players))
   console.log('player joined room')
   if (params.id === room.id) {
@@ -189,8 +179,21 @@ if (!sessionStorage.getItem('creator')) {
     if (creator) document.location.reload()
   }
   console.log(params.id)
-  socket.emit('joinRoom', params.id, player)
+  socket.emit('checkPlayerCount', params.id)
 }
+
+socket.on('roomFull', (roomId: string) => {
+  if (roomId === useUrlSearchParams('history').id) {
+    sessionStorage.setItem('Full', 'true')
+    router.push('/')
+  }
+})
+
+socket.on('roomNotFull', (roomId: string) => {
+  if (roomId === useUrlSearchParams('history').id) {
+    socket.emit('joinRoom', params.id, player)
+  }
+})
 
 // Generate a random GUID
 

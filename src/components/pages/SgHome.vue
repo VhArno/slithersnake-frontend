@@ -11,6 +11,7 @@ const socket: Socket = inject('socket') as Socket
 const play = usePlayStore()
 
 const redirecting = ref(false)
+const full = ref(false)
 
 const goToPlay = () => {
   router.push('/play')
@@ -56,6 +57,14 @@ socket.on('roomDoesNotExist', (roomId) => {
   router.push('/create-room?id=' + roomId)
 })
 
+if (sessionStorage.getItem('Full')) {
+  full.value = true
+  setTimeout(() => {
+    full.value = false
+    sessionStorage.removeItem('Full')
+  }, 5000)
+}
+
 onBeforeUnmount(() => {
   socket.off('prepNewRoom')
   socket.off('roomExists')
@@ -69,6 +78,11 @@ onBeforeUnmount(() => {
       <div v-if="redirecting" class="redirecting">
         <div class="loading">
           <h2>Redirecting to lobby...</h2>
+        </div>
+      </div>
+      <div v-if="full" class="redirecting">
+        <div class="loading">
+          <h2>The lobby you tried to join was full!</h2>
         </div>
       </div>
     </div>
