@@ -24,10 +24,7 @@ watchEffect(() => {
   creator = sessionStorage.getItem('creator') === 'true'
 })
 
-setTimeout(() => {
-  checkIfRoomInitated()
-  console.log('checking')
-}, 1000)
+checkIfRoomInitated()
 
 function checkIfRoomInitated() {
   setTimeout(() => {
@@ -37,7 +34,7 @@ function checkIfRoomInitated() {
       sessionStorage.setItem('creator', 'true')
       creator = true
     }
-    if (params.id) {
+    if (params.id && !sessionStorage.getItem('reQ')) {
       return
     }
     const randomGuid: string = uuidv4()

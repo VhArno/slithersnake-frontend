@@ -234,6 +234,7 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   socket?.on('gameOver', (winningPlayerId: string) => {
+    console.log('game ended')
     endGlobal()
     console.log(`Game Over! Player ${winningPlayerId} wins!`)
   })
@@ -386,7 +387,7 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   function generatePowerUp() {
-    socket?.emit('setPowerUpAvailability', true)
+    socket?.emit('setPowerUpAvailability', true, params.id)
     // Random positie genereren
     do {
       powerUp.value.x = Math.floor(Math.random() * numCols)
@@ -605,6 +606,7 @@ export const usePlayStore = defineStore('play', () => {
 
     socket?.on('setPowerUpAvailability', (bool) => {
       powerUpAvailable.value = bool
+      console.log('power up availability: ' + powerUpAvailable.value)
     })
 
     socket?.on('activateGhost', (id) => {
@@ -772,7 +774,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
-      socket?.emit('setPowerUpAvailability', false)
+      socket?.emit('setPowerUpAvailability', false, params.id)
       //genereer een nieuwe powerUp na aantal seconden
       console.log('power up picked up')
       pickupPowerUp()
