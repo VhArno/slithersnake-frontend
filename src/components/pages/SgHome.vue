@@ -54,6 +54,7 @@ socket.on('roomDoesNotExist', (roomId) => {
   console.log('room doesnt exists')
   console.log(roomId)
   sessionStorage.setItem('creator', 'true')
+  sessionStorage.setItem('reQ', 'true')
   router.push('/create-room?id=' + roomId)
 })
 
