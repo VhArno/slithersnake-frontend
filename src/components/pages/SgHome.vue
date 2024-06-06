@@ -47,7 +47,7 @@ socket.on('roomExists', (roomId: string) => {
     redirecting.value = false
     sessionStorage.removeItem('creator')
     router.push('/create-room?id=' + roomId)
-  }, 1500)
+  }, 2500)
 })
 
 socket.on('roomDoesNotExist', (roomId) => {
