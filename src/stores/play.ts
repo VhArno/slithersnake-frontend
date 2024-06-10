@@ -234,6 +234,7 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   socket?.on('gameOver', (winningPlayerId: string) => {
+    console.log('game ended')
     endGlobal()
     console.log(`Game Over! Player ${winningPlayerId} wins!`)
   })
@@ -268,7 +269,7 @@ export const usePlayStore = defineStore('play', () => {
       foodY = Math.floor(Math.random() * numRows)
     } while (gameGrid.value[foodY][foodX] !== 'empty')
 
-    socket?.emit('generateFood', foodX, foodY)
+    socket?.emit('generateFood', foodX, foodY, params.id)
   }
 
   /*
@@ -368,25 +369,25 @@ export const usePlayStore = defineStore('play', () => {
   const ghost = function () {
     console.log('player ' + params.playerId + ' ghosted')
 
-    socket?.emit('activateGhost', params.playerId)
+    socket?.emit('activateGhost', params.playerId, params.id)
     setTimeout(() => {
       console.log('ghost over')
-      socket?.emit('deactivateGhost', params.playerId)
+      socket?.emit('deactivateGhost', params.playerId, params.id)
     }, 10000)
   }
 
   const invisibility = function () {
     console.log('player ' + params.playerId + ' went invisible')
 
-    socket?.emit('activateInvis', params.playerId)
+    socket?.emit('activateInvis', params.playerId, params.id)
     setTimeout(() => {
       console.log('invisibility over')
-      socket?.emit('deactivateInvis', params.playerId)
+      socket?.emit('deactivateInvis', params.playerId, params.id)
     }, 3000)
   }
 
   function generatePowerUp() {
-    socket?.emit('setPowerUpAvailability', true)
+    socket?.emit('setPowerUpAvailability', true, params.id)
     // Random positie genereren
     do {
       powerUp.value.x = Math.floor(Math.random() * numCols)
@@ -410,12 +411,12 @@ export const usePlayStore = defineStore('play', () => {
     //     break
     // }
 
-    socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y)
+    socket?.emit('generatePowerUp', powerUp.value.x, powerUp.value.y, params.id)
   }
 
   function pickupPowerUp() {
     powerUpActive.value = true
-    socket?.emit('setPowerUpAvailability', false)
+    socket?.emit('setPowerUpAvailability', false, params.id)
 
     switch (powerUp.value.id) {
       case 1:
@@ -475,7 +476,7 @@ export const usePlayStore = defineStore('play', () => {
       if(playerAlive.value){
         socket?.emit('sendPlayerData', snake.value, params.playerId)
       }
-      socket?.emit('getPlayerData')
+      socket?.emit('getPlayerData', params.id)
 
       if (!gameOver.value) {
         updateGameGrid()
@@ -554,6 +555,7 @@ export const usePlayStore = defineStore('play', () => {
     socket?.on('generatePowerUps', () => {
       powerUpTimeOut = setTimeout(() => {
         if (players.value[0].id === params.playerId) {
+          console.log('generating powerups')
           generatePowerUp()
         }
       }, 5000)
@@ -583,6 +585,8 @@ export const usePlayStore = defineStore('play', () => {
     })
 
     socket?.on('showPowerUp', (powerX, powerY, random) => {
+      console.log('power up received')
+      console.log(powerX, powerY, random)
       switch (random) {
         case 1:
           powerUp.value = { id: 1, name: 'speedboost', x: powerX, y: powerY }
@@ -597,10 +601,12 @@ export const usePlayStore = defineStore('play', () => {
           powerUp.value = { id: 4, name: 'magnet', x: powerX, y: powerY }
           break
       }
+      console.log(powerUp.value)
     })
 
     socket?.on('setPowerUpAvailability', (bool) => {
       powerUpAvailable.value = bool
+      console.log('power up availability: ' + powerUpAvailable.value)
     })
 
     socket?.on('activateGhost', (id) => {
@@ -768,7 +774,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     if (newHead.x === powerUp.value.x && newHead.y === powerUp.value.y && powerUpAvailable.value) {
-      socket?.emit('setPowerUpAvailability', false)
+      socket?.emit('setPowerUpAvailability', false, params.id)
       //genereer een nieuwe powerUp na aantal seconden
       console.log('power up picked up')
       pickupPowerUp()

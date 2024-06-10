@@ -32,8 +32,9 @@ function checkIfRoomInitated() {
     console.log(params.id)
     if (!params.id) {
       sessionStorage.setItem('creator', 'true')
+      creator = true
     }
-    if (params.id && !sessionStorage.getItem('reQ')){
+    if (params.id && !sessionStorage.getItem('reQ')) {
       return
     }
     const randomGuid: string = uuidv4()
@@ -257,6 +258,7 @@ socket.on('gameStarted', (roomId: string) => {
   console.log('game started')
   //console.log(player.value.id)
   const params = useUrlSearchParams('history')
+  sessionStorage.setItem('players', JSON.stringify(players.value))
   if (params.id && roomId && player.value) {
     if (roomId === params.id) {
       if (creator) {
