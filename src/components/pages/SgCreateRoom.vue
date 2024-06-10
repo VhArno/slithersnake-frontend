@@ -20,21 +20,30 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 
 let creator = false
+
 watchEffect(() => {
-  creator = sessionStorage.getItem('creator') === 'true'
+  const params = useUrlSearchParams('history')
+  if (sessionStorage.getItem('creator') === params.id) {
+    creator = true
+  } else {
+    creator = false
+  }
 })
 
 checkIfRoomInitated()
 
 function checkIfRoomInitated() {
   setTimeout(() => {
+    console.log(creator)
     const params = useUrlSearchParams('history')
     console.log(params.id)
     if (!params.id) {
-      sessionStorage.setItem('creator', 'true')
       creator = true
     }
     if (params.id && !sessionStorage.getItem('reQ')) {
+      return
+    }
+    if (!creator){
       return
     }
     const randomGuid: string = uuidv4()
@@ -42,6 +51,9 @@ function checkIfRoomInitated() {
       params.id = sessionStorage.getItem('newRoom') + ''
     } else {
       params.id = randomGuid
+    }
+    if (creator) {
+      sessionStorage.setItem('creator', params.id)
     }
     sessionStorage.removeItem('newRoom')
     setTimeout(() => {
@@ -142,9 +154,10 @@ socket.on('joinedRoom', (room: Room) => {
 })
 
 socket.on('newCreator', (plId) => {
+  const params = useUrlSearchParams('history')
   console.log('new creator')
   if (socket.id === plId) {
-    sessionStorage.setItem('creator', 'true')
+    sessionStorage.setItem('creator', params.id +'')
     creator = true
   }
 })
@@ -171,7 +184,7 @@ socket.on('players', (room: Room) => {
   currentRoom.value = room
 })
 
-if (!sessionStorage.getItem('creator')) {
+if (!creator) {
   const params = useUrlSearchParams('history')
   if (!params.id) {
     if (creator) document.location.reload()
@@ -286,7 +299,7 @@ watchEffect(() => {
     ping: 0
   }
 
-  if (sessionStorage.getItem('creator')) {
+  if (creator) {
     socket.emit('settingsChanged', currentRoom.value)
   }
 })
