@@ -216,7 +216,7 @@ export const usePlayStore = defineStore('play', () => {
     players.value.forEach((e) => {
       if (e.alive) {
         console.log('winner is ' + e.id)
-        winnerName.value = e.id
+        winnerName.value = e.username
       }
     })
     // Toon een game over bericht of handel het einde van het spel af

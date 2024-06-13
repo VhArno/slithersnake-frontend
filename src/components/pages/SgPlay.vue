@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
         <!-- <p>Jij (lvl. {{ useAuthStore().user?.level }})</p> -->
         <!--<span>{{ playStore.score }}</span>-->
         <li class="players-list" v-for="player in players" :key="player.id">
-          <span>{{ player.username }} ({{ player.level }})</span>
+          <span>{{ player.username }} (lvl. {{ player.level }}): {{ player.alive ? 'alive' : 'spectating' }}</span>
           <span>{{ playStore.score }}</span>
         </li>
       </div>
