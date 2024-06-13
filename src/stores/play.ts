@@ -826,18 +826,20 @@ export const usePlayStore = defineStore('play', () => {
       }
 
       // Controleer botsingen met andere snake
-
-      players.value.forEach((e) => {
-        if (e.id !== params.playerId) { // && players.value.length > 1
-          for (let i = 1; i < e.data.length; i++) {
-            if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
-              //gameOver.value = true
-              removePlayer()
-              return
+      //if (players.value.length > 1) {
+        players.value.forEach((e) => {
+          if (e.id !== params.playerId) { // && players.value.length > 1
+            for (let i = 1; i < e.data.length; i++) {
+              if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
+                //gameOver.value = true
+                removePlayer()
+                return
+              }
             }
           }
-        }
-      })
+        })
+      //}
+
 
       // for (let i = 1; i < enemySnake.value.length; i++) {
       //   if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {

@@ -53,6 +53,8 @@ export interface Duel {
 
 export interface IngamePlayer {
   id: string
+  username: string
+  level: number
   ghosted: boolean
   invisible: boolean
   data: Array<{ x: number; y: number }>

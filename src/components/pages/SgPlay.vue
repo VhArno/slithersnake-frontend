@@ -171,13 +171,14 @@ onBeforeUnmount(() => {
 
     <div class="scoreboard">
       <div v-if="playStore.remainingTime != 0">Time left: {{ playStore.remainingTime }}</div>
-      <div class="Spectate" v-if="!playStore.playerAlive">Spectating</div>
       <div class="players">
+        <div class="Spectate" v-if="!playStore.playerAlive">Spectating...</div>
         <h3>Scorebord</h3>
         <!-- <p>Jij (lvl. {{ useAuthStore().user?.level }})</p> -->
         <!--<span>{{ playStore.score }}</span>-->
-        <li v-for="player in players" :key="player.id">
-          {{ player.id }}
+        <li class="players-list" v-for="player in players" :key="player.id">
+          <span>{{ player.username }} ({{ player.level }})</span>
+          <span>{{ playStore.score }}</span>
         </li>
       </div>
 
@@ -262,7 +263,7 @@ onBeforeUnmount(() => {
       flex-flow: column;
       gap: 1rem;
 
-      > div {
+      > .players-list {
         display: flex;
         flex-flow: row;
         justify-content: space-between;

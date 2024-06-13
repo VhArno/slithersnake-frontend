@@ -87,7 +87,7 @@ const player = ref<Player>()
 
 if (authStore.isAuthenticated && authStore.user) {
   player.value = {
-    id: authStore.user.id,
+    id: '' + authStore.user.id,
     username: authStore.user.username,
     email: authStore.user.email,
     level: authStore.user.level,
