@@ -39,23 +39,31 @@ function checkIfRoomInitated() {
     console.log(params.id)
     if (!params.id) {
       creator = true
+      console.log('no room 1111')
     }
     if (params.id && !sessionStorage.getItem('reQ')) {
+      console.log('no room 2222')
       return
     }
-    if (!creator){
+    if (!creator && !sessionStorage.getItem('reQ')){
+      console.log('no room 3333')
       return
     }
+    console.log('room initiated')
     const randomGuid: string = uuidv4()
     if (sessionStorage.getItem('newRoom')) {
       params.id = sessionStorage.getItem('newRoom') + ''
+      console.log('new room with id: ' + params.id)
+      creator = true
     } else {
       params.id = randomGuid
+      console.log('new room with random id: ' + params.id)
     }
     if (creator) {
       sessionStorage.setItem('creator', params.id)
     }
     sessionStorage.removeItem('newRoom')
+    sessionStorage.removeItem('reQ')
     setTimeout(() => {
       socket.emit('createRoom', currentRoom.value, player, params.id)
     }, 1000)
