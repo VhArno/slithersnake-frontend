@@ -167,20 +167,21 @@ export const usePlayStore = defineStore('play', () => {
   const endGame = () => {
     if(playerAlive.value){
       console.log('game over')
-    playerAlive.value = false
-    //clearInterval(gameLoopInterval)
-    //clearInterval(socketInterval)
-    //clearInterval(timerInterval)
-    // Toon een game over bericht of handel het einde van het spel af
-    // Pause game music
-    gameMusic.value.pause()
-    //send player id and game id
-    //socket?.emit('playerDied', params.playerId, params.gameId)
-    console.log('emitting player died' + params.playerId + " " + params.id)
-    socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
-    // Play end game sound
-    endGameSound.value.currentTime = 0
-    endGameSound.value.play().catch(() => {
+      gameOver.value = true
+      playerAlive.value = false
+      //clearInterval(gameLoopInterval)
+      //clearInterval(socketInterval)
+      //clearInterval(timerInterval)
+      // Toon een game over bericht of handel het einde van het spel af
+      // Pause game music
+      gameMusic.value.pause()
+      //send player id and game id
+      //socket?.emit('playerDied', params.playerId, params.gameId)
+      console.log('emitting player died' + params.playerId + " " + params.id)
+      socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
+      // Play end game sound
+      endGameSound.value.currentTime = 0
+      endGameSound.value.play().catch(() => {
       console.error('Something went wrong')
     })
 
