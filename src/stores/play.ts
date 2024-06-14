@@ -103,6 +103,10 @@ export const usePlayStore = defineStore('play', () => {
     // make obstacles ref empty
     obstacles.value = []
 
+    //trying to make sure the powerup is stil not in the grid when not picked up in a game and lobby gets redirected and replayed.
+    powerUpAvailable.value = false
+    powerUpActive.value = false
+
     // spawn slang
     let startX = Math.floor(numCols / 2)
     let startY = Math.floor(numRows / 2)
