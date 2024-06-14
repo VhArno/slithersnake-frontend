@@ -45,7 +45,7 @@ function checkIfRoomInitated() {
       console.log('no room 2222')
       return
     }
-    if (!creator && !sessionStorage.getItem('reQ')){
+    if (!creator && !sessionStorage.getItem('reQ')) {
       console.log('no room 3333')
       return
     }
@@ -155,7 +155,7 @@ socket.on('joinedRoom', (room: Room) => {
 
     //get the id of the player that last joined this room and push it intho the messages array to display in chat
     messages.value.push({
-      playerId: room.players[room.players.length - 1].username,
+      playerName: room.players[room.players.length - 1].username,
       message: 'joined the room'
     })
   }
@@ -165,7 +165,7 @@ socket.on('newCreator', (plId) => {
   const params = useUrlSearchParams('history')
   console.log('new creator')
   if (socket.id === plId) {
-    sessionStorage.setItem('creator', params.id +'')
+    sessionStorage.setItem('creator', params.id + '')
     creator = true
   }
 })
@@ -177,7 +177,7 @@ socket.on('playerLeft', (room: Room) => {
   if (oldPlayers.value) {
     console.log('inside oldplayers')
     messages.value.push({
-      playerId: oldPlayers.value[room.players.length - 1] as string,
+      playerName: oldPlayers.value[room.players.length - 1] as string,
       message: 'left the room'
     })
   }
@@ -329,14 +329,14 @@ const leaveGame = async () => {
 // before leaving the page even if the user closes the tab or goes to previous page run socket.emit('leaveRoom')
 
 // Chat functionality
-const messages = ref<{ playerId: string; message: string }[]>([])
+const messages = ref<{ playerName: string; message: string }[]>([])
 const chatMessage = ref('')
 
 // Listen for incoming chat messages
-socket.on('receiveMessage', (message: string, playerId: string, roomId: string) => {
+socket.on('receiveMessage', (message: string, playerName: string, roomId: string) => {
   //if the player is in the lobby
   if (roomId === currentRoom.value?.id) {
-    messages.value.push({ playerId, message })
+    messages.value.push({ playerName, message })
   }
 })
 
@@ -344,7 +344,7 @@ socket.on('receiveMessage', (message: string, playerId: string, roomId: string) 
 const sendMessage = () => {
   const params = useUrlSearchParams('history')
   if (chatMessage.value.trim() !== '' && player.value && params.id) {
-    socket.emit('sendMessage', chatMessage.value, params.id, player.value.id)
+    socket.emit('sendMessage', chatMessage.value, params.id, player.value.username)
     chatMessage.value = ''
   }
 }
@@ -431,7 +431,7 @@ onBeforeUnmount(() => {
       <div class="chat-container">
         <div class="chat">
           <p v-for="(message, index) in messages" :key="index">
-            {{ message.playerId }}: {{ message.message }}
+            {{ message.playerName }}: {{ message.message }}
           </p>
         </div>
       </div>
