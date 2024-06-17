@@ -91,8 +91,16 @@ export const usePlayStore = defineStore('play', () => {
     console.log(params.playerId)
     console.log(players.value)
     //Sla de geselecteerde character op
-    character.value = charStore.selectedCharacter
-    interval.value = character.value.attributes.speed
+    character.value = {
+      id: 1,
+      name: 'Speedy',
+      attributes: { speed: 1, startLength: 4, lives: 1 },
+      imgUrl: ""
+    }
+    if(JSON.parse(sessionStorage.getItem('selectCharater')!)){
+    character.value = JSON.parse(sessionStorage.getItem('selectCharater')!)
+    }
+    interval.value = character.value!.attributes.speed
     //in geval dat spel herbegint
     gameOver.value = false
     // Maak een leeg speelveld
@@ -146,7 +154,7 @@ export const usePlayStore = defineStore('play', () => {
     }
 
     snake.value = [{ x: startX, y: startY }]
-    for (let i = 1; i < character.value.attributes.startLength; i++) {
+    for (let i = 1; i < character.value!.attributes.startLength; i++) {
       switch (direction.value) {
         case 'up':
           snake.value.push({ x: startX, y: startY + i })

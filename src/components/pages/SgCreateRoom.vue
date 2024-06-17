@@ -14,10 +14,12 @@ import { useSettingsStore } from '@/stores/settings'
 import { Socket } from 'socket.io-client'
 import { watch } from 'fs'
 import { useAuthStore } from '@/stores/auth'
+import { useCharStore } from '@/stores/char'
 
 // pinia
 /* auth store */
 const authStore = useAuthStore()
+const charStore = useCharStore()
 
 let creator = false
 
@@ -263,6 +265,32 @@ const nextMode = () => {
   selectedMode.value = modes.value[newIndex]
 }
 
+const charRange = ref<number>(0)
+
+// Method to switch to previous character
+const prevChar = () => {
+  if(charRange.value == 0){
+    charRange.value = 2
+  }else{
+    charRange.value--
+  }
+
+  charStore.selectedCharacter = charStore.chars[charRange.value]
+  sessionStorage.setItem("selectCharater", JSON.stringify(charStore.selectedCharacter));
+}
+
+// Method to switch to next character
+const nextChar = () => {
+  if(charRange.value == 2){
+    charRange.value = 0
+  }else{
+    charRange.value++
+  }
+
+  charStore.selectedCharacter = charStore.chars[charRange.value]
+  sessionStorage.setItem("selectCharater", JSON.stringify(charStore.selectedCharacter));
+}
+
 /* actions buttons */
 const startGame = () => {
   // router.push('/character-select')
@@ -414,6 +442,23 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <SgButton v-if="creator" @click="nextMode" class="select-btn"
+                  ><i class="fa-solid fa-chevron-right"></i
+                ></SgButton>
+              </div>
+            </div>
+
+            <div>
+              <h3>Character</h3>
+              <div class="gamemode-select">
+                <SgButton @click="prevChar" class="select-btn"
+                  ><i class="fa-solid fa-chevron-left"></i
+                ></SgButton>
+                <div class="gamemodes">
+                  <div>
+                    <p>{{ charStore.selectedCharacter.name }}</p>
+                  </div>
+                </div>
+                <SgButton @click="nextChar" class="select-btn"
                   ><i class="fa-solid fa-chevron-right"></i
                 ></SgButton>
               </div>

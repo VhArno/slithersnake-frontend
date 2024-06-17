@@ -11,7 +11,7 @@ export const useCharStore = defineStore('char', () => {
   const chars = ref<Character[]>([{
     id: 1,
     name: 'Speedy',
-    attributes: { speed: 5, startLength: 1, lives: 1 },
+    attributes: { speed: 4, startLength: 1, lives: 1 },
     imgUrl: ""
   },{
     id: 2,
