@@ -685,16 +685,19 @@ export const usePlayStore = defineStore('play', () => {
   }
 
   // Lees toetsenbordinvoer
-  onKeyStroke(keybinds.value.down, () => {
+  onKeyStroke([keybinds.value.down, 'ArrowDown'], () => {
     moveSnakeUp()
   })
-  onKeyStroke(keybinds.value.up, () => {
+
+  onKeyStroke([keybinds.value.up, 'ArrowUp'], () => {
     moveSnakeDown()
   })
-  onKeyStroke(keybinds.value.left, () => {
+
+  onKeyStroke([keybinds.value.left, 'ArrowLeft'], () => {
     moveSnakeLeft()
   })
-  onKeyStroke(keybinds.value.right, () => {
+
+  onKeyStroke([keybinds.value.right, 'ArrowRight'], () => {
     moveSnakeRight()
   })
 
