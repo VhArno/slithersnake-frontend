@@ -78,7 +78,7 @@ export const usePlayStore = defineStore('play', () => {
     obstacles.value.push({ x, y })
   }
   */
- 
+
   function initializeSocket(s: Socket) {
     socket = s
   }
@@ -92,8 +92,13 @@ export const usePlayStore = defineStore('play', () => {
     console.log(players.value)
     //Sla de geselecteerde character op
     character.value = charStore.chars[0]
-    if(JSON.parse(sessionStorage.getItem('selectCharater')!)){
-    character.value = JSON.parse(sessionStorage.getItem('selectCharater')!)
+    if (JSON.parse(sessionStorage.getItem('selectCharater')!)) {
+      const c = JSON.parse(sessionStorage.getItem('selectCharater')!)
+      if (c.speed > 4 || c.speed < 2 || c.startLength > 5 || c.startLength < 1) {
+        character.value = charStore.chars[0]
+      } else {
+        character.value = JSON.parse(sessionStorage.getItem('selectCharater')!)
+      }
     }
     interval.value = character.value!.attributes.speed
     //in geval dat spel herbegint
@@ -131,7 +136,7 @@ export const usePlayStore = defineStore('play', () => {
         // startX = Math.floor(numCols / (2 + players.value.length * i))
 
         startX = Math.floor(0)
-        startY = Math.floor((numRows / 2) - 1)
+        startY = Math.floor(numRows / 2 - 1)
         direction.value = 'up'
       } else if (players.value[1] && players.value[1].id === params.playerId) {
         startX = Math.floor(numCols - 1)
@@ -172,7 +177,7 @@ export const usePlayStore = defineStore('play', () => {
 
   //eindigt de game ALLEEN VOOR DE GEBRUIKER en wordt spectator
   const endGame = () => {
-    if(playerAlive.value){
+    if (playerAlive.value) {
       console.log('game over')
       gameOver.value = true
       playerAlive.value = false
@@ -184,17 +189,17 @@ export const usePlayStore = defineStore('play', () => {
       gameMusic.value.pause()
       //send player id and game id
       //socket?.emit('playerDied', params.playerId, params.gameId)
-      console.log('emitting player died' + params.playerId + " " + params.id)
+      console.log('emitting player died' + params.playerId + ' ' + params.id)
       socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
       // Play end game sound
       endGameSound.value.currentTime = 0
       endGameSound.value.play().catch(() => {
-      console.error('Something went wrong')
-    })
+        console.error('Something went wrong')
+      })
 
-    //removePlayer()
+      //removePlayer()
 
-    /*alert('game over!')
+      /*alert('game over!')
     restartGame()*/
     } else {
       console.log('player already dead')
@@ -247,20 +252,18 @@ export const usePlayStore = defineStore('play', () => {
     console.log(`Game Over! Player ${winningPlayerId} wins!`)
   })
 
-
   function removePlayer() {
     //playerAlive.value = false
     console.log('inside removeplayer')
-    if(playerAlive.value){
+    if (playerAlive.value) {
       endGame()
       console.log('player died')
 
-    //snake.value = [] // Assign an empty array to snake.value
-    //socket?.emit('sendPlayerData', snake.value, params.playerId)
+      //snake.value = [] // Assign an empty array to snake.value
+      //socket?.emit('sendPlayerData', snake.value, params.playerId)
 
-    //socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
+      //socket?.emit('playerDied', params.playerId, params.id) // Send player died event to server
     }
-    
   }
 
   //herstart de game
@@ -449,12 +452,12 @@ export const usePlayStore = defineStore('play', () => {
           e.data.forEach((segment) => {
             const { x, y } = segment
 
-            if(segment === e.data[0]) {
+            if (segment === e.data[0]) {
               gameGrid.value[y][x] = 'enemy-head'
             } else {
               gameGrid.value[y][x] = 'enemy'
             }
-            
+
             if (e.ghosted) {
               gameGrid.value[y][x] = 'ghostedEnemy'
             }
@@ -481,7 +484,7 @@ export const usePlayStore = defineStore('play', () => {
     // })
     // console.log(socket)
     socketInterval = setInterval(() => {
-      if(playerAlive.value){
+      if (playerAlive.value) {
         socket?.emit('sendPlayerData', snake.value, params.playerId)
       }
       socket?.emit('getPlayerData', params.id)
@@ -494,7 +497,6 @@ export const usePlayStore = defineStore('play', () => {
     }, 50)
 
     socket?.on('getData', (snake) => {
-      
       if (params.playerId !== snake.id) {
         // console.log('enemy snake moved!')
         // console.log(snake)
@@ -514,25 +516,25 @@ export const usePlayStore = defineStore('play', () => {
     socket?.on('someoneDied', (id) => {
       console.log('inside player died from socket')
       players.value.forEach((e) => {
-      console.log(players.value)
-      if (e.id === id) {
-        //e.invisible = true
-        e.alive = false
-        e.data = []
-        console.log('other player died')
-      }
-      })
-      if (id === params.playerId) {
-      //invisible.value = true
-      console.log('own snake died')
-      snake.value = []
-      playerAlive.value = false
-      //put yourself as alive false in players by checking id
-      players.value.forEach((e) => {
-        if (e.id === params.playerId) {
+        console.log(players.value)
+        if (e.id === id) {
+          //e.invisible = true
           e.alive = false
+          e.data = []
+          console.log('other player died')
         }
       })
+      if (id === params.playerId) {
+        //invisible.value = true
+        console.log('own snake died')
+        snake.value = []
+        playerAlive.value = false
+        //put yourself as alive false in players by checking id
+        players.value.forEach((e) => {
+          if (e.id === params.playerId) {
+            e.alive = false
+          }
+        })
       }
     })
   }
@@ -542,11 +544,11 @@ export const usePlayStore = defineStore('play', () => {
     startInterval()
     //deleting all walls incase they were placed last round
     //checking modes and maps and listening to server to run logic
-    socket?.emit('checkModeMap',  params.id)
+    socket?.emit('checkModeMap', params.id)
 
     //reset all players alive in the server aswell in case they are still in the same lobby
     socket?.emit('resetPlayersAlive', params.id)
-    
+
     playerAlive.value = true
     //if the gamemode is limited-time
     socket?.on('setTimeLimit', () => {
@@ -556,10 +558,10 @@ export const usePlayStore = defineStore('play', () => {
 
     // Listen for the walls event from the server
     socket?.on('wallsGenerated', (walls: Array<{ x: number; y: number }>) => {
-    console.log('Walls received from server:', obstacles);
-    obstacles.value = walls
-    });
-    
+      console.log('Walls received from server:', obstacles)
+      obstacles.value = walls
+    })
+
     socket?.on('generatePowerUps', () => {
       powerUpTimeOut = setTimeout(() => {
         if (players.value[0].id === params.playerId) {
@@ -581,9 +583,9 @@ export const usePlayStore = defineStore('play', () => {
     }
     */
 
-     socket?.on('teleportFalse', () => {
+    socket?.on('teleportFalse', () => {
       teleports.value = false
-     })
+    })
 
     // Genereer eerste voedsel
     generateFood()
@@ -668,11 +670,11 @@ export const usePlayStore = defineStore('play', () => {
           checkCollisions()
           moveSnake()
           checkCollisions()
-        } 
+        }
         if (!gameOver.value) {
           updateGameGrid()
         }
-        
+
         /*else {
           console.log('calling endgame from inside interval constantly')
           endGame()
@@ -819,7 +821,7 @@ export const usePlayStore = defineStore('play', () => {
       obstacles.value.forEach((obstacle) => {
         if (head.x === obstacle.x && head.y === obstacle.y) {
           //gameOver.value = true
-        removePlayer()
+          removePlayer()
           return
         }
       })
@@ -828,26 +830,26 @@ export const usePlayStore = defineStore('play', () => {
       for (let i = 1; i < snake.value.length; i++) {
         if (head.x === snake.value[i].x && head.y === snake.value[i].y) {
           //gameOver.value = true
-        removePlayer()
+          removePlayer()
           return
         }
       }
 
       // Controleer botsingen met andere snake
       //if (players.value.length > 1) {
-        players.value.forEach((e) => {
-          if (e.id !== params.playerId) { // && players.value.length > 1
-            for (let i = 1; i < e.data.length; i++) {
-              if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
-                //gameOver.value = true
-                removePlayer()
-                return
-              }
+      players.value.forEach((e) => {
+        if (e.id !== params.playerId) {
+          // && players.value.length > 1
+          for (let i = 1; i < e.data.length; i++) {
+            if (head.x === e.data[i].x && head.y === e.data[i].y && !e.ghosted) {
+              //gameOver.value = true
+              removePlayer()
+              return
             }
           }
-        })
+        }
+      })
       //}
-
 
       // for (let i = 1; i < enemySnake.value.length; i++) {
       //   if (head.x === enemySnake.value[i].x && head.y === enemySnake.value[i].y) {
@@ -856,7 +858,7 @@ export const usePlayStore = defineStore('play', () => {
       //   }
       // }
 
-      // Controleer botsingen met andere snake head 
+      // Controleer botsingen met andere snake head
       //alleen controleren op spelers die nog leven
 
       players.value.forEach((e) => {
@@ -904,7 +906,7 @@ export const usePlayStore = defineStore('play', () => {
     //hier is de error na dood
     // Plaats de slangen op het speelveld
 
-    if(playerAlive.value){
+    if (playerAlive.value) {
       snake.value.forEach((segment) => {
         if (segment === snake.value[0]) {
           const { x, y } = segment
@@ -946,9 +948,8 @@ export const usePlayStore = defineStore('play', () => {
 
     socket?.on('endGame', (winnerId, gameId) => {
       console.log('game ended')
-      if(gameId === params.id)
-      endGlobal()
-      
+      if (gameId === params.id) endGlobal()
+
       //socket?.emit('gameOver', params.playerId)
       console.log(`Game Over! Player ${winnerId} wins!`)
     })
@@ -960,7 +961,6 @@ export const usePlayStore = defineStore('play', () => {
     socket?.emit('leaveGameInProgress', params.id)
     router.push('/')
   }
-  
 
   // Start the timer
   function startTimer() {
