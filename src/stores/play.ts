@@ -91,12 +91,7 @@ export const usePlayStore = defineStore('play', () => {
     console.log(params.playerId)
     console.log(players.value)
     //Sla de geselecteerde character op
-    character.value = {
-      id: 1,
-      name: 'Speedy',
-      attributes: { speed: 1, startLength: 4, lives: 1 },
-      imgUrl: ""
-    }
+    character.value = charStore.chars[0]
     if(JSON.parse(sessionStorage.getItem('selectCharater')!)){
     character.value = JSON.parse(sessionStorage.getItem('selectCharater')!)
     }
@@ -1020,6 +1015,8 @@ export const usePlayStore = defineStore('play', () => {
     moveSnakeLeft,
     playerAlive,
     players,
-    winnerName
+    winnerName,
+    gameLoopInterval,
+    socketInterval
   }
 })

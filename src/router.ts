@@ -16,6 +16,7 @@ import { useAuthStore } from './stores/auth'
 import { authGuard } from './guards/authGuard'
 import { loginGuard } from './guards/loginGuard'
 import { ref } from 'vue'
+import { resetIntervalGuard } from './guards/gameGuard'
 
 const autoLoggedIn = ref<boolean>(false)
 
@@ -25,7 +26,8 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      beforeEnter: [resetIntervalGuard]
     },
     {
       path: '/character-select',
@@ -35,50 +37,55 @@ const router = createRouter({
     {
       path: '/play',
       name: 'play',
-      component: PlayView
+      component: PlayView,
     },
     {
       path: '/find-game',
       name: 'find-game',
-      component: FindGame
+      component: FindGame,
+      beforeEnter: [resetIntervalGuard]
     },
     {
       path: '/create-room',
       name: 'create-room',
-      component: CreateRoomView
+      component: CreateRoomView,
+      beforeEnter: [resetIntervalGuard]
     },
     {
       path: '/skins',
       name: 'skins',
-      component: SkinsView
+      component: SkinsView,
+      beforeEnter: [resetIntervalGuard]
     },{
       path: '/leaderboard',
       name: 'leaderboard',
-      component: LeaderboardView
+      component: LeaderboardView,
+      beforeEnter: [resetIntervalGuard]
     },
     {
       path: '/settings',
       name: 'settings',
-      component: SettingsView
+      component: SettingsView,
+      beforeEnter: [resetIntervalGuard]
     },
     {
       path: '/profile',
       name: 'profile',
       component: ProfileView,
       meta: { requiresAuth: true },
-      beforeEnter: [authGuard]
+      beforeEnter: [authGuard, resetIntervalGuard]
     },
     {
       path: '/login',
       name: 'login',
       component: LoginView,
-      beforeEnter: [loginGuard]
+      beforeEnter: [loginGuard, resetIntervalGuard]
     },
     {
       path: '/register',
       name: 'register',
       component: RegisterView,
-      beforeEnter: [loginGuard]
+      beforeEnter: [loginGuard, resetIntervalGuard]
     },
     {
       path: '/redirect',

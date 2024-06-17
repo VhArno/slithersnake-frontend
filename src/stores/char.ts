@@ -16,19 +16,19 @@ export const useCharStore = defineStore('char', () => {
   },{
     id: 2,
     name: 'SlowBoy',
-    attributes: { speed: 2, startLength: 2, lives: 2 },
+    attributes: { speed: 2, startLength: 3, lives: 2 },
     imgUrl: ""
   }, {
     id: 3,
     name: 'LongNeck',
-    attributes: { speed: 3, startLength: 6, lives: 1 },
+    attributes: { speed: 3, startLength: 5, lives: 1 },
     imgUrl: ""
   }])
 
   const selectedCharacter = ref<Character>({
     id: 1,
     name: 'Speedy',
-    attributes: { speed: 1, startLength: 4, lives: 1 },
+    attributes: { speed: 4, startLength: 1, lives: 1 },
     imgUrl: ""
   })
 
