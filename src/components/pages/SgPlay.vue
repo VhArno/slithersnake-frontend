@@ -155,7 +155,6 @@ onBeforeUnmount(() => {
   socket.off('teleportTrue')
   socket.off('teleportFalse')
   socket.off('showFood')
-  socket.off('setPowerUpAvailability')
   socket.off('endGame')
   socket.off('gameOver')
   socket.off('getData')
