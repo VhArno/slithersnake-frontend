@@ -17,7 +17,7 @@ const calcWinRate = (played: number, won: number) => {
 
   gamesPlayed = gamesPlayed === 0 ? 1 : gamesPlayed;
   
-  return gamesWon / gamesPlayed;
+  return (gamesWon / gamesPlayed).toFixed(2);
 }
 
 watch(sort, () => {
