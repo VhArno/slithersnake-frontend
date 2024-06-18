@@ -38,6 +38,7 @@ const router = createRouter({
       path: '/play',
       name: 'play',
       component: PlayView,
+      beforeEnter: [resetIntervalGuard]
     },
     {
       path: '/find-game',

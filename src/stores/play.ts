@@ -87,7 +87,7 @@ export const usePlayStore = defineStore('play', () => {
   function initializeGame() {
     params = useUrlSearchParams('history')
     players.value = JSON.parse(sessionStorage.getItem('players')!)
-    players.value.forEach((e) => e.score = -1)
+    players.value.forEach((e) => e.score = 0)
     playerCount.value = players.value.length
     console.log(params.playerId)
     console.log(players.value)
@@ -95,7 +95,8 @@ export const usePlayStore = defineStore('play', () => {
     character.value = charStore.chars[0]
     if (JSON.parse(sessionStorage.getItem('selectCharater')!)) {
       const c = JSON.parse(sessionStorage.getItem('selectCharater')!)
-      if (c.speed > 4 || c.speed < 2 || c.startLength > 5 || c.startLength < 1) {
+      if (c.attributes.speed > 4 || c.attributes.speed < 2 || c.attributes.startLength > 6 || c.attributes.startLength < 1) {
+        console.log("tampered char")
         character.value = charStore.chars[0]
       } else {
         character.value = JSON.parse(sessionStorage.getItem('selectCharater')!)
@@ -182,9 +183,9 @@ export const usePlayStore = defineStore('play', () => {
       console.log('game over')
       gameOver.value = true
       playerAlive.value = false
-      //clearInterval(gameLoopInterval)
-      //clearInterval(socketInterval)
-      //clearInterval(timerInterval)
+      // clearInterval(gameLoopInterval)
+      // clearInterval(socketInterval)
+      // clearInterval(timerInterval)
       // Toon een game over bericht of handel het einde van het spel af
       // Pause game music
       gameMusic.value.pause()
@@ -225,6 +226,11 @@ export const usePlayStore = defineStore('play', () => {
     clearInterval(gameLoopInterval)
     clearInterval(socketInterval)
     clearInterval(timerInterval)
+
+    gameLoopInterval = setInterval(() => {})
+    socketInterval = setInterval(() => {})
+    timerInterval = setInterval(() => {})
+    // players.value.forEach((e) => e.score = -1)
 
     //check which player is still alive to give back winner
     players.value.forEach((e) => {
@@ -371,7 +377,7 @@ export const usePlayStore = defineStore('play', () => {
       2000 / (interval.value * 2)
     )
 
-    // Stop the interval after 30 seconds
+    // Stop the interval after 10 seconds
     setTimeout(() => {
       clearInterval(intervalId)
       powerUpActive.value = false
@@ -493,7 +499,7 @@ export const usePlayStore = defineStore('play', () => {
       if (!gameOver.value) {
         updateGameGrid()
       } else {
-        endGame()
+        endGlobal()
       }
     }, 50)
 
@@ -592,8 +598,16 @@ export const usePlayStore = defineStore('play', () => {
     generateFood()
 
     socket?.on('showFood', (foodX, foodY, id) => {
-      console.log(id)
       food.value = { x: foodX, y: foodY }
+      // players.value.forEach((e) => {
+      //   if(e.id === id){
+      //     e.score++
+      //     console.log(e.score + e.id)
+      //   }
+      // })
+    })
+
+    socket?.on('updateScores', (id) => {
       players.value.forEach((e) => {
         if(e.id === id){
           e.score++
@@ -807,6 +821,7 @@ export const usePlayStore = defineStore('play', () => {
 
   function FoodCollision() {
     score.value++
+    socket?.emit('updateScores', params.id, params.playerId)
     // Play pick up sound
     pickupSound.value.currentTime = 0
     pickupSound.value.play().catch(() => {
@@ -959,7 +974,7 @@ export const usePlayStore = defineStore('play', () => {
 
     socket?.on('endGame', (winnerId, gameId) => {
       console.log('game ended')
-      if (gameId === params.id) endGlobal()
+      if (gameId === params.id){ endGlobal()}
 
       //socket?.emit('gameOver', params.playerId)
       console.log(`Game Over! Player ${winnerId} wins!`)
