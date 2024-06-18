@@ -87,6 +87,7 @@ export const usePlayStore = defineStore('play', () => {
   function initializeGame() {
     params = useUrlSearchParams('history')
     players.value = JSON.parse(sessionStorage.getItem('players')!)
+    players.value.forEach((e) => e.score = -1)
     playerCount.value = players.value.length
     console.log(params.playerId)
     console.log(players.value)
@@ -280,7 +281,7 @@ export const usePlayStore = defineStore('play', () => {
       foodY = Math.floor(Math.random() * numRows)
     } while (gameGrid.value[foodY][foodX] !== 'empty')
 
-    socket?.emit('generateFood', foodX, foodY, params.id)
+    socket?.emit('generateFood', foodX, foodY, params.id, params.playerId)
   }
 
   /*
@@ -590,8 +591,15 @@ export const usePlayStore = defineStore('play', () => {
     // Genereer eerste voedsel
     generateFood()
 
-    socket?.on('showFood', (foodX, foodY) => {
+    socket?.on('showFood', (foodX, foodY, id) => {
+      console.log(id)
       food.value = { x: foodX, y: foodY }
+      players.value.forEach((e) => {
+        if(e.id === id){
+          e.score++
+          console.log(e.score + e.id)
+        }
+      })
     })
 
     socket?.on('showPowerUp', (powerX, powerY, random) => {

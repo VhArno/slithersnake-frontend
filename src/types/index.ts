@@ -58,6 +58,7 @@ export interface IngamePlayer {
   ghosted: boolean
   invisible: boolean
   data: Array<{ x: number; y: number }>
+  score: number
   alive: boolean
 }
 

@@ -178,7 +178,8 @@ onBeforeUnmount(() => {
         <!--<span>{{ playStore.score }}</span>-->
         <li class="players-list" v-for="player in players" :key="player.id">
           <span>{{ player.username }} (lvl. {{ player.level }}): {{ player.alive ? 'alive' : 'spectating' }}</span>
-          <span>{{ playStore.score }}</span>
+          <span v-if="player.score >= 0">{{ player.score }}</span>
+          <span v-else>0</span>
         </li>
       </div>
 

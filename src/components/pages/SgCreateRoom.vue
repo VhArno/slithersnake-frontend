@@ -266,7 +266,11 @@ const nextMode = () => {
 }
 
 const charRange = ref<number>(0)
-  sessionStorage.setItem("selectCharater", JSON.stringify(charStore.chars[0]));
+// if(JSON.parse(sessionStorage.getItem('selectCharater')!)){
+//   charRange.value = charStore.chars.indexOf(JSON.parse(sessionStorage.getItem('selectCharater')!))
+//   console.log(charRange.value)
+// }
+sessionStorage.setItem("selectCharater", JSON.stringify(charStore.chars[0]));
 
 // Method to switch to previous character
 const prevChar = () => {
