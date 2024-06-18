@@ -126,7 +126,7 @@ const backToLobby = () => {
 }
 
 const postUserData = () => {
-  if (useAuthStore().isAuthenticated) {
+  if (useAuthStore().isAuthenticated && playStore.players.length >= 2) {
     playStore.saveUserDuelData({
       duel_id: duelId.value,
       score: playStore.score,
