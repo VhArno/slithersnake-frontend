@@ -171,7 +171,7 @@ onBeforeUnmount(() => {
 
     <div class="game-over countdown" v-if="playStore.gameOver">
       <p>Game over!</p>
-      <p v-show="winnerName">Winner is: {{ winnerName }}</p>
+      <p v-show="winnerName && playStore.players.length >= 2">Winner is: {{ winnerName }}</p>
       <SgButton v-if="isCreator" @click="backToLobby()">Go back to lobby</SgButton>
       <SgButton @click="playStore.leaveGame">Leave game</SgButton>
     </div>
