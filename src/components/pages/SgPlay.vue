@@ -158,7 +158,7 @@ onBeforeUnmount(() => {
   socket.off('endGame')
   socket.off('gameOver')
   socket.off('getData')
-  socket.off('someoneDied')
+  socket.off('playerDied')
   socket.off('setTimeLimit')
 })
 </script>

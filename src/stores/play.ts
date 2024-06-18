@@ -95,7 +95,7 @@ export const usePlayStore = defineStore('play', () => {
     character.value = charStore.chars[0]
     if (JSON.parse(sessionStorage.getItem('selectCharater')!)) {
       const c = JSON.parse(sessionStorage.getItem('selectCharater')!)
-      if (c.attributes.speed > 4 || c.attributes.speed < 2 || c.attributes.startLength > 6 || c.attributes.startLength < 1) {
+      if (c.attributes.speed > 4 || c.attributes.speed < 1.5 || c.attributes.startLength > 6 || c.attributes.startLength < 1) {
         console.log("tampered char")
         character.value = charStore.chars[0]
       } else {
@@ -520,7 +520,7 @@ export const usePlayStore = defineStore('play', () => {
     // socket?.on('sendData', () => {
     //   console.log('player data sent')
     // })
-    socket?.on('someoneDied', (id) => {
+    socket?.on('playerDied', (id) => {
       console.log('inside player died from socket')
       players.value.forEach((e) => {
         console.log(players.value)
