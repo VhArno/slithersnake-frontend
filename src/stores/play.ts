@@ -444,7 +444,8 @@ export const usePlayStore = defineStore('play', () => {
         ghost()
         break
       case 3:
-        invisibility()
+        //getting speed
+        speedBoost()
         break
       case 4:
         magnetApple()
